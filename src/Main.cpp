@@ -1,4 +1,5 @@
 #include "MainComponent.h"
+#include "MyColours.h"
 
 //==============================================================================
 class GuiAppApplication final : public juce::JUCEApplication
@@ -14,6 +15,7 @@ public:
     //==============================================================================
     void initialise (const juce::String& commandLine) override
     {
+        MyColours::setDefaultTheme();
         juce::ignoreUnused (commandLine);
 
         mainWindow.reset (new MainWindow (getApplicationName()));

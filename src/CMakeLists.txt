@@ -5,6 +5,8 @@ juce_add_gui_app(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
     PRIVATE
+        MyColours.cpp
+        MyTestComponent.cpp
         Main.cpp
         MainComponent.cpp)
 
