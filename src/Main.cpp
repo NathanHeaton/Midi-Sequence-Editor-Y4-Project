@@ -7,7 +7,6 @@ class GuiAppApplication final : public juce::JUCEApplication
 public:
     //==============================================================================
     GuiAppApplication() {}
-
     const juce::String getApplicationName() override       { return JUCE_APPLICATION_NAME_STRING; }
     const juce::String getApplicationVersion() override    { return JUCE_APPLICATION_VERSION_STRING; }
     bool moreThanOneInstanceAllowed() override             { return true; }
@@ -17,7 +16,6 @@ public:
     {
         MyColours::setDefaultTheme();
         juce::ignoreUnused (commandLine);
-
         mainWindow.reset (new MainWindow (getApplicationName()));
     }
 

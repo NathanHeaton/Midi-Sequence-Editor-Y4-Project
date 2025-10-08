@@ -1,10 +1,14 @@
 set(JUMAKE_TEMPLATE "GuiApplication")
 
+set(JUCE_ENABLE_LTO OFF)
+
 juce_add_gui_app(${PROJECT_NAME}
     PRODUCT_NAME ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
     PRIVATE
+        filePicker.cpp
+        MidiFileManager.cpp
         MyColours.cpp
         MyTestComponent.cpp
         Main.cpp

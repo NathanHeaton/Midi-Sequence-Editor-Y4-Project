@@ -2,7 +2,8 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-class MainComponent final : public juce::Component
+class MainComponent final : public juce::Component,
+                            private juce::Button::Listener
 {
 public:
     MainComponent();
@@ -11,5 +12,11 @@ public:
     void resized() override;
 
 private:
+
+    juce::TextButton openFileButton { "open Midi"};
+
+    void buttonClicked (juce::Button* button) override;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+
 };
