@@ -43,8 +43,9 @@ void MainComponent::buttonClicked(juce::Button* button)
                 juce::File chosen = fc.getResult();
                 if (chosen.existsAsFile())
                 {
+                    MidiFileManager midiFileManage;
                     DBG("Async selected file: " + chosen.getFullPathName());
-                    MidiFileManager::loadFile(chosen);
+                    midiFileManage.loadFile(chosen);
                 }
             });
 

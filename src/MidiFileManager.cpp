@@ -14,7 +14,19 @@ std::string findMidiFile()
 }
 
 
-void MidiFileManager::loadFile(juce::File file)
+void MidiFileManager::loadFile(juce::File& file)
 {
-    std::cout<<file.getFullPathName()<<std::endl;
+    createMidiProjectFolder();
+
+    juce::File copyPlace("midi_files/" + file.getFileName());
+    
+    file.copyFileTo(copyPlace);
+
+}
+
+
+void MidiFileManager::createMidiProjectFolder()
+{
+    juce::File copyPlace("midi_files/"); // changes this later
+    copyPlace.createDirectory();
 }

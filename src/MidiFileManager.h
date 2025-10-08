@@ -13,7 +13,8 @@ public:
     MidiFileManager();
     ~MidiFileManager();
     std::string getMidiFile();
-    static void loadFile(juce::File file);
+    void loadFile(juce::File& file);
+    void createMidiProjectFolder();
 
 private:
     std::string findMidiFile();
