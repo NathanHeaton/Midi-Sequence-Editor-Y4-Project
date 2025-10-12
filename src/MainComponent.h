@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "UI/boxComponent.h"
 
 class MainComponent final : public juce::Component,
                             private juce::Button::Listener
@@ -10,6 +11,8 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+
+    boxComponent testBox;
 
 private:
 

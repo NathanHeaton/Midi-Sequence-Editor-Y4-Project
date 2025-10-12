@@ -1,5 +1,5 @@
 #include "MainComponent.h"
-#include "MyColours.h"
+#include "Misc/MyColours.h"
 
 //==============================================================================
 class GuiAppApplication final : public juce::JUCEApplication

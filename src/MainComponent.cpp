@@ -1,11 +1,15 @@
 #include "MainComponent.h"
-#include "MyColours.h"
-#include "MidiFileManager.h"
+#include "Misc/MyColours.h"
+#include "MIDI_Logic/MidiFileManager.h"
+
 
 
 MainComponent::MainComponent()
 {
     addAndMakeVisible(openFileButton);
+
+    addAndMakeVisible(testBox);
+
     openFileButton.addListener(this);
     setSize (1960, 1080);
 }
@@ -24,6 +28,7 @@ void MainComponent::paint (juce::Graphics& g)
 void MainComponent::resized()
 {
     openFileButton.setBounds(15,15, 100, 15);
+    testBox.setBounds(100,100,100,100);
 }
 
 
