@@ -14,8 +14,12 @@ public:
 private:
 
     juce::TextButton openFileButton { "open Midi"};
+    juce::TextButton testButton {"test!"};
+    juce::DrawableRectangle testAngle;
 
     void buttonClicked (juce::Button* button) override;
+
+    void addUIAndMakeVisible();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 

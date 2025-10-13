@@ -14,11 +14,11 @@ public:
     ~MidiFileManager();
     std::string getMidiFile();
     void loadFile(juce::File& file);
-    void createMidiProjectFolder();
+
 
 private:
-    std::string findMidiFile();
-
+    void createMidiProjectFolder();
+    void readMidiFile();
 
 };
 

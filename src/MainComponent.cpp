@@ -6,6 +6,9 @@
 MainComponent::MainComponent()
 {
     addAndMakeVisible(openFileButton);
+    addAndMakeVisible(testButton);
+    addAndMakeVisible(testAngle);
+    
     openFileButton.addListener(this);
     setSize (1960, 1080);
 }
@@ -15,15 +18,16 @@ void MainComponent::paint (juce::Graphics& g)
 {
 
     g.fillAll (MyColours::background);
-
     g.setFont (juce::FontOptions (30.0f));
-    g.setColour (juce::Colours::white);
-    g.drawText ("Test Project", getLocalBounds(), juce::Justification::centred, true);
+    g.setColour (MyColours::textPri);
+    g.drawText ("Midi Sequence Editor", getLocalBounds(), juce::Justification::centred, true);
 }
 
 void MainComponent::resized()
 {
-    openFileButton.setBounds(15,15, 100, 15);
+    openFileButton.setBounds(30,30, 100, 30);
+    testButton.setBounds(130,30,100,30);
+    testAngle.setBounds(200, 50,50,50);
 }
 
 
@@ -50,4 +54,8 @@ void MainComponent::buttonClicked(juce::Button* button)
             });
 
     }
+}
+
+void addUIAndMakeVisable()
+{
 }

@@ -7,7 +7,6 @@ juce_add_gui_app(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        filePicker.cpp
         MidiFileManager.cpp
         MyColours.cpp
         MyTestComponent.cpp

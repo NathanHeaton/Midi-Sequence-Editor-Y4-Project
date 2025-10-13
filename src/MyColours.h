@@ -10,6 +10,8 @@ class MyColours
         static juce::Colour textPri;
         static juce::Colour textSce;
         static juce::Colour backgroundAlt;
+        static juce::Colour outline;
+        static juce::Colour accent;
 
         static void setDefaultTheme();
         
