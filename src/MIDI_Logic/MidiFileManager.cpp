@@ -8,20 +8,18 @@ MidiFileManager::~MidiFileManager()
 {
 }
 
-std::string findMidiFile()
-{
-    return "0";
-}
-
+std::string MidiFileManager::getMidiFile(){return m_fileName;}
 
 void MidiFileManager::loadFile(juce::File& file)
 {
     createMidiProjectFolder();
 
     juce::File copyPlace("midi_files/" + file.getFileName());
-    
+    m_fileName = file.getFileName().toStdString();
+
     file.copyFileTo(copyPlace);
     m_midiFile = file;
+    sendChangeMessage();
 
     readMidiFile();
 }

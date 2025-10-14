@@ -1,21 +1,35 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "UI/boxComponent.h"
+#include "MIDI_Logic/MidiFileManager.h"
 
 class MainComponent final : public juce::Component,
-                            private juce::Button::Listener
+                            private juce::Button::Listener,
+                            public juce::ChangeListener
 {
 public:
-    MainComponent();
+    // Vars
+    boxComponent testBox;
 
+    MainComponent();
     void paint (juce::Graphics&) override;
     void resized() override;
 
-private:
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override
+    {
+        if(source == &midifileManager)
+        {
+            testBox.change_text("changing Text");
+        }
+    }
 
+private:
+    MidiFileManager midifileManager;
     juce::TextButton openFileButton { "open Midi"};
     juce::TextButton testButton {"test!"};
     juce::DrawableRectangle testAngle;
+    
 
     void buttonClicked (juce::Button* button) override;
 

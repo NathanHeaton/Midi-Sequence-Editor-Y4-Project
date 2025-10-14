@@ -3,11 +3,12 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <iostream>
 
-class MidiFileManager
+class MidiFileManager : public juce::ChangeBroadcaster
 {
 public:
     // variables
     juce::File m_midiFile;
+    std::string m_fileName;
 
     // functions
     MidiFileManager();

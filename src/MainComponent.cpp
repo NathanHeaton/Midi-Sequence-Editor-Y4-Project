@@ -1,14 +1,15 @@
 #include "MainComponent.h"
-#include "MyColours.h"
-#include "MidiFileManager.h"
+#include "Misc/MyColours.h"
+#include "MIDI_Logic/MidiFileManager.h"
+
 
 
 MainComponent::MainComponent()
 {
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
-    addAndMakeVisible(testAngle);
-    
+    addAndMakeVisible(testBox);
+
     openFileButton.addListener(this);
     setSize (1960, 1080);
 }
@@ -18,16 +19,20 @@ void MainComponent::paint (juce::Graphics& g)
 {
 
     g.fillAll (MyColours::background);
-    g.setFont (juce::FontOptions (30.0f));
-    g.setColour (MyColours::textPri);
-    g.drawText ("Midi Sequence Editor", getLocalBounds(), juce::Justification::centred, true);
+    g.setFont (juce::FontOptions (45.0f));
+    g.setColour (juce::Colours::white);
+    g.drawText ("Test Project", getLocalBounds(), juce::Justification::centred, true);
 }
 
 void MainComponent::resized()
 {
+    //buttons
     openFileButton.setBounds(30,30, 100, 30);
     testButton.setBounds(130,30,100,30);
-    testAngle.setBounds(200, 50,50,50);
+
+    // boxes
+    testBox.setBounds(getLocalBounds().withHeight(400).reduced(10).withTrimmedTop(100));
+
 }
 
 
