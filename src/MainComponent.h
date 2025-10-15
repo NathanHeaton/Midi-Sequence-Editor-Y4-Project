@@ -3,6 +3,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "UI/boxComponent.h"
 #include "MIDI_Logic/MidiFileManager.h"
+#include <iostream>
 
 class MainComponent final : public juce::Component,
                             private juce::Button::Listener,
@@ -20,6 +21,7 @@ public:
     {
         if(source == &midifileManager)
         {
+            std::cout<<"observed change"<<std::endl;
             testBox.change_text("changing Text");
         }
     }

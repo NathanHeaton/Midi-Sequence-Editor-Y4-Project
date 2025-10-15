@@ -19,6 +19,8 @@ void MidiFileManager::loadFile(juce::File& file)
 
     file.copyFileTo(copyPlace);
     m_midiFile = file;
+    
+    std::cout<<"sending message"<<std::endl;
     sendChangeMessage();
 
     readMidiFile();

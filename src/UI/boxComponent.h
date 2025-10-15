@@ -8,7 +8,7 @@
 class boxComponent: public juce::Component
 {
 public:
-    std::string m_text{""};
+    std::string m_text{"test"};
 
     boxComponent();
     boxComponent(std::string text);
