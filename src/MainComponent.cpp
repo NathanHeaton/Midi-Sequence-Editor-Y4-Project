@@ -9,7 +9,8 @@ MainComponent::MainComponent()
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
     addAndMakeVisible(testBox);
-
+    test_function();
+    midifileManager.addChangeListener(this);
     openFileButton.addListener(this);
     setSize (1960, 1080);
 }
@@ -40,7 +41,7 @@ void MainComponent::buttonClicked(juce::Button* button)
 {
     if(button == &openFileButton)
     {
-        juce::File initalDir = juce::File::getCurrentWorkingDirectory();
+        juce::File initalDir = juce::File::getCurrentWorkingDirectory();    
 
         auto chooser = std::make_shared<juce::FileChooser>("choose a .midi or .mid file",
                                     initalDir ,
@@ -52,9 +53,8 @@ void MainComponent::buttonClicked(juce::Button* button)
                 juce::File chosen = fc.getResult();
                 if (chosen.existsAsFile())
                 {
-                    MidiFileManager midiFileManage;
                     DBG("Async selected file: " + chosen.getFullPathName());
-                    midiFileManage.loadFile(chosen);
+                    midifileManager.loadFile(chosen);
                 }
             });
 
