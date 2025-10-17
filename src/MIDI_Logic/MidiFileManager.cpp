@@ -38,13 +38,14 @@ void MidiFileManager::readMidiFile()
         juce::MemoryBlock data;
         stream.readIntoMemoryBlock(data);
 
-        auto* bytes = data.getData();
+        std::vector<uint8_t> bytes(
+            static_cast<const uint8_t*>(data.getData()),
+            static_cast<const uint8_t*>(data.getData()) + data.getSize()
+        );
         DBG(data.getSize());
-
-        for (size_t i = 0; i < data.getSize(); ++i)
-            DBG("Byte " << i << ": 0x" << generate8Bytes(bytes));
-
-
+        //for (size_t i = 0; i < data.getSize()/8; ++i)
+            //DBG(i << " 0x" << generate8Bytes(bytes,i));
+        ParsedMidi newMidiData(bytes);
     }
     else {
         DBG("file not opened");
@@ -52,10 +53,12 @@ void MidiFileManager::readMidiFile()
 
 }
 
-juce::String MidiFileManager::generate8Bytes(auto* bytes) {
+juce::String MidiFileManager::generate8Bytes(auto* bytes,int numBytes) {
     juce::String string8 = "";
-    for (size_t i = 0; i = 8; ++i) {
-        string8 += juce::String::toHexString(((const uint8_t*)bytes)[i]);
+    int batch = numBytes*8;
+    for (int i = 0+batch; i < 8+batch; ++i) {
+        string8 +=  (" " + juce::String::toHexString(static_cast<const uint8_t *>(bytes)[i]));
     }
     return string8;
 }
+

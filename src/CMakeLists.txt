@@ -1,7 +1,5 @@
 set(JUMAKE_TEMPLATE "GuiApplication")
 
-set(JUCE_ENABLE_LTO OFF)
-
 juce_add_gui_app(${PROJECT_NAME}
     PRODUCT_NAME ${PROJECT_NAME})
 
@@ -11,6 +9,8 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/Note.cpp
         MIDI_Logic/filePicker.cpp
         MIDI_Logic/MidiFileManager.cpp
+        MIDI_Logic/ParsedMidi.cpp
+        MIDI_Logic/TrackChunk.cpp
         Misc/MyColours.cpp
         Main.cpp
         MainComponent.cpp)
