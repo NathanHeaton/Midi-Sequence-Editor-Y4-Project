@@ -63,6 +63,19 @@
         "variant": "cpp",
         "__threading_support": "cpp",
         "__verbose_abort": "cpp",
-        "execution": "cpp"
+        "execution": "cpp",
+        "bitset": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "cstdarg": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "__bit_reference": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "print": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     }
 }

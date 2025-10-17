@@ -12,28 +12,33 @@ class MainComponent final : public juce::Component,
 public:
     // Vars
     boxComponent testBox;
-
+    MidiFileManager midifileManager;
     MainComponent();
     void paint (juce::Graphics&) override;
     void resized() override;
+
+    void test_function()
+    {
+        testBox.change_text("changing Text");
+    }
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override
     {
         if(source == &midifileManager)
         {
-            std::cout<<"observed change"<<std::endl;
-            testBox.change_text("changing Text");
+
+            testBox.change_text("setes");
         }
     }
 
 private:
-    MidiFileManager midifileManager;
+
     juce::TextButton openFileButton { "open Midi"};
     juce::TextButton testButton {"test!"};
     juce::DrawableRectangle testAngle;
     
 
-    void buttonClicked (juce::Button* button) override;
+    void buttonClicked(juce::Button* button) override;
 
     void addUIAndMakeVisible();
 

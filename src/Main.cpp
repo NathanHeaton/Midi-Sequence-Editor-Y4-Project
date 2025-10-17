@@ -10,10 +10,10 @@ public:
     const juce::String getApplicationName() override       { return JUCE_APPLICATION_NAME_STRING; }
     const juce::String getApplicationVersion() override    { return JUCE_APPLICATION_VERSION_STRING; }
     bool moreThanOneInstanceAllowed() override             { return true; }
-
     //==============================================================================
     void initialise (const juce::String& commandLine) override
     {
+        DBG("test_output");
         MyColours::setDefaultTheme();
         juce::ignoreUnused (commandLine);
         mainWindow.reset (new MainWindow (getApplicationName()));
