@@ -5,6 +5,7 @@
 #include <juce_events/juce_events.h>
 #include <iostream>
 #include "ParsedMidi.h"
+#include  "../utils.h"
 
 class MidiFileManager : public juce::ChangeBroadcaster
 {

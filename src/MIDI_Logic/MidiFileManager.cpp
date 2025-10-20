@@ -1,5 +1,7 @@
 #include "MidiFileManager.h"
 
+#include <span>
+
 MidiFileManager::MidiFileManager()
 {
 
@@ -38,13 +40,20 @@ void MidiFileManager::readMidiFile()
         juce::MemoryBlock data;
         stream.readIntoMemoryBlock(data);
 
-        std::vector<uint8_t> bytes(
+        std::vector<uint8_t> bytes( // creates an std::vector of bytes contatined in the file
             static_cast<const uint8_t*>(data.getData()),
             static_cast<const uint8_t*>(data.getData()) + data.getSize()
         );
         DBG(data.getSize());
         //for (size_t i = 0; i < data.getSize()/8; ++i)
             //DBG(i << " 0x" << generate8Bytes(bytes,i));
+
+        if (vector_to_HexString(vector_slice(bytes,0,4)) == "4D5468640") {
+            DBG("valid file");
+        }
+        else {
+            DBG("file bytes are invalid: "<<vector_to_HexString(vector_slice(bytes,0,4)));
+        }
         ParsedMidi newMidiData(bytes);
     }
     else {

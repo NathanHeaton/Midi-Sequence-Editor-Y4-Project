@@ -9,7 +9,7 @@
 #include <iostream>
 #include <juce_core/juce_core.h>
 #include "juce_core/system/juce_PlatformDefs.h"
-
+#include  "../utils.h"
 
 
 class ParsedMidi {
@@ -27,6 +27,7 @@ class ParsedMidi {
     private:
     void createMidiChunk();
     void establishSMPTE();
+    void printMidiInfo();
 
 };
 
