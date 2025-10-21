@@ -24,9 +24,18 @@ class ParsedMidi {
     bool SMPTE_time;
     std::vector<uint8_t> m_headerChunkLength;
 
+    // track chunk
+    bool isTrackChunk;
+    std::vector<int> trackLength;
+
+
     int ticksInQuarterNote;
+    const juce::String CHUNK_TITLE_HEX = "4D54726B";
+    const int HEADER_END = 14;
     private:
-    void createMidiChunk();
+
+    void createMidiChunk(int trackStart);
+    void validateTrackChunk(int trackStart);
     void establishSMPTE();
     void printMidiInfo();
 

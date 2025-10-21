@@ -34,14 +34,12 @@ juce::String vector_to_HexString(std::vector<T> a) {
 
 // probably refactor this
 template <typename T>
-int bytes_to_int(std::vector<T> a) {
-    unsigned int hex;
-    for( int i = 0; i < a.size(); i++ ) {
-        hex += a.at(i);
+int vector_bytes_to_int(std::vector<T> a) {
+    int value;
+    for(uint i = 0; i < a.size(); i++) {
+        value = value << a[i] | i;
     }
-    auto c = stoi(std::format("{:d}", a[1]));
-
-    return c;
+    return value;
 }
 
 

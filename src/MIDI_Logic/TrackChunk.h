@@ -4,9 +4,12 @@
 
 #ifndef MYPROJECT_TRACKCHUNK_H
 #define MYPROJECT_TRACKCHUNK_H
+#include <cstdint>
 
 
 class TrackChunk {
+    private:
+    uint8_t m_trackBytes;
 };
 
 
