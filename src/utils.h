@@ -8,7 +8,7 @@
 #include <format>
 
 
-
+// returns a slice of a vector
 template <typename T>
 std::vector<T> vector_slice(std::vector<T> a,int start_point,int end_point ) {
     std::vector<T> b;
@@ -21,6 +21,7 @@ std::vector<T> vector_slice(std::vector<T> a,int start_point,int end_point ) {
     return b;
 }
 
+// returns bytes in a hes string
 template <typename T>
 juce::String vector_to_HexString(std::vector<T> a) {
     juce::String s;
@@ -30,5 +31,18 @@ juce::String vector_to_HexString(std::vector<T> a) {
 
     return s;
 }
+
+// probably refactor this
+template <typename T>
+int bytes_to_int(std::vector<T> a) {
+    unsigned int hex;
+    for( int i = 0; i < a.size(); i++ ) {
+        hex += a.at(i);
+    }
+    auto c = stoi(std::format("{:d}", a[1]));
+
+    return c;
+}
+
 
 #endif //MYPROJECT_UTILS_H

@@ -22,6 +22,7 @@ class ParsedMidi {
     int MIDI_FORMAT;
     int tracks;
     bool SMPTE_time;
+    std::vector<uint8_t> m_headerChunkLength;
 
     int ticksInQuarterNote;
     private:

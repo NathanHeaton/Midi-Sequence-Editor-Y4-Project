@@ -8,13 +8,12 @@
 
 ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     m_bytes = midi_bytes;
-    MIDI_FORMAT = m_bytes.at(8);
-    tracks =  m_bytes.at(9);
+    MIDI_FORMAT = bytes_to_int(vector_slice(m_bytes,8,9));
+    tracks =  bytes_to_int(vector_slice(m_bytes,10,11));
     SMPTE_time = false;
-    ticksInQuarterNote = 0;
+    ticksInQuarterNote = bytes_to_int(vector_slice(m_bytes,12,13));;
+    m_headerChunkLength = vector_slice(m_bytes,4,7);
     printMidiInfo();
-    std::vector<uint8_t> var = vector_slice(m_bytes,8,9999);
-
 }
 
 ParsedMidi::~ParsedMidi() {
@@ -34,5 +33,7 @@ void ParsedMidi::printMidiInfo() {
     DBG( "MIDI_FORMAT :" << MIDI_FORMAT);
     DBG( "Tracks :" << tracks);
     DBG( "smpte :" << std::to_string(SMPTE_time));
+    DBG( "ticksInQuarterNote:" << ticksInQuarterNote);
+    DBG( "m_headerChunkLength :" << bytes_to_int(m_headerChunkLength)<< " contents :"<< vector_to_HexString(m_headerChunkLength));
     DBG( "divisions :" << ticksInQuarterNote);
 }
