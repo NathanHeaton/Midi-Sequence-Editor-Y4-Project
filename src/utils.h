@@ -35,9 +35,19 @@ juce::String vector_to_HexString(std::vector<T> a) {
 // probably refactor this
 template <typename T>
 int vector_bytes_to_int(std::vector<T> a) {
-    int value;
-    for(uint i = 0; i < a.size(); i++) {
-        value = value << a[i] | i;
+    int value = 0;
+    int increment = 0;
+    std::vector<uint8_t> singleHexDigits;
+    for (uint8_t byte : a) {
+        uint8_t high = (byte >> 4) & 0x0F; // upper 4 bits
+        uint8_t low  = byte & 0x0F;        // lower 4 bits
+        singleHexDigits.push_back(high);
+        singleHexDigits.push_back(low);
+    }
+
+    for(int i = singleHexDigits.size()-1; i >= 0; i -= 1) {
+        value = value + (singleHexDigits.at(i) * pow(16,increment));
+        increment++;
     }
     return value;
 }
