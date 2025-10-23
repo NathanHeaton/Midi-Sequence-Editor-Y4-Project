@@ -26,6 +26,7 @@ class ParsedMidi {
 
     // track chunk
     bool isTrackChunk;
+    std::vector<int> track_start;
     std::vector<int> trackLength;
 
 
@@ -35,9 +36,10 @@ class ParsedMidi {
     private:
 
     void createMidiChunk(int trackStart);
-    void validateTrackChunk(int trackStart);
+    bool validateTrackChunk(int trackStart);
     void establishSMPTE();
     void printMidiInfo();
+    void get_length_of_tracks();
 
 };
 

@@ -10,15 +10,11 @@
 
 // returns a slice of a vector
 template <typename T>
-std::vector<T> vector_slice(std::vector<T> a,int start_point,int end_point ) {
-    std::vector<T> b;
-    for( int i = start_point; i <= end_point; i++ ) {
-        if( static_cast<unsigned int>(a.back()) > start_point + end_point ) {
-            throw std::invalid_argument("out of range");
-        }
-        b.insert(b.begin()+i - start_point,a[i]);
+std::vector<T> vector_slice(const std::vector<T>& a, int start_point, int end_point) {
+    if (start_point < 0 || end_point >= static_cast<int>(a.size()) || start_point > end_point) {
+        throw std::out_of_range("Invalid slice range");
     }
-    return b;
+    return std::vector<T>(a.begin() + start_point, a.begin() + end_point + 1);
 }
 
 // returns bytes in a hes string

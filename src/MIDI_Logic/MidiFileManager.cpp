@@ -40,7 +40,7 @@ void MidiFileManager::readMidiFile()
         juce::MemoryBlock data;
         stream.readIntoMemoryBlock(data);
 
-        std::vector<uint8_t> bytes( // creates an std::vector of bytes contatined in the file
+        std::vector<uint8_t> bytes( // creates a std::vector of bytes contatined in the file
             static_cast<const uint8_t*>(data.getData()),
             static_cast<const uint8_t*>(data.getData()) + data.getSize()
         );

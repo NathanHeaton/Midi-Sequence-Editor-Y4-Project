@@ -18,9 +18,10 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     if (MIDI_FORMAT == 0)
     {
         validateTrackChunk(HEADER_END);
+        track_start.push_back(HEADER_END);
     }
     else if (MIDI_FORMAT == 1) {
-
+        get_length_of_tracks();
     }
     else {
 
@@ -35,18 +36,53 @@ void ParsedMidi::createMidiChunk(int track) {
     DBG(vector_to_HexString(vector_slice(m_bytes,track,track+3)));
     trackLength.insert(trackLength.begin(),length);
     DBG("length: " << length );
-
 }
 
-void ParsedMidi::validateTrackChunk(int trackStart) {
+
+bool ParsedMidi::validateTrackChunk(int trackStart) {
 
     if (vector_to_HexString(vector_slice(m_bytes,trackStart,trackStart+3)) == CHUNK_TITLE_HEX ) {
-        createMidiChunk(trackStart+4);
+        return true;
     }
     else {
         DBG(vector_to_HexString(vector_slice(m_bytes,trackStart,trackStart+3)));
         DBG("Wrong track chunk size");
+        return false;
     }
+}
+
+
+void ParsedMidi::get_length_of_tracks() {
+
+    int byte = HEADER_END+4;
+
+    for (int i = 0; i < tracks; i++) {
+        std::vector<uint8_t> slice = vector_slice(m_bytes,byte,byte+3);
+        DBG(vector_to_HexString(slice));
+        int length = vector_bytes_to_int(slice);
+        trackLength.push_back(length);
+        DBG("track "<<i<<" length: " << length);
+        if (byte + length + 8 < m_bytes.size()  ) {
+            byte = byte + length + 4;
+            if (validateTrackChunk(byte)) {
+                DBG("chunk is valid");
+                byte = byte + 4;
+            }
+            DBG("byte: "<<byte);
+            DBG(vector_to_HexString(vector_slice(m_bytes,byte,byte+3)));
+        }
+        else {
+            DBG("about to go out side of file bounds");
+        }
+
+
+    }
+
+
+    for (int i = 0; i < trackLength.size(); i ++) {
+        //DBG("track length: " << trackLength.at(i));
+    }
+
 }
 
 
