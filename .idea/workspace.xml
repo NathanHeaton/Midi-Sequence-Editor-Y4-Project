@@ -27,13 +27,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/Note.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/Note.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +101,7 @@
       <option name="presentableId" value="Default" />
       <updated>1761481166212</updated>
       <workItem from="1761481168762" duration="196000" />
-      <workItem from="1761481379561" duration="3638000" />
+      <workItem from="1761481379561" duration="5938000" />
     </task>
     <servers />
   </component>

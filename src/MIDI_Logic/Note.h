@@ -12,6 +12,12 @@ public:
     int m_velocity;
     float m_pan;
 
+    uint8_t delta_time;
+    uint8_t status;
+    uint8_t event_type;
+    uint8_t channel;
+    uint8_t pitch;
+    uint8_t velocity;
     Note(int pitch, float start, float duration, int velocity, float pan);
     ~Note();
     
