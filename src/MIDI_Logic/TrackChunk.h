@@ -5,11 +5,22 @@
 #ifndef MYPROJECT_TRACKCHUNK_H
 #define MYPROJECT_TRACKCHUNK_H
 #include <cstdint>
-
+#include <vector>
+#include "Note.h"
+#include "../utils.h"
 
 class TrackChunk {
+    public:
+    TrackChunk(std::vector<uint8_t> bytes);
+    ~TrackChunk();
+    void printMidiInfo();
+    void createNoteEvents();
+
+    std::vector<Note> notes;
+
+    std::vector<uint8_t> m_trackBytes;
+
     private:
-    uint8_t m_trackBytes;
 };
 
 

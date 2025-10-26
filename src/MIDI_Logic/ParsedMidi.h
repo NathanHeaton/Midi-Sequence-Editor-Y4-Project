@@ -10,7 +10,7 @@
 #include <juce_core/juce_core.h>
 #include "juce_core/system/juce_PlatformDefs.h"
 #include  "../utils.h"
-
+#include  "TrackChunk.h"
 
 class ParsedMidi {
     public:
@@ -20,11 +20,13 @@ class ParsedMidi {
     //vars
     std::vector<uint8_t> m_bytes;
     int MIDI_FORMAT;
-    int tracks;
+    int num_of_tracks;
     bool SMPTE_time;
     std::vector<uint8_t> m_headerChunkLength;
 
     // track chunk
+    std::vector<TrackChunk> m_tracks;
+
     bool isTrackChunk;
     std::vector<int> track_start;
     std::vector<int> trackLength;
@@ -40,6 +42,7 @@ class ParsedMidi {
     void establishSMPTE();
     void printMidiInfo();
     void get_length_of_tracks();
+    int check_if_next_track_valid(int byte, int track_length);
 
 };
 

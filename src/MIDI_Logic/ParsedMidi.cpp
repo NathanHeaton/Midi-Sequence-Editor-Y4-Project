@@ -9,7 +9,7 @@
 ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     m_bytes = midi_bytes;
     MIDI_FORMAT = vector_bytes_to_int(vector_slice(m_bytes,8,9));
-    tracks =  vector_bytes_to_int(vector_slice(m_bytes,10,11));
+    num_of_tracks =  vector_bytes_to_int(vector_slice(m_bytes,10,11));
     SMPTE_time = false;
     ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));;
     m_headerChunkLength = vector_slice(m_bytes,4,7);
@@ -56,33 +56,40 @@ void ParsedMidi::get_length_of_tracks() {
 
     int byte = HEADER_END+4;
 
-    for (int i = 0; i < tracks; i++) {
+    for (int i = 0; i < num_of_tracks; i++) {
         std::vector<uint8_t> slice = vector_slice(m_bytes,byte,byte+3);
         DBG(vector_to_HexString(slice));
         int length = vector_bytes_to_int(slice);
         trackLength.push_back(length);
         DBG("track "<<i<<" length: " << length);
-        if (byte + length + 8 < m_bytes.size()  ) {
-            byte = byte + length + 4;
-            if (validateTrackChunk(byte)) {
-                DBG("chunk is valid");
-                byte = byte + 4;
-            }
-            DBG("byte: "<<byte);
-            DBG(vector_to_HexString(vector_slice(m_bytes,byte,byte+3)));
-        }
-        else {
-            DBG("about to go out side of file bounds");
-        }
 
+        std::vector<uint8_t> chunkBytes = vector_slice(m_bytes,byte+3,length);
 
+        TrackChunk newTrackChunk(chunkBytes);
+        m_tracks.push_back(newTrackChunk);
+        // move to next byte
+        byte = check_if_next_track_valid(byte,length);
     }
+}
 
-
-    for (int i = 0; i < trackLength.size(); i ++) {
-        //DBG("track length: " << trackLength.at(i));
+int ParsedMidi::check_if_next_track_valid(int byte,int track_length) {
+    if (byte + track_length + 8 < m_bytes.size()  ) {
+        byte = byte + track_length + 4;
+        if (validateTrackChunk(byte)) {
+            DBG("next chunk is valid");
+            byte = byte + 4;
+        }
+        DBG("byte: "<<byte);
+        DBG(vector_to_HexString(vector_slice(m_bytes,byte,byte+3)));
     }
-
+    else if (byte + track_length <= m_bytes.size()  ) {
+        DBG("EOF");
+    }
+    else {
+        DBG("accessing byte"<<byte+track_length);
+        DBG("about to go out side of file bounds");
+    }
+    return byte;
 }
 
 
@@ -91,7 +98,7 @@ void ParsedMidi::establishSMPTE() {
 }
 void ParsedMidi::printMidiInfo() {
     DBG( "MIDI_FORMAT :" << MIDI_FORMAT);
-    DBG( "Tracks :" << tracks);
+    DBG( "Tracks :" << num_of_tracks);
     DBG( "smpte :" << std::to_string(SMPTE_time));
     DBG( "ticksInQuarterNote:" << ticksInQuarterNote);
     DBG( "m_headerChunkLength :" << vector_bytes_to_int(m_headerChunkLength)<< " contents :"<< vector_to_HexString(m_headerChunkLength));
