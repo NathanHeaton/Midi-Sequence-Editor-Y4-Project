@@ -6,7 +6,8 @@
 #define MYPROJECT_TRACKCHUNK_H
 #include <cstdint>
 #include <vector>
-#include "Note.h"
+#include <juce_core/juce_core.h>
+#include "MIDI_Events/MidiEvent.h"
 #include "../utils.h"
 
 class TrackChunk {
@@ -15,8 +16,10 @@ class TrackChunk {
     ~TrackChunk();
     void printMidiInfo();
     void createNoteEvents();
+    short readVariableLength(size_t index);
 
-    std::vector<Note> notes;
+    std::vector<MidiEvent> Events;
+
 
     std::vector<uint8_t> m_trackBytes;
 
