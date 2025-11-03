@@ -8,12 +8,14 @@
 
 ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     m_bytes = midi_bytes;
+
     MIDI_FORMAT = vector_bytes_to_int(vector_slice(m_bytes,8,9));
     num_of_tracks =  vector_bytes_to_int(vector_slice(m_bytes,10,11));
     SMPTE_time = false;
-    ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));;
+    ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));
     m_headerChunkLength = vector_slice(m_bytes,4,7);
     printMidiInfo();
+
 
     if (MIDI_FORMAT == 0)
     {

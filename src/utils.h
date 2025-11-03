@@ -11,13 +11,15 @@
 // returns a slice of a vector
 template <typename T>
 std::vector<T> vector_slice(const std::vector<T>& a, int start_point, int end_point) {
+
     if (start_point < 0 || end_point >= static_cast<int>(a.size()) || start_point > end_point) {
+        DBG("start_point: "<< start_point<< "end_point = {}" <<end_point);
         throw std::out_of_range("Invalid slice range");
     }
     return std::vector<T>(a.begin() + start_point, a.begin() + end_point + 1);
 }
 
-// returns bytes in a hes string
+// returns bytes in a hex string
 template <typename T>
 juce::String vector_to_HexString(std::vector<T> a) {
     juce::String s;
@@ -41,7 +43,7 @@ int vector_bytes_to_int(std::vector<T> a) {
         singleHexDigits.push_back(low);
     }
 
-    for(int i = singleHexDigits.size()-1; i >= 0; i -= 1) {
+    for(auto i = singleHexDigits.size()-1; i > 0; i -= 1) {
         value = value + (singleHexDigits.at(i) * pow(16,increment));
         increment++;
     }
