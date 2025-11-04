@@ -16,18 +16,18 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     m_headerChunkLength = vector_slice(m_bytes,4,7);
     printMidiInfo();
 
-
-    if (MIDI_FORMAT == 0)
-    {
-        validateTrackChunk(HEADER_END);
-        track_start.push_back(HEADER_END);
-    }
-    else if (MIDI_FORMAT == 1) {
-        get_length_of_tracks();
-    }
-    else {
-
-    }
+    get_length_of_tracks();
+    // if (MIDI_FORMAT == 0)
+    // {
+    //     validateTrackChunk(HEADER_END);
+    //     track_start.push_back(HEADER_END);
+    // }
+    // else if (MIDI_FORMAT == 1) {
+    //     get_length_of_tracks();
+    // }
+    // else {
+    //
+    // }
 }
 
 ParsedMidi::~ParsedMidi() {

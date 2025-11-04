@@ -11,11 +11,17 @@
 class MidiByteReader {
 
     public:
-    MidiByteReader();
-
+    MidiByteReader(const std::vector<uint8_t>& m_bytes);
+    ~MidiByteReader();
     uint8_t readNext();
     uint8_t peakNext();
-    std::vector<uint8_t> readNextN();
+    std::vector<uint8_t> readNextN(unsigned long n);
+    unsigned long position(){return index;}
+    unsigned long remainingBytes();
+    bool inRange(int n);
+
+    const std::vector<uint8_t>& m_bytes;
+    unsigned long index;
 
 };
 

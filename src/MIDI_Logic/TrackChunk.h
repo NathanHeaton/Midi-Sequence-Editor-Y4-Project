@@ -12,7 +12,7 @@
 
 class TrackChunk {
     public:
-    TrackChunk(std::vector<uint8_t> bytes);
+    TrackChunk(std::vector<uint8_t>& bytes);
     ~TrackChunk();
     void printMidiInfo();
     void createNoteEvents();
@@ -21,7 +21,7 @@ class TrackChunk {
     std::vector<MidiEvent> Events;
 
 
-    std::vector<uint8_t> m_trackBytes;
+    const std::vector<uint8_t>& m_trackBytes;
 
     private:
 };
