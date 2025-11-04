@@ -6,7 +6,7 @@
 
 TrackChunk::TrackChunk(std::vector<uint8_t> bytes){
     m_trackBytes = bytes;
-    createNoteEvents();
+    //createNoteEvents();
 }
 
 TrackChunk::~TrackChunk() {
