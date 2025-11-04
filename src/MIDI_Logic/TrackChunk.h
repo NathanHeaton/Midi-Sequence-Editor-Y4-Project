@@ -8,6 +8,7 @@
 #include <vector>
 #include <juce_core/juce_core.h>
 #include "MIDI_Events/MidiEvent.h"
+#include "MidiByteReader.h"
 #include "../utils.h"
 
 class TrackChunk {

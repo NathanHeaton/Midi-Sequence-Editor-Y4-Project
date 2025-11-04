@@ -19,6 +19,7 @@ class MidiByteReader {
     unsigned long position(){return index;}
     unsigned long remainingBytes();
     bool inRange(int n);
+    unsigned short readVariableLength();
 
     const std::vector<uint8_t>& m_bytes;
     unsigned long index;

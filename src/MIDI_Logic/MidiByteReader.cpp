@@ -53,3 +53,6 @@ bool MidiByteReader::inRange(int n) {
     return false;
 
 }
+
+unsigned short MidiByteReader::readVariableLength() {
+}

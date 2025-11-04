@@ -31,7 +31,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
