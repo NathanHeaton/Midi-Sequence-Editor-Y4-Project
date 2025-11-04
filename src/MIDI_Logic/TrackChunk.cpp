@@ -6,6 +6,7 @@
 
 TrackChunk::TrackChunk(std::vector<uint8_t> bytes){
     m_trackBytes = bytes;
+    createNoteEvents();
 }
 
 TrackChunk::~TrackChunk() {
@@ -14,20 +15,39 @@ TrackChunk::~TrackChunk() {
 
 
 void TrackChunk::createNoteEvents() {
-
     size_t index = 0;
-    do {
-        if (m_trackBytes.at(index) == 0xFF) { // meta event
-            u_int8_t meta_type = m_trackBytes.at(index+1);
-            u_int8_t length = m_trackBytes.at(index+2);
-            if (meta_type == 0x00) {
+    const size_t size = m_trackBytes.size();
 
-            }
+    while (index < size) {
+        uint8_t status = m_trackBytes.at(index);
 
+        if (status == 0xFF) { // Meta event
+            if (index + 2 >= size) break; // Safety check
+
+            uint8_t meta_type = m_trackBytes[index + 1];
+            uint8_t length = m_trackBytes[index + 2];
+
+            // Ensure we have enough bytes to read
+            if (index + 3 + length > size) break;
+
+            std::vector<uint8_t> meta_bytes =
+                vector_slice(m_trackBytes, index + 3, index + 3 + length);
+
+            MidiEvent metaEvent(meta_type, length, meta_bytes);
+            Events.push_back(metaEvent);
+
+            // Handle end-of-track
+            if (meta_type == 0x2F)
+                return;
+
+            // Advance index by header + length
+            index += 3 + length;
         }
-        index++;
+        else {
+            // TODO: handle MIDI channel events, sysex, etc.
+            index++;
+        }
     }
-    while (m_trackBytes.size() > index);
 }
 
 short TrackChunk::readVariableLength(size_t index) {

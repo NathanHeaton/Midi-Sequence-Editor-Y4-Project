@@ -11,6 +11,7 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/MIDI_Events/MidiEvent.cpp
         MIDI_Logic/filePicker.cpp
         MIDI_Logic/MidiFileManager.cpp
+        MIDI_Logic/MidiByteReader.cpp
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
         Misc/MyColours.cpp
