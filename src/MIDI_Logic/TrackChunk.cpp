@@ -4,7 +4,6 @@
 
 #include "TrackChunk.h"
 
-#include "juce_graphics/fonts/harfbuzz/OT/Layout/types.hh"
 
 TrackChunk::TrackChunk(std::vector<uint8_t>& bytes) : m_trackBytes(bytes) {
     //createNoteEvents();
