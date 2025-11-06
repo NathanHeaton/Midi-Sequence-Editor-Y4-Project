@@ -6,11 +6,10 @@
 
 #include <filesystem>
 
-#include "juce_gui_extra/misc/juce_PushNotifications.h"
-
 
 TrackChunk::TrackChunk(std::vector<uint8_t>& bytes) : m_trackBytes(bytes), m_midiReader(bytes){
-    //createNoteEvents();
+    createNoteEvents();
+    printMidiInfo();
 }
 
 TrackChunk::~TrackChunk() {
@@ -21,6 +20,7 @@ TrackChunk::~TrackChunk() {
 void TrackChunk::createNoteEvents() {
 
     while (!m_endofTrack && m_midiReader.index < m_trackBytes.size()) {
+        DBG("track index: "<<m_midiReader.index);
         uint32_t delta = m_midiReader.readVariableLength();
         DBG("delta time: " << static_cast<int>(delta));
         if (m_midiReader.peak() == 0xFF) {
@@ -38,12 +38,21 @@ void TrackChunk::createNoteEvents() {
 void TrackChunk::handleMetaEvent(uint32_t delta) {
     uint8_t status = m_midiReader.readNext();
     uint8_t event = m_midiReader.readNext();
-    uint32_t length = m_midiReader.readVariableLength();// finds the length of the data
-    std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
-    if (event == 0x2F) {
+    uint32_t length = 0;
+    if (event == 0x00 || event == 0x20) {
+        length = m_midiReader.readVariableLength();// finds the length of the data
+    }
+    else if (event == 0x51) {
+
+    }
+    else if (event == 0x2F) {
         m_endofTrack = true;
         return;
     }
+    length = m_midiReader.readVariableLength();// finds the length of the data
+    DBG("length"<< (static_cast<int>(length)));
+    std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
+
     MidiEvent midi_event(delta, status,event, length,dataBytes );
     Events.push_back(midi_event);
 
@@ -62,7 +71,7 @@ void TrackChunk::handleInstrumentEvent(uint32_t delta) {
 
     uint8_t note = m_midiReader.readNext();
     uint8_t velocity = m_midiReader.readNext();
-
+    DBG("note event: "<<status<< " " << note<<" "<<velocity);
     MidiEvent midi_event(delta, status, note, velocity);
     Events.push_back(midi_event);
 }
@@ -70,7 +79,7 @@ void TrackChunk::handleInstrumentEvent(uint32_t delta) {
 
 void TrackChunk::printMidiInfo() {
     for (MidiEvent i : Events) {
-
+        i.printEventData();
     }
 
 }

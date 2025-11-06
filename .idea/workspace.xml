@@ -30,12 +30,16 @@
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MetaEvent.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MetaEvent.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MidiEvent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MidiEvent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MidiEvent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/MidiEvent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/Note.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MIDI_Events/Note.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiByteReader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +100,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="myProject" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="myProject" TARGET_NAME="myProject" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="myProject" RUN_TARGET_NAME="myProject">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -120,7 +129,7 @@
       <workItem from="1762013213734" duration="5158000" />
       <workItem from="1762211907429" duration="3003000" />
       <workItem from="1762344850063" duration="1448000" />
-      <workItem from="1762425360067" duration="9619000" />
+      <workItem from="1762425360067" duration="14946000" />
     </task>
     <servers />
   </component>

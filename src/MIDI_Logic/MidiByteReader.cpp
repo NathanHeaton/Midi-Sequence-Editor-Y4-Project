@@ -6,7 +6,6 @@
 
 #include <stdexcept>
 
-#include "juce_core/text/juce_String.h"
 
 
 MidiByteReader::MidiByteReader(const std::vector<uint8_t>& bytes) : m_bytes(bytes), index(0) {
@@ -22,7 +21,7 @@ uint8_t MidiByteReader::readNext() {
         index++;
     }
     else {
-        throw std::out_of_range("Invalid slice range");
+        throw std::out_of_range("Invalid slice range from readNext");
     }
 
     return byte;
@@ -39,7 +38,7 @@ std::vector<uint8_t> MidiByteReader::readNextN(unsigned long n) {
         return std::vector<uint8_t>(m_bytes.begin() + start_point, m_bytes.begin() + index);
     }
     else {
-        throw std::out_of_range("Invalid slice range");
+        throw std::out_of_range("Invalid slice range from readNextN");
     }
 
 }
@@ -57,11 +56,15 @@ bool MidiByteReader::inRange(int n) {
 }
 
 uint32_t MidiByteReader::readVariableLength() {
-    uint32_t totalDelta = 0;
-    do{
+    uint32_t totalDelta = peak();
+    while (true) {
+        if ((peak() & 0x80) == 0) {
+            break;
+        }
         totalDelta = totalDelta << 7| (readNext() & 0x7F);
+
     }
-    while ((peak() & 0x80) != 0);
+
 
 
     return totalDelta;

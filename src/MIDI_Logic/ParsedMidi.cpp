@@ -14,7 +14,7 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     SMPTE_time = false;
     ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));
     m_headerChunkLength = vector_slice(m_bytes,4,7);
-    printMidiInfo();
+
 
     get_length_of_tracks();
     // if (MIDI_FORMAT == 0)
@@ -28,6 +28,7 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     // else {
     //
     // }
+    printMidiInfo();
 }
 
 ParsedMidi::~ParsedMidi() {
