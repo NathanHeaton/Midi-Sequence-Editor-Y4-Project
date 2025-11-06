@@ -8,7 +8,7 @@ MidiEvent::MidiEvent(uint8_t meta_type, uint8_t v_length, std::vector<uint8_t> m
     type = META;
 }
 
-MidiEvent::MidiEvent(char pitch, float start, float duration, int velocity) {
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, uint8_t pitch, uint8_t velocity) {
     type = NOTE;
 
 }

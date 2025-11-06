@@ -17,14 +17,17 @@ class TrackChunk {
     ~TrackChunk();
     void printMidiInfo();
     void createNoteEvents();
-    short readVariableLength(size_t index);
+    void handleMetaEvent(uint32_t delta);
+    void handleInstrumentEvent(uint32_t delta);
 
     std::vector<MidiEvent> Events;
 
 
     const std::vector<uint8_t>& m_trackBytes;
-
+    MidiByteReader m_midiReader;
     private:
+    bool m_endofTrack = false;
+
 };
 
 

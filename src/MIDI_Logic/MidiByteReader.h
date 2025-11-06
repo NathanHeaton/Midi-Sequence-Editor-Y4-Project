@@ -14,15 +14,16 @@ class MidiByteReader {
     MidiByteReader(const std::vector<uint8_t>& m_bytes);
     ~MidiByteReader();
     uint8_t readNext();
-    uint8_t peakNext();
+    uint8_t peak();
     std::vector<uint8_t> readNextN(unsigned long n);
     unsigned long position(){return index;}
     unsigned long remainingBytes();
     bool inRange(int n);
-    unsigned short readVariableLength();
+    uint32_t readVariableLength();
 
     const std::vector<uint8_t>& m_bytes;
     unsigned long index;
+    uint8_t m_runningStatus;
 
 };
 

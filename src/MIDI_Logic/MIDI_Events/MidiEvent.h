@@ -17,9 +17,9 @@ class MidiEvent {
     public:
     MidiEventType type;
 
-    MidiEvent(char pitch, float start, float duration, int velocity);// for note events
+    MidiEvent(uint32_t delta, uint8_t status, uint8_t pitch, uint8_t velocity);// for note events
 
-    MidiEvent(uint8_t meta_type, uint8_t v_length, std::vector<uint8_t> meta_bytes ); // for meta events
+    MidiEvent(uint32_t delta, uint8_t status ,uint8_t meta_type, uint32_t v_length, std::vector<uint8_t> meta_bytes ); // for meta events
 };
 
 
