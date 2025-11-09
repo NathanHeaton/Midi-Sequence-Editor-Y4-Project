@@ -6,7 +6,8 @@
 #define MYPROJECT_MIDIBYTEREADER_H
 #include <cstdint>
 #include <vector>
-
+#include <stdexcept>
+#include "juce_core/system/juce_PlatformDefs.h"
 
 class MidiByteReader {
 

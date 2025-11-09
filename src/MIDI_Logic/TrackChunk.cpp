@@ -18,18 +18,20 @@ TrackChunk::~TrackChunk() {
 
 
 void TrackChunk::createNoteEvents() {
-
+    DBG(vector_to_HexString(m_trackBytes));
     while (!m_endofTrack && m_midiReader.index < m_trackBytes.size()) {
         DBG("track index: "<<m_midiReader.index);
         uint32_t delta = m_midiReader.readVariableLength();
         DBG("delta time: " << static_cast<int>(delta));
         if (m_midiReader.peak() == 0xFF) {
+            DBG("meta event");
             handleMetaEvent(delta);
         }
         else if (m_midiReader.peak() == 0xF0 ||m_midiReader.peak()== 0xF7) {
             DBG("yeah sysex event");
         }
         else {
+            DBG("note event");
             handleInstrumentEvent(delta);
         }
     }
@@ -51,10 +53,10 @@ void TrackChunk::handleMetaEvent(uint32_t delta) {
     }
     length = m_midiReader.readVariableLength();// finds the length of the data
     DBG("length"<< (static_cast<int>(length)));
-    std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
+    //std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
 
-    MidiEvent midi_event(delta, status,event, length,dataBytes );
-    Events.push_back(midi_event);
+    //MidiEvent midi_event(delta, status,event, length,dataBytes );
+    //Events.push_back(midi_event);
 
 }
 
@@ -71,7 +73,7 @@ void TrackChunk::handleInstrumentEvent(uint32_t delta) {
 
     uint8_t note = m_midiReader.readNext();
     uint8_t velocity = m_midiReader.readNext();
-    DBG("note event: "<<status<< " " << note<<" "<<velocity);
+    //DBG("note event: "<<status<< " " << note<<" "<<velocity);
     MidiEvent midi_event(delta, status, note, velocity);
     Events.push_back(midi_event);
 }

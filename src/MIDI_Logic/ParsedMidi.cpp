@@ -66,7 +66,7 @@ void ParsedMidi::get_length_of_tracks() {
         trackLength.push_back(length);
         DBG("track "<<i<<" length: " << length);
 
-        std::vector<uint8_t> chunkBytes = vector_slice(m_bytes,byte+3,byte+3+length);
+        std::vector<uint8_t> chunkBytes = vector_slice(m_bytes,byte+4,byte+3+length);
 
         TrackChunk newTrackChunk(chunkBytes);
         m_tracks.push_back(newTrackChunk);

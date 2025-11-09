@@ -4,7 +4,6 @@
 
 #include "MidiByteReader.h"
 
-#include <stdexcept>
 
 
 
@@ -16,14 +15,11 @@ MidiByteReader::~MidiByteReader() {
 }
 
 uint8_t MidiByteReader::readNext() {
-    auto byte = m_bytes[index];
-    if (inRange(index + 1)) {
-        index++;
-    }
-    else {
+    if (!inRange(index + 1)) {
         throw std::out_of_range("Invalid slice range from readNext");
     }
-
+    uint8_t byte = m_bytes[index];
+    index++;
     return byte;
 }
 
@@ -51,21 +47,19 @@ bool MidiByteReader::inRange(int n) {
     if (n < m_bytes.size()) {
         return true;
     }
-    return false;
+    return false ;
 
 }
 
 uint32_t MidiByteReader::readVariableLength() {
-    uint32_t totalDelta = peak();
-    while (true) {
-        if ((peak() & 0x80) == 0) {
-            break;
-        }
-        totalDelta = totalDelta << 7| (readNext() & 0x7F);
+    uint32_t totalDelta = 0;
+    uint8_t byte;
 
+    do {
+        byte = readNext();
+        totalDelta = (totalDelta << 7) | (byte & 0x7F);
     }
-
-
+    while (byte & 0x80);
 
     return totalDelta;
 }
