@@ -8,7 +8,8 @@
 #include <vector>
 enum MidiEventType {
     META,
-    NOTE
+    NOTE,
+    PROGRAM
 };
 class MidiEvent {
 
@@ -19,6 +20,8 @@ class MidiEvent {
     MidiEvent(uint32_t delta, uint8_t status, uint8_t pitch, uint8_t velocity);// for note events
 
     MidiEvent(uint32_t delta, uint8_t status ,uint8_t meta_type, uint32_t v_length, std::vector<uint8_t> meta_bytes ); // for meta events
+
+    MidiEvent(uint32_t delta, uint8_t status, uint8_t program_number);
 
     void printEventData();
 
@@ -32,6 +35,8 @@ class MidiEvent {
     uint8_t m_meta_type;
     uint32_t m_v_length;
     std::vector<uint8_t> m_meta_bytes;
+    //program change specific
+    uint8_t m_program_number;
 
 
 };

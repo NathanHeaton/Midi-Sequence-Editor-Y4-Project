@@ -8,9 +8,17 @@
 
 MidiEvent::MidiEvent(uint32_t delta, uint8_t status ,uint8_t meta_type, uint32_t v_length, std::vector<uint8_t> meta_bytes )
     : m_delta(delta), m_meta_type(meta_type),
-m_v_length(v_length), m_meta_bytes(meta_bytes), m_status(status)
+    m_v_length(v_length), m_meta_bytes(meta_bytes), m_status(status),
+    type(META)
 {
-    type = META;
+
+}
+
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, uint8_t program_number)
+    :m_delta(delta), m_status(status), m_program_number(program_number),
+    type(PROGRAM)
+{
+
 }
 
 void MidiEvent::printEventData() {
@@ -28,10 +36,9 @@ void MidiEvent::printEventData() {
 }
 
 MidiEvent::MidiEvent(uint32_t delta, uint8_t status, uint8_t pitch, uint8_t velocity)
-    : m_delta(delta), m_pitch(pitch), m_velocity(velocity), m_status(status)
+    : m_delta(delta), m_pitch(pitch), m_velocity(velocity), m_status(status),
+    type(NOTE)
 {
-    type = NOTE;
-
 }
 
 

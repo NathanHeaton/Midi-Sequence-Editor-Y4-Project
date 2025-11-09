@@ -19,6 +19,7 @@ class TrackChunk {
     void createNoteEvents();
     void handleMetaEvent(uint32_t delta);
     void handleInstrumentEvent(uint32_t delta);
+    void handleProgramEvent(uint32_t delta);
 
     std::vector<MidiEvent> Events;
 
