@@ -23,20 +23,55 @@ void TrackChunk::createNoteEvents() {
         DBG("track index: "<<m_midiReader.index);
         uint32_t delta = m_midiReader.readVariableLength();
         DBG("delta time: " << static_cast<int>(delta));
-        if (m_midiReader.peak() == 0xFF) {
-            DBG("meta event");
+        DBG("type:"<< m_midiReader.peak());
+        uint8_t status = m_midiReader.peak();
+        uint8_t eventType = status & 0xF0;
+        uint8_t channel   = status & 0x0F;
+
+        // SYSTEM / META
+        if (status == 0xFF) {
             handleMetaEvent(delta);
         }
-        else if (m_midiReader.peak() == 0xF0 ||m_midiReader.peak()== 0xF7) {
-            DBG("yeah sysex event");
+        else if (status == 0xF0 || status == 0xF7) {
+            handleSysExEvent(delta);
         }
-        else if (m_midiReader.peak() == 0xC0 || m_midiReader.peak()== 0xC2) {
-            DBG("Program event");
-            handleProgramEvent(delta);
+
+        // CHANNEL EVENTS
+        else if (eventType == 0x80) {
+            // Note Off
+            handleNoteOff(delta, channel);
         }
+        else if (eventType == 0x90) {
+            // Note On
+            handleNoteOn(delta, channel);
+        }
+        else if (eventType == 0xA0) {
+            // Polyphonic Aftertouch
+            handlePolyAftertouch(delta, channel);
+        }
+        else if (eventType == 0xB0) {
+            // Control Change
+            handleControlChange(delta, channel);
+        }
+        else if (eventType == 0xC0) {
+            // Program Change
+            handleProgramEvent(delta, channel);
+        }
+        else if (eventType == 0xD0) {
+            // Channel Aftertouch
+            handleChannelAftertouch(delta, channel);
+        }
+        else if (eventType == 0xE0) {
+            // Pitch Bend
+            handlePitchBend(delta, channel);
+        }
+
+        // ------------------
+        // UNKNOWN / UNHANDLED
+        // ------------------
         else {
-            DBG("note event");
-            handleInstrumentEvent(delta);
+            DBG("Unknown event: " << m_midiReader.peak() << (int)status);
+            // You can skip or handle gracefully here
         }
     }
 }
@@ -64,7 +99,14 @@ void TrackChunk::handleMetaEvent(uint32_t delta) {
 
 }
 
-void TrackChunk::handleInstrumentEvent(uint32_t delta) {
+void TrackChunk::handleSysExEvent(uint32_t delta) {
+}
+
+void TrackChunk::handleNoteOff(uint32_t delta, uint8_t channel) {
+
+}
+
+void TrackChunk::handleNoteOn(uint32_t delta, uint8_t channel) {
     uint8_t status = 0;
 
 
@@ -83,12 +125,24 @@ void TrackChunk::handleInstrumentEvent(uint32_t delta) {
     Events.push_back(midi_event);
 }
 
-void TrackChunk::handleProgramEvent(uint32_t delta) {
+void TrackChunk::handlePolyAftertouch(uint32_t delta, uint8_t channel) {
+}
+
+void TrackChunk::handleControlChange(uint32_t delta, uint8_t channel) {
+}
+
+void TrackChunk::handleProgramEvent(uint32_t delta, uint8_t channel) {
     uint8_t status = m_midiReader.readNext();
     uint8_t program = m_midiReader.readNext();
     DBG("program event: "<<status<<" "<< program);
     MidiEvent midi_event(delta, status, program);
     Events.push_back(midi_event);
+}
+
+void TrackChunk::handleChannelAftertouch(uint32_t delta, uint8_t channel) {
+}
+
+void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel) {
 }
 
 

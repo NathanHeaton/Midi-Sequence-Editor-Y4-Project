@@ -17,9 +17,19 @@ class TrackChunk {
     ~TrackChunk();
     void printMidiInfo();
     void createNoteEvents();
+
+    // META & SYSEX
     void handleMetaEvent(uint32_t delta);
-    void handleInstrumentEvent(uint32_t delta);
-    void handleProgramEvent(uint32_t delta);
+    void handleSysExEvent(uint32_t delta);
+
+    // CHANNEL EVENTS
+    void handleNoteOff(uint32_t delta, uint8_t channel);
+    void handleNoteOn(uint32_t delta, uint8_t channel);
+    void handlePolyAftertouch(uint32_t delta, uint8_t channel);
+    void handleControlChange(uint32_t delta, uint8_t channel);
+    void handleProgramEvent(uint32_t delta, uint8_t channel);
+    void handleChannelAftertouch(uint32_t delta, uint8_t channel);
+    void handlePitchBend(uint32_t delta, uint8_t channel);
 
     std::vector<MidiEvent> Events;
 
