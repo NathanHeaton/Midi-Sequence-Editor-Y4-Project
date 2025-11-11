@@ -22,7 +22,6 @@ void TrackChunk::createNoteEvents() {
     while (!m_endofTrack && m_midiReader.index < m_trackBytes.size()) {
         DBG("track index: "<<m_midiReader.index);
         uint32_t delta = m_midiReader.readVariableLength();
-        DBG("delta time: " << static_cast<int>(delta));
         DBG("type:"<< m_midiReader.peak());
         uint8_t status = m_midiReader.peak();
         uint8_t eventType = status & 0xF0;
@@ -71,7 +70,6 @@ void TrackChunk::createNoteEvents() {
         // ------------------
         else {
             DBG("Unknown event: " << m_midiReader.peak() << (int)status);
-            // You can skip or handle gracefully here
         }
     }
 }
@@ -94,7 +92,7 @@ void TrackChunk::handleMetaEvent(uint32_t delta) {
     DBG("length"<< (static_cast<int>(length)));
     std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
 
-    MidiEvent midi_event(delta, status,event, length,dataBytes );
+    MidiEvent midi_event(delta, status,{event, length,dataBytes} );
     Events.push_back(midi_event);
 
 }
@@ -108,8 +106,6 @@ void TrackChunk::handleNoteOff(uint32_t delta, uint8_t channel) {
 
 void TrackChunk::handleNoteOn(uint32_t delta, uint8_t channel) {
     uint8_t status = 0;
-
-
     if ((m_midiReader.peak() & 0x80) != 0) {
         status = m_midiReader.readNext();
         m_midiReader.m_runningStatus = status;
@@ -121,8 +117,10 @@ void TrackChunk::handleNoteOn(uint32_t delta, uint8_t channel) {
     uint8_t note = m_midiReader.readNext();
     uint8_t velocity = m_midiReader.readNext();
     DBG("note event: "<<status<< " " << note<<" "<<velocity);
-    MidiEvent midi_event(delta, status, note, velocity);
-    Events.push_back(midi_event);
+
+    //MidiEvent midi_event(delta, status, {note, velocity}, channel);
+
+    //Events.push_back(midi_event);
 }
 
 void TrackChunk::handlePolyAftertouch(uint32_t delta, uint8_t channel) {
@@ -135,7 +133,7 @@ void TrackChunk::handleProgramEvent(uint32_t delta, uint8_t channel) {
     uint8_t status = m_midiReader.readNext();
     uint8_t program = m_midiReader.readNext();
     DBG("program event: "<<status<<" "<< program);
-    MidiEvent midi_event(delta, status, program);
+    MidiEvent midi_event(delta, status, {program});
     Events.push_back(midi_event);
 }
 
