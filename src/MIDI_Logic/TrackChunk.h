@@ -10,6 +10,7 @@
 #include "MIDI_Events/MidiEvent.h"
 #include "MidiByteReader.h"
 #include "../utils.h"
+#include "MIDI_Events/MidiStructs.h"
 
 class TrackChunk {
     public:
@@ -19,17 +20,16 @@ class TrackChunk {
     void createNoteEvents();
 
     // META & SYSEX
-    void handleMetaEvent(uint32_t delta);
-    void handleSysExEvent(uint32_t delta);
+    void handleMetaEvent(uint32_t delta, uint8_t status);
+    void handleSysExEvent(uint32_t delta, uint8_t status);
 
     // CHANNEL EVENTS
-    void handleNoteOff(uint32_t delta, uint8_t channel);
-    void handleNoteOn(uint32_t delta, uint8_t channel);
-    void handlePolyAftertouch(uint32_t delta, uint8_t channel);
-    void handleControlChange(uint32_t delta, uint8_t channel);
-    void handleProgramEvent(uint32_t delta, uint8_t channel);
-    void handleChannelAftertouch(uint32_t delta, uint8_t channel);
-    void handlePitchBend(uint32_t delta, uint8_t channel);
+    void handleNote(uint32_t delta, uint8_t channel, uint8_t status);
+    void handlePolyAftertouch(uint32_t delta, uint8_t channel, uint8_t status);
+    void handleControlChange(uint32_t delta, uint8_t channel, uint8_t status);
+    void handleProgramEvent(uint32_t delta, uint8_t channel, uint8_t status);
+    void handleChannelAftertouch(uint32_t delta, uint8_t channel, uint8_t status);
+    void handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status);
 
     std::vector<MidiEvent> Events;
 

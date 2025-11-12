@@ -6,33 +6,18 @@
 
 #include "juce_core/system/juce_PlatformDefs.h"
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Meta_Ev event)
-    : m_delta(delta),
-      m_status(status),
-      m_channel(0),
-      m_meta_event(event),
-      m_note{},
-      m_program_cha{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
-      m_sysex{},
-      type(META)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Meta_Ev event): m_delta(delta),
+    m_status(status),
+    m_event_data(event),
+    m_channel(0),
+    type(META)
 {}
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Note a, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Note event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
-      m_channel(channel),
-      m_note(a),
-      m_meta_event{},
-      m_program_cha{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
-      m_sysex{}
+m_event_data(event),
+      m_channel(channel)
 {
     if ((status & 0xF0) == 0x90) {
         type = NOTE_ON;
@@ -43,95 +28,52 @@ MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Note a, uint8_t channel)
     }
 }
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Program_Cha change, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Program_Cha event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
+m_event_data(event),
       m_channel(channel),
-      m_program_cha(change),
-      m_meta_event{},
-      m_note{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
-      m_sysex{},
       type(PROGRAM_CHANGE)
 {}
 
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Control_Cha control, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Control_Cha event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
+m_event_data(event),
       m_channel(channel),
-      m_control_cha(control),
-      m_meta_event{},
-      m_note{},
-      m_program_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
-      m_sysex{},
       type(CONTROL_CHANGE)
 {}
 
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Pitch_Be value, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Pitch_Be event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
       m_channel(channel),
-      m_pitch_bend(value),
-      m_meta_event{},
-      m_note{},
-      m_program_cha{},
-      m_control_cha{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
-      m_sysex{},
       type(PITCH_BEND)
 {}
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Poly_Af value, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Poly_Af event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
+m_event_data(event),
       m_channel(channel),
-      m_poly_aftertouch(value),
-      m_meta_event{},
-      m_note{},
-      m_program_cha{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_channel_aftertouch{},
-      m_sysex{},
       type(POLY_AFTERTOUCH)
 {}
 
-MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Poly_Cha value, uint8_t channel)
+MidiEvent::MidiEvent(uint32_t delta, uint8_t status, Poly_Cha event, uint8_t channel)
     : m_delta(delta),
       m_status(status),
+m_event_data(event),
       m_channel(channel),
-      m_channel_aftertouch(value),
-      m_meta_event{},
-      m_note{},
-      m_program_cha{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_sysex{},
       type(CHANNEL_AFTERTOUCH)
 {}
 
-MidiEvent::MidiEvent(uint32_t delta, SysEx bytes)
+MidiEvent::MidiEvent(uint32_t delta, SysEx event)
     : m_delta(delta),
       m_status(0xF0),//
+m_event_data(event),
       m_channel(0),
-      m_sysex(bytes),
-      m_meta_event{},
-      m_note{},
-      m_program_cha{},
-      m_control_cha{},
-      m_pitch_bend{},
-      m_poly_aftertouch{},
-      m_channel_aftertouch{},
       type(SYSEX)
 {}
 

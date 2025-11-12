@@ -6,7 +6,6 @@
 
 #include <filesystem>
 
-
 TrackChunk::TrackChunk(std::vector<uint8_t>& bytes) : m_trackBytes(bytes), m_midiReader(bytes){
     createNoteEvents();
     printMidiInfo();
@@ -16,53 +15,54 @@ TrackChunk::~TrackChunk() {
 
 }
 
-
 void TrackChunk::createNoteEvents() {
     DBG(vector_to_HexString(m_trackBytes));
     while (!m_endofTrack && m_midiReader.index < m_trackBytes.size()) {
-        DBG("track index: "<<m_midiReader.index);
         uint32_t delta = m_midiReader.readVariableLength();
-        DBG("type:"<< m_midiReader.peak());
-        uint8_t status = m_midiReader.peak();
+        uint8_t status;
+
+        if ((m_midiReader.peak() & 0x80) != 0) {
+            status = m_midiReader.readNext();
+            m_midiReader.m_runningStatus = status;
+        }
+        else {
+            status = m_midiReader.m_runningStatus;
+        }
+
         uint8_t eventType = status & 0xF0;
         uint8_t channel   = status & 0x0F;
 
         // SYSTEM / META
         if (status == 0xFF) {
-            handleMetaEvent(delta);
+            handleMetaEvent(delta, status);
         }
         else if (status == 0xF0 || status == 0xF7) {
-            handleSysExEvent(delta);
+            handleSysExEvent(delta, status);
         }
-
         // CHANNEL EVENTS
-        else if (eventType == 0x80) {
+        else if (eventType == 0x80 || eventType == 0x90) {
             // Note Off
-            handleNoteOff(delta, channel);
-        }
-        else if (eventType == 0x90) {
-            // Note On
-            handleNoteOn(delta, channel);
+            handleNote(delta, channel, status);
         }
         else if (eventType == 0xA0) {
             // Polyphonic Aftertouch
-            handlePolyAftertouch(delta, channel);
+            handlePolyAftertouch(delta, channel, status);
         }
         else if (eventType == 0xB0) {
             // Control Change
-            handleControlChange(delta, channel);
+            handleControlChange(delta, channel, status);
         }
         else if (eventType == 0xC0) {
             // Program Change
-            handleProgramEvent(delta, channel);
+            handleProgramEvent(delta, channel, status);
         }
         else if (eventType == 0xD0) {
             // Channel Aftertouch
-            handleChannelAftertouch(delta, channel);
+            handleChannelAftertouch(delta, channel, status);
         }
         else if (eventType == 0xE0) {
             // Pitch Bend
-            handlePitchBend(delta, channel);
+            handlePitchBend(delta, channel, status);
         }
 
         // ------------------
@@ -74,8 +74,7 @@ void TrackChunk::createNoteEvents() {
     }
 }
 
-void TrackChunk::handleMetaEvent(uint32_t delta) {
-    uint8_t status = m_midiReader.readNext();
+void TrackChunk::handleMetaEvent(uint32_t delta, uint8_t status) {
     uint8_t event = m_midiReader.readNext();
     uint32_t length = 0;
     if (event == 0x00 || event == 0x20) {
@@ -94,59 +93,65 @@ void TrackChunk::handleMetaEvent(uint32_t delta) {
 
     MidiEvent midi_event(delta, status,{event, length,dataBytes} );
     Events.push_back(midi_event);
-
 }
 
-void TrackChunk::handleSysExEvent(uint32_t delta) {
+void TrackChunk::handleSysExEvent(uint32_t delta, uint8_t status) {
+    //
+    //
+    // SysEx sys_ex = {bytes};
+    // MidiEvent midi_event(delta, status, note, channel);
+    // Events.push_back(midi_event);
 }
 
-void TrackChunk::handleNoteOff(uint32_t delta, uint8_t channel) {
-
-}
-
-void TrackChunk::handleNoteOn(uint32_t delta, uint8_t channel) {
-    uint8_t status = 0;
-    if ((m_midiReader.peak() & 0x80) != 0) {
-        status = m_midiReader.readNext();
-        m_midiReader.m_runningStatus = status;
-    }
-    else {
-        status = m_midiReader.m_runningStatus;
-    }
-
-    uint8_t note = m_midiReader.readNext();
+void TrackChunk::handleNote(uint32_t delta, uint8_t channel, uint8_t status) {
+    uint8_t pitch = m_midiReader.readNext();
     uint8_t velocity = m_midiReader.readNext();
-    DBG("note event: "<<status<< " " << note<<" "<<velocity);
-
-    //MidiEvent midi_event(delta, status, {note, velocity}, channel);
-
-    //Events.push_back(midi_event);
+    Note note = {pitch, velocity};
+    MidiEvent Note(delta, status, note, channel);
+    Events.push_back(Note);
 }
 
-void TrackChunk::handlePolyAftertouch(uint32_t delta, uint8_t channel) {
+void TrackChunk::handlePolyAftertouch(uint32_t delta, uint8_t channel, uint8_t status) {
+    uint8_t pressure = m_midiReader.readNext();
+    uint8_t pitch = m_midiReader.readNext();
+    Note poly_aftertouch = {pressure, pitch};
+    MidiEvent PolyAftertouch(delta, status, poly_aftertouch, channel);
+    Events.push_back(PolyAftertouch);
 }
 
-void TrackChunk::handleControlChange(uint32_t delta, uint8_t channel) {
+void TrackChunk::handleControlChange(uint32_t delta, uint8_t channel, uint8_t status) {
+    uint8_t controller = m_midiReader.readNext();
+    uint8_t value = m_midiReader.readNext();
+    Control_Cha control_cha = {controller,value};
+    MidiEvent ControlChange(delta, status, control_cha, channel);
+    Events.push_back(ControlChange);
 }
 
-void TrackChunk::handleProgramEvent(uint32_t delta, uint8_t channel) {
-    uint8_t status = m_midiReader.readNext();
+void TrackChunk::handleProgramEvent(uint32_t delta, uint8_t channel, uint8_t status) {
     uint8_t program = m_midiReader.readNext();
-    DBG("program event: "<<status<<" "<< program);
-    MidiEvent midi_event(delta, status, {program});
-    Events.push_back(midi_event);
+    Program_Cha program_cha = {program};
+    MidiEvent ProgramEvent(delta, status, program_cha, channel);
+    Events.push_back(ProgramEvent);
 }
 
-void TrackChunk::handleChannelAftertouch(uint32_t delta, uint8_t channel) {
+void TrackChunk::handleChannelAftertouch(uint32_t delta, uint8_t channel, uint8_t status) {
+    uint8_t pressure = m_midiReader.readNext();
+    Poly_Cha poly_cha = {pressure};
+    MidiEvent ChannelAftertouch(delta, status, poly_cha, channel);
+    Events.push_back(ChannelAftertouch);
 }
 
-void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel) {
+void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status) {
+    uint8_t value = m_midiReader.readNext();
+    Poly_Cha poly_cha = {value};
+    MidiEvent PitchBend(delta, status, poly_cha, channel);
+    Events.push_back(PitchBend);
 }
 
 
 void TrackChunk::printMidiInfo() {
-    for (MidiEvent i : Events) {
-        i.printEventData();
-    }
+    DBG("printing midi track events");
+    for (MidiEvent i : Events)
+        { DBG("Delta: "<< static_cast<int>(i.m_delta)<<" status: "<< i.m_status); }
 
 }
