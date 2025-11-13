@@ -142,16 +142,19 @@ void TrackChunk::handleChannelAftertouch(uint32_t delta, uint8_t channel, uint8_
 }
 
 void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status) {
-    uint8_t value = m_midiReader.readNext();
-    Poly_Cha poly_cha = {value};
-    MidiEvent PitchBend(delta, status, poly_cha, channel);
+    uint8_t lsb_value = m_midiReader.readNext();
+    uint8_t msb_value = m_midiReader.readNext();
+    Pitch_Be pitch_be = {lsb_value, msb_value};
+    MidiEvent PitchBend(delta, status, pitch_be, channel);
     Events.push_back(PitchBend);
 }
 
 
 void TrackChunk::printMidiInfo() {
     DBG("printing midi track events");
-    for (MidiEvent i : Events)
-        { DBG("Delta: "<< static_cast<int>(i.m_delta)<<" status: "<< i.m_status); }
+    for (MidiEvent i : Events) {
+        DBG(i.getMidiData());
+    }
+
 
 }

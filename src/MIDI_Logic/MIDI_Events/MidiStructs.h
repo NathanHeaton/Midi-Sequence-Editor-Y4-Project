@@ -22,7 +22,8 @@ struct Meta_Ev {
     std::vector<uint8_t> m_meta_bytes;
 };
 struct Pitch_Be {
-    uint8_t m_value;
+    uint8_t m_lsb_value;
+    uint8_t m_msb_value;
 };
 struct Poly_Af {
     uint8_t m_pressure;

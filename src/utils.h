@@ -7,13 +7,11 @@
 #include <charconv>
 #include <format>
 
-
 // returns a slice of a vector
 template <typename T>
 std::vector<T> vector_slice(const std::vector<T>& a, int start_point, int end_point) {
 
     if (start_point < 0 || end_point >= static_cast<int>(a.size()) || start_point > end_point) {
-        DBG("start_point: "<< start_point<< "end_point = {}" <<end_point);
         throw std::out_of_range("Invalid slice range");
     }
     return std::vector<T>(a.begin() + start_point, a.begin() + end_point + 1);

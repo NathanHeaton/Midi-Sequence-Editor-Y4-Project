@@ -5,10 +5,11 @@
 #ifndef MYPROJECT_MIDIEVENT_H
 #define MYPROJECT_MIDIEVENT_H
 #include <cstdint>
+#include <string>
 #include <variant>
 #include <vector>
 #include "MidiStructs.h"
-
+#include <format>
 
 class MidiEvent {
 
@@ -46,7 +47,7 @@ class MidiEvent {
     // note data
     MidiEvent(uint32_t delta, uint8_t status, Note event, uint8_t channel);// for note events
     //meta events
-    MidiEvent(uint32_t delta, uint8_t status, Meta_Ev event); // for meta events
+    MidiEvent(uint32_t delta, uint8_t status, Meta_Ev event); // for meta-events
     // program change
     MidiEvent(uint32_t delta, uint8_t status, Program_Cha event, uint8_t channel);
     // control change
@@ -62,6 +63,7 @@ class MidiEvent {
 
 
     void printEventData();
+    std::string getMidiData();
 
 
 };
