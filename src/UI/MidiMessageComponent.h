@@ -2,16 +2,16 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Misc/MyColours.h"
+#include "../MIDI_Logic/ParsedMidi.h"
 #include <iostream>
 
 
-class boxComponent: public juce::Component
+class MidiMessage: public juce::Component
 {
 public:
-    std::string m_text{"test that build"};
+    std::string m_text{"Midi_Messages"};
 
-    boxComponent();
-    boxComponent(std::string text);
+    MidiMessage();
 
     void paint(juce::Graphics& g) override
     {
@@ -20,14 +20,13 @@ public:
 
         g.setColour(juce::Colours::white);
         g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
-        g.drawText (m_text, getLocalBounds(), juce::Justification::centred, true);
+        g.drawText (m_text, getLocalBounds(), juce::Justification::topLeft, true);
     }
 
     void change_text(std::string text)
     {
-         m_text = text;
-        repaint();
+        m_text = text;
     }
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(boxComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiMessage)
 };

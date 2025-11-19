@@ -15,7 +15,9 @@ std::string MidiFileManager::getMidiFile(){return m_fileName;}
 
 void MidiFileManager::loadFile(juce::File& file)
 {
+    DBG("sending change message");
     sendChangeMessage();
+
     createMidiProjectFolder();
     juce::File copyPlace("midi_files/" + file.getFileName());
     m_fileName = file.getFileName().toStdString();
@@ -60,14 +62,5 @@ void MidiFileManager::readMidiFile()
         DBG("file not opened");
     }
 
-}
-
-juce::String MidiFileManager::generate8Bytes(auto* bytes,int numBytes) {
-    juce::String string8 = "";
-    int batch = numBytes*8;
-    for (int i = 0+batch; i < 8+batch; ++i) {
-        string8 +=  (" " + juce::String::toHexString(static_cast<const uint8_t *>(bytes)[i]));
-    }
-    return string8;
 }
 

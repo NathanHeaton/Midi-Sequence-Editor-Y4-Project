@@ -14,6 +14,7 @@
 
 class TrackChunk {
     public:
+
     TrackChunk(std::vector<uint8_t>& bytes);
     ~TrackChunk();
     void printMidiInfo();

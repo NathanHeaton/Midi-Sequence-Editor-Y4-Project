@@ -1,7 +1,9 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_events/juce_events.h>
 #include "UI/boxComponent.h"
+#include "UI/MidiMessageComponent.h"
 #include "MIDI_Logic/MidiFileManager.h"
 #include <iostream>
 
@@ -13,6 +15,8 @@ public:
     // Vars
     boxComponent testBox;
     MidiFileManager midifileManager;
+    MidiMessage midiMessageBox;
+
     MainComponent();
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -22,14 +26,7 @@ public:
         testBox.change_text("changing Text");
     }
 
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override
-    {
-        if(source == &midifileManager)
-        {
-
-            testBox.change_text("setes");
-        }
-    }
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
 private:
 
@@ -39,6 +36,7 @@ private:
     
 
     void buttonClicked(juce::Button* button) override;
+
 
     void addUIAndMakeVisible();
 

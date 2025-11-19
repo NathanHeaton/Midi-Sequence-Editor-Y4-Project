@@ -8,6 +8,7 @@ MainComponent::MainComponent()
 {
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
+    addAndMakeVisible(midiMessageBox);
     addAndMakeVisible(testBox);
     test_function();
     midifileManager.addChangeListener(this);
@@ -32,7 +33,9 @@ void MainComponent::resized()
     testButton.setBounds(130,30,100,30);
 
     // boxes
-    testBox.setBounds(getLocalBounds().withHeight(400).reduced(10).withTrimmedTop(100));
+    testBox.setBounds(getLocalBounds().withHeight(200).reduced(20).withTrimmedTop(100));
+
+    midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
 
 }
 
@@ -61,6 +64,15 @@ void MainComponent::buttonClicked(juce::Button* button)
     }
 }
 
-void addUIAndMakeVisable()
+
+
+void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
+    if(source == &midifileManager)
+    {
+        DBG("midi file loaded");
+        testBox.change_text(static_cast<std::string>("440Hz"));
+        midiMessageBox.setAlpha(.3);
+        DBG("should have changed text");
+    }
 }
