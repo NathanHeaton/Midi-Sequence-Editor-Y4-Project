@@ -16,7 +16,7 @@ std::string MidiFileManager::getMidiFile(){return m_fileName;}
 void MidiFileManager::loadFile(juce::File& file)
 {
     DBG("sending change message");
-    sendChangeMessage();
+    sendActionMessage("fileLoaded");
 
     createMidiProjectFolder();
     juce::File copyPlace("midi_files/" + file.getFileName());
@@ -56,11 +56,11 @@ void MidiFileManager::readMidiFile()
         else {
             DBG("file bytes are invalid: "<<vector_to_HexString(vector_slice(bytes,0,4)));
         }
-        ParsedMidi newMidiData(bytes);
+        m_ParsedMidi.emplace_back(bytes);
+        sendActionMessage("midiData");
     }
     else {
         DBG("file not opened");
     }
-
 }
 

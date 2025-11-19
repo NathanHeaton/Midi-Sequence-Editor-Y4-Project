@@ -29,16 +29,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/UI/MidiMessageComponent.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/UI/MidiMessageComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiFileManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiFileManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/MidiFileManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/MidiFileManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/boxComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/boxComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/MidiMessageComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/MidiMessageComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/MidiMessageComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/MidiMessageComponent.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +141,7 @@
       <workItem from="1762942383321" duration="8256000" />
       <workItem from="1763034694467" duration="573000" />
       <workItem from="1763035277569" duration="4886000" />
-      <workItem from="1763543663182" duration="4523000" />
+      <workItem from="1763543663182" duration="11818000" />
     </task>
     <servers />
   </component>

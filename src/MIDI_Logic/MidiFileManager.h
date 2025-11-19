@@ -7,12 +7,13 @@
 #include "ParsedMidi.h"
 #include  "../utils.h"
 
-class MidiFileManager : public juce::ChangeBroadcaster
+class MidiFileManager : public juce::ActionBroadcaster
 {
 public:
     // variables
     juce::File m_midiFile;
     std::string m_fileName;
+    std::vector<ParsedMidi> m_ParsedMidi;
 
 
     // functions

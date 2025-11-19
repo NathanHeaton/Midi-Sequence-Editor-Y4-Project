@@ -2,31 +2,40 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Misc/MyColours.h"
-#include "../MIDI_Logic/ParsedMidi.h"
-#include <iostream>
 
-
-class MidiMessage: public juce::Component
+class MidiMessage : public juce::Component
 {
 public:
-    std::string m_text{"Midi_Messages"};
-
-    MidiMessage();
-
-    void paint(juce::Graphics& g) override
+    MidiMessage()
     {
-        g.setColour(MyColours::backgroundAlt);
-        g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
+        // Configure the text editor
+        textEditor.setMultiLine(true);
+        textEditor.setReadOnly(true);
+        textEditor.setScrollbarsShown(true);
+        textEditor.setReturnKeyStartsNewLine(false);
 
-        g.setColour(juce::Colours::white);
-        g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
-        g.drawText (m_text, getLocalBounds(), juce::Justification::topLeft, true);
+        textEditor.setColour(juce::TextEditor::backgroundColourId, MyColours::backgroundAlt);
+        textEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::white);
+        textEditor.setColour(juce::TextEditor::textColourId, juce::Colours::white);
+
+        addAndMakeVisible(textEditor);
     }
 
-    void change_text(std::string text)
+    void resized() override
     {
-        m_text = text;
+        textEditor.setBounds(getLocalBounds());
     }
+
+    // Append a line of text to the log
+    void addMessage(const juce::String& text)
+    {
+        textEditor.moveCaretToEnd();
+        textEditor.insertTextAtCaret(text + "\n");
+
+    }
+
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiMessage)
+    juce::TextEditor textEditor;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiMessage)
 };

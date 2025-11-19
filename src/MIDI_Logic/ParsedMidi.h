@@ -12,7 +12,7 @@
 #include  "../utils.h"
 #include  "TrackChunk.h"
 
-class ParsedMidi {
+class ParsedMidi{
     public:
     ParsedMidi(const std::vector<uint8_t>& midi_bytes);
     ~ParsedMidi();
@@ -35,12 +35,14 @@ class ParsedMidi {
     int ticksInQuarterNote;
     const juce::String CHUNK_TITLE_HEX = "4D54726B";
     const int HEADER_END = 14;
+    std::string printMidiInfo();
+
     private:
 
     void createMidiChunk(int trackStart);
     bool validateTrackChunk(int trackStart);
     void establishSMPTE();
-    void printMidiInfo();
+
     void get_length_of_tracks();
     int check_if_next_track_valid(int byte, int track_length);
 

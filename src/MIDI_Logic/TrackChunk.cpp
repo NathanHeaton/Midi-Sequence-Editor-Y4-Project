@@ -150,11 +150,11 @@ void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status
 }
 
 
-void TrackChunk::printMidiInfo() {
+std::string TrackChunk::printMidiInfo() {
+    std::string info;
     // DBG("printing midi track events");
-    // for (MidiEvent i : Events) {
-    //     DBG(i.getMidiData());
-    // }
-
-
+    for (MidiEvent i : Events) {
+        info += i.getMidiData();
+    }
+    return info;
 }

@@ -6,12 +6,14 @@
 
 MainComponent::MainComponent()
 {
+    //midiParser.addChangeListener(this);
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
-    addAndMakeVisible(midiMessageBox);
     addAndMakeVisible(testBox);
+    addAndMakeVisible(midiMessageBox);
     test_function();
-    midifileManager.addChangeListener(this);
+    midifileManager.addActionListener(this);
+
     openFileButton.addListener(this);
     setSize (1960, 1080);
 }
@@ -19,7 +21,6 @@ MainComponent::MainComponent()
 //==============================================================================
 void MainComponent::paint (juce::Graphics& g)
 {
-
     g.fillAll (MyColours::background);
     g.setFont (juce::FontOptions (45.0f));
     g.setColour (juce::Colours::white);
@@ -66,13 +67,3 @@ void MainComponent::buttonClicked(juce::Button* button)
 
 
 
-void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
-{
-    if(source == &midifileManager)
-    {
-        DBG("midi file loaded");
-        testBox.change_text(static_cast<std::string>("440Hz"));
-        midiMessageBox.setAlpha(.3);
-        DBG("should have changed text");
-    }
-}

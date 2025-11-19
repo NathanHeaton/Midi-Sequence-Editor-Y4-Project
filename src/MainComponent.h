@@ -5,16 +5,18 @@
 #include "UI/boxComponent.h"
 #include "UI/MidiMessageComponent.h"
 #include "MIDI_Logic/MidiFileManager.h"
+#include  "MIDI_Logic/ParsedMidi.h"
 #include <iostream>
 
 class MainComponent final : public juce::Component,
                             private juce::Button::Listener,
-                            public juce::ChangeListener
+                            public juce::ActionListener
 {
 public:
     // Vars
     boxComponent testBox;
     MidiFileManager midifileManager;
+    //ParsedMidi midiParser;
     MidiMessage midiMessageBox;
 
     MainComponent();
@@ -26,7 +28,16 @@ public:
         testBox.change_text("changing Text");
     }
 
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    void actionListenerCallback(const juce::String &message) override {
+        if (message == "fileLoaded") {
+
+        }
+        else if (message == "midiData") {
+            std::string text = midifileManager.m_ParsedMidi.at(0).printMidiInfo();
+            midiMessageBox.addMessage(text);
+        }
+
+    }
 
 private:
 

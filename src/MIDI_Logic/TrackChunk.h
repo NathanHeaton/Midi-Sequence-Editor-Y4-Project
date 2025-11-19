@@ -8,6 +8,7 @@
 #include <vector>
 #include <juce_core/juce_core.h>
 #include "MIDI_Events/MidiEvent.h"
+#include "juce_events/juce_events.h"
 #include "MidiByteReader.h"
 #include "../utils.h"
 #include "MIDI_Events/MidiStructs.h"
@@ -17,7 +18,7 @@ class TrackChunk {
 
     TrackChunk(std::vector<uint8_t>& bytes);
     ~TrackChunk();
-    void printMidiInfo();
+    std::string printMidiInfo();
     void createNoteEvents();
 
     // META & SYSEX

@@ -3,7 +3,3 @@
 //
 
 #include "MidiMessageComponent.h"
-
-MidiMessage::MidiMessage() {
-
-}

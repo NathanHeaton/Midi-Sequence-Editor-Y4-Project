@@ -28,7 +28,6 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
     // else {
     //
     // }
-    printMidiInfo();
 }
 
 ParsedMidi::~ParsedMidi() {
@@ -99,11 +98,17 @@ int ParsedMidi::check_if_next_track_valid(int byte,int track_length) {
 void ParsedMidi::establishSMPTE() {
 
 }
-void ParsedMidi::printMidiInfo() {
+std::string ParsedMidi::printMidiInfo() {
     DBG( "MIDI_FORMAT :" << MIDI_FORMAT);
     DBG( "Tracks :" << num_of_tracks);
     DBG( "smpte :" << std::to_string(SMPTE_time));
     DBG( "ticksInQuarterNote:" << ticksInQuarterNote);
     DBG( "m_headerChunkLength :" << vector_bytes_to_int(m_headerChunkLength)<< " contents :"<< vector_to_HexString(m_headerChunkLength));
     DBG( "divisions :" << ticksInQuarterNote);
+    std::string allInfo;
+    for (TrackChunk i : m_tracks) {
+
+        allInfo += i.printMidiInfo();
+    }
+    return allInfo;
 }
