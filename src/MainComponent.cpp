@@ -1,16 +1,17 @@
 #include "MainComponent.h"
-#include "Misc/MyColours.h"
+
 #include "MIDI_Logic/MidiFileManager.h"
 
 
 
 MainComponent::MainComponent()
 {
-    //midiParser.addChangeListener(this);
+    addAndMakeVisible(testBox);
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
-    addAndMakeVisible(testBox);
+
     addAndMakeVisible(midiMessageBox);
+    addAndMakeVisible(testTrack);
     test_function();
     midifileManager.addActionListener(this);
 
@@ -30,11 +31,13 @@ void MainComponent::paint (juce::Graphics& g)
 void MainComponent::resized()
 {
     //buttons
+    testBox.setBounds(getLocalBounds().withHeight(150));
     openFileButton.setBounds(30,30, 100, 30);
     testButton.setBounds(130,30,100,30);
 
     // boxes
-    testBox.setBounds(getLocalBounds().withHeight(200).reduced(20).withTrimmedTop(100));
+
+    testTrack.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150));
 
     midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
 

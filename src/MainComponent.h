@@ -6,6 +6,8 @@
 #include "UI/MidiMessageComponent.h"
 #include "MIDI_Logic/MidiFileManager.h"
 #include  "MIDI_Logic/ParsedMidi.h"
+#include "UI/Track/TrackComponent.h"
+#include "Misc/MyColours.h"
 #include <iostream>
 
 class MainComponent final : public juce::Component,
@@ -15,6 +17,8 @@ class MainComponent final : public juce::Component,
 public:
     // Vars
     boxComponent testBox;
+    TrackComponent testTrack;
+
     MidiFileManager midifileManager;
     //ParsedMidi midiParser;
     MidiMessage midiMessageBox;
