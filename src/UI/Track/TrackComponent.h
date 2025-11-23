@@ -13,11 +13,9 @@ class TrackComponent: public juce::Component
 public:
 
     HeadingComponent heading;
-    TrackContent content;
 
     TrackComponent() {
         addAndMakeVisible(heading);
-        addAndMakeVisible(content);
     }
 
 
@@ -37,7 +35,6 @@ public:
 
 
         flex.items.add(juce::FlexItem(heading).withWidth(300).withHeight(getHeight()));
-        flex.items.add(juce::FlexItem(content).withFlex(1.0f));
 
 
         flex.performLayout(getLocalBounds());

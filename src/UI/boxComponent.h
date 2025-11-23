@@ -15,10 +15,10 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        g.setColour(MyColours::backgroundAlt);
+        g.setColour(MyColours::background);
         g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
 
-        g.setColour(juce::Colours::white);
+        g.setColour(MyColours::outline);
         g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
         g.drawText (m_text, getLocalBounds(), juce::Justification::centred, true);
     }

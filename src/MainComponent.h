@@ -8,6 +8,7 @@
 #include  "MIDI_Logic/ParsedMidi.h"
 #include "UI/Track/TrackComponent.h"
 #include "Misc/MyColours.h"
+#include "UI/Track/PatternViewport.h"
 #include <iostream>
 
 class MainComponent final : public juce::Component,
@@ -17,11 +18,15 @@ class MainComponent final : public juce::Component,
 public:
     // Vars
     boxComponent testBox;
+
     TrackComponent testTrack;
+    PatternViewport patternViewport;
 
     MidiFileManager midifileManager;
     //ParsedMidi midiParser;
     MidiMessage midiMessageBox;
+
+
 
     MainComponent();
     void paint (juce::Graphics&) override;

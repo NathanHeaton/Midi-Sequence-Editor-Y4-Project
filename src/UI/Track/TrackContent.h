@@ -9,34 +9,33 @@
 class TrackContent : public juce::Component
 {
 public:
+
+
     TrackContent()
     {
-        addAndMakeVisible(title);
-        addAndMakeVisible(muteButton);
-        addAndMakeVisible(soloButton);
+        setSize(3000, 100 );
+    }
 
-        title.setText("Track", juce::dontSendNotification);
-        muteButton.setButtonText("M");
-        soloButton.setButtonText("S");
+    void paint(juce::Graphics& g) override {
+        g.setColour(MyColours::background);
+        g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
+
+        g.setColour(MyColours::outline);
+        g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
+
+        //temp grid
+        for (int i =0; i < getWidth(); i+=50) {
+            g.drawRoundedRectangle(i,0,50,getHeight(),0,1);
+        }
     }
 
     void resized() override
     {
-        juce::FlexBox row;
-        row.flexDirection = juce::FlexBox::Direction::row;
-        row.alignItems = juce::FlexBox::AlignItems::center;
 
-        row.items.add(juce::FlexItem(title).withFlex(1.0f));
-        row.items.add(juce::FlexItem(muteButton).withWidth(40));
-        row.items.add(juce::FlexItem(soloButton).withWidth(40));
-
-        row.performLayout(getLocalBounds());
     }
 
 private:
-    juce::Label title;
-    juce::TextButton muteButton {"Mute"};
-    juce::TextButton soloButton {"Solo"};
+
 };
 
 #endif //MYPROJECT_TRACKCONTENT_H

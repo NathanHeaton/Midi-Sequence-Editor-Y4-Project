@@ -12,6 +12,7 @@ MainComponent::MainComponent()
 
     addAndMakeVisible(midiMessageBox);
     addAndMakeVisible(testTrack);
+    addAndMakeVisible(patternViewport);
     test_function();
     midifileManager.addActionListener(this);
 
@@ -37,7 +38,10 @@ void MainComponent::resized()
 
     // boxes
 
+
+    //tracks
     testTrack.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150));
+    patternViewport.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150).withTrimmedLeft(300));
 
     midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
 
