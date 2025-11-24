@@ -18,6 +18,7 @@ public:
         addAndMakeVisible(effectButton);
         addAndMakeVisible(spacer);
 
+        title.setEditable(true);
         title.setText("Track", juce::sendNotification);
         //muteButton.setButtonText("M");
         //soloButton.setButtonText("S");

@@ -8,6 +8,7 @@
 #include  "MIDI_Logic/ParsedMidi.h"
 #include "UI/Track/TrackComponent.h"
 #include "Misc/MyColours.h"
+#include "UI/Top_nav/TopNavComponent.h"
 #include "UI/Track/PatternViewport.h"
 #include <iostream>
 
@@ -17,6 +18,7 @@ class MainComponent final : public juce::Component,
 {
 public:
     // Vars
+    TopNavComponent topNavComponent;
     boxComponent testBox;
 
     TrackComponent testTrack;

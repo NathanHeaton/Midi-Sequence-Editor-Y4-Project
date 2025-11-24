@@ -9,7 +9,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(testBox);
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(testButton);
-
+    addAndMakeVisible(&topNavComponent);
     addAndMakeVisible(midiMessageBox);
     addAndMakeVisible(testTrack);
     addAndMakeVisible(patternViewport);
@@ -31,8 +31,10 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
+    //top Nav
+    topNavComponent.setBounds(getLocalBounds().withHeight(36));
     //buttons
-    testBox.setBounds(getLocalBounds().withHeight(150));
+    // testBox.setBounds(getLocalBounds().withHeight(130));
     openFileButton.setBounds(30,30, 100, 30);
     testButton.setBounds(130,30,100,30);
 

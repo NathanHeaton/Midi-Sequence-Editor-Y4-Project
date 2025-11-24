@@ -6,6 +6,7 @@ juce::Colour MyColours::textSce;
 juce::Colour MyColours::backgroundAlt;
 juce::Colour MyColours::accent;
 juce::Colour MyColours::outline;
+juce::Colour MyColours::altOutline;
 
 void MyColours::setDefaultTheme()
 {
@@ -13,9 +14,11 @@ void MyColours::setDefaultTheme()
     backgroundAlt = juce::Colour::fromRGB(19,27,42);        
     outline = juce::Colour::fromRGB(187,196,213);
     accent = juce::Colour::fromRGB(243,180,64);
+    altOutline = juce::Colour::fromRGB(115,123,137);
 
 
     textPri = juce::Colour::fromRGB(255,255,255);
     textSce = juce::Colour::fromRGB(160,169,100);
+
 
 }

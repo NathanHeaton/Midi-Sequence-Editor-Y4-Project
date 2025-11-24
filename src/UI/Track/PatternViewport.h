@@ -22,6 +22,8 @@ public:
     PatternViewport() {
         addAndMakeVisible(viewport);
          viewport.setViewedComponent(&trackContent,false);
+
+        viewport.setScrollBarPosition(1,0);
     }
 
 

@@ -6,7 +6,6 @@ juce_add_gui_app(${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
     PRIVATE
         UI/boxComponent.cpp
-        UI/MidiMessageComponent.cpp
         MIDI_Logic/MIDI_Events/MidiEvent.cpp
         MIDI_Logic/filePicker.cpp
         MIDI_Logic/MidiFileManager.cpp

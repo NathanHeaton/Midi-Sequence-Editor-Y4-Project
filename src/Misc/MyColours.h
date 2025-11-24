@@ -12,6 +12,7 @@ class MyColours
         static juce::Colour backgroundAlt;
         static juce::Colour outline;
         static juce::Colour accent;
+        static juce::Colour altOutline;
 
         static void setDefaultTheme();
         

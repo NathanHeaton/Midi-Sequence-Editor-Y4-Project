@@ -29,13 +29,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/UI/Track/PatternViewport.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UI/Top_nav/TopNavComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/Track/TrackComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Track/TrackComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Misc/MyColours.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Misc/MyColours.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Misc/MyColours.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/Misc/MyColours.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/MidiMessageComponent.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Track/HeadingComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Track/HeadingComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Track/PatternViewport.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Track/PatternViewport.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/UI/Track/TrackContent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Track/TrackContent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/boxComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/boxComponent.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +101,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="myProject" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="myProject" TARGET_NAME="myProject" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="myProject" RUN_TARGET_NAME="myProject">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -135,7 +144,8 @@
       <workItem from="1763035277569" duration="4886000" />
       <workItem from="1763543663182" duration="11818000" />
       <workItem from="1763727693123" duration="11257000" />
-      <workItem from="1763929884117" duration="3623000" />
+      <workItem from="1763929884117" duration="6075000" />
+      <workItem from="1764019713248" duration="4655000" />
     </task>
     <servers />
   </component>
@@ -146,5 +156,15 @@
     <isAutomaticCheckingOnLaunch value="false" />
     <isAutomaticFoundErrors value="true" />
     <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/UI/Track/TrackContent.h</url>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
