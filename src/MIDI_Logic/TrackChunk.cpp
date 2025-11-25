@@ -88,7 +88,6 @@ void TrackChunk::handleMetaEvent(uint32_t delta, uint8_t status) {
         return;
     }
     length = m_midiReader.readVariableLength();// finds the length of the data
-    DBG("length"<< (static_cast<int>(length)));
     std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all of the meta event data
 
     MidiEvent midi_event(delta, status,{event, length,dataBytes} );
@@ -152,9 +151,10 @@ void TrackChunk::handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status
 
 std::string TrackChunk::printMidiInfo() {
     std::string info;
-    // DBG("printing midi track events");
+    DBG("printing midi track events");
     for (MidiEvent i : Events) {
         info += i.getMidiData();
     }
+    DBG(info);
     return info;
 }

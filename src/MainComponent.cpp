@@ -43,7 +43,7 @@ void MainComponent::resized()
 
     //tracks
     testTrack.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150));
-    patternViewport.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150).withTrimmedLeft(300));
+    patternViewport.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(130).withTrimmedLeft(300));
 
     midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
 

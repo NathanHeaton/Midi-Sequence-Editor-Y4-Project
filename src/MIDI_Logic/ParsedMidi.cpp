@@ -99,12 +99,6 @@ void ParsedMidi::establishSMPTE() {
 
 }
 std::string ParsedMidi::printMidiInfo() {
-    DBG( "MIDI_FORMAT :" << MIDI_FORMAT);
-    DBG( "Tracks :" << num_of_tracks);
-    DBG( "smpte :" << std::to_string(SMPTE_time));
-    DBG( "ticksInQuarterNote:" << ticksInQuarterNote);
-    DBG( "m_headerChunkLength :" << vector_bytes_to_int(m_headerChunkLength)<< " contents :"<< vector_to_HexString(m_headerChunkLength));
-    DBG( "divisions :" << ticksInQuarterNote);
     std::string allInfo;
     for (TrackChunk i : m_tracks) {
 
