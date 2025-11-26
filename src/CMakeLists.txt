@@ -5,7 +5,6 @@ juce_add_gui_app(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        UI/boxComponent.cpp
         MIDI_Logic/MIDI_Events/MidiEvent.cpp
         MIDI_Logic/filePicker.cpp
         MIDI_Logic/MidiFileManager.cpp
@@ -13,8 +12,7 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
         Misc/MyColours.cpp
-        Main.cpp
-        MainComponent.cpp)
+        Main.cpp)
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE

@@ -30,12 +30,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/UI/ControlPannel/ControlComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UI/Piano_Roll/PianoRollComponent.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UI/Piano_Roll/PianoRollWindow.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MainComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainComponent.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/ControlPannel/ControlComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/ControlPannel/ControlComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/boxComponent.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/boxComponent.h" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,7 +151,7 @@
       <workItem from="1764019713248" duration="4655000" />
       <workItem from="1764081260964" duration="5925000" />
       <workItem from="1764148657982" duration="6248000" />
-      <workItem from="1764187518038" duration="3319000" />
+      <workItem from="1764187518038" duration="7580000" />
     </task>
     <servers />
   </component>
