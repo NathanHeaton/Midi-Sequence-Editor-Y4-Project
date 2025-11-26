@@ -2,7 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../../Misc/MyColours.h"
-#include "PianoRollComponent.h"
+#include "PianoRollMain.h"
 
 #include <iostream>
 
@@ -14,7 +14,7 @@ public:
         "Piano Roll", MyColours::background, juce::DocumentWindow::allButtons,
         true)
     {
-        setContentOwned(new PianoRollComponent(), true);
+        setContentOwned(new PianoRollMain(), true);
 
         setUsingNativeTitleBar (true);
         centreWithSize(300,300);
