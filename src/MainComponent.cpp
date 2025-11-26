@@ -1,22 +1,17 @@
 #include "MainComponent.h"
 
-#include "MIDI_Logic/MidiFileManager.h"
-
-
-
 MainComponent::MainComponent()
 {
     addAndMakeVisible(arranger);
     addAndMakeVisible(testBox);
-    addAndMakeVisible(openFileButton);
+    addAndMakeVisible(&controlComponent);
     addAndMakeVisible(&topNavComponent);
-    addAndMakeVisible(midiMessageBox);
 
 
     test_function();
-    midifileManager.addActionListener(this);
+    //midifileManager.addActionListener(this);
 
-    openFileButton.addListener(this);
+
     setSize (1960, 1080);
 }
 
@@ -31,43 +26,15 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    arranger.setBounds(getLocalBounds().withHeight(getHeight()).withTrimmedTop(60).reduced(5));
-    //top Nav
-    topNavComponent.setBounds(getLocalBounds().withHeight(36));
-    //buttons
-    // testBox.setBounds(getLocalBounds().withHeight(130));
-    openFileButton.setBounds(30,30, 100, 30);
-    // boxes
+    juce::FlexBox column;
+    column.flexDirection = juce::FlexBox::Direction::column;
+    column.alignItems = juce::FlexBox::AlignItems::center;
 
-    midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
+    column.items.add(juce::FlexItem (topNavComponent).withHeight(36).withWidth(getWidth()));
+    column.items.add(juce::FlexItem (controlComponent).withHeight(92).withWidth(getWidth()));
+    column.items.add(juce::FlexItem (arranger).withHeight(800).withWidth(getWidth()));
 
+    column.performLayout(getLocalBounds());
 }
-
-
-void MainComponent::buttonClicked(juce::Button* button)
-{
-    if(button == &openFileButton)
-    {
-        juce::File initalDir = juce::File::getCurrentWorkingDirectory();    
-
-        auto chooser = std::make_shared<juce::FileChooser>("choose a .midi or .mid file",
-                                    initalDir ,
-                                    "*.mid;*");
-        
-        chooser->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
-            [this, chooser](const juce::FileChooser& fc)
-            {
-                juce::File chosen = fc.getResult();
-                if (chosen.existsAsFile())
-                {
-                    DBG("Async selected file: " + chosen.getFullPathName());
-                    midifileManager.loadFile(chosen);
-                }
-            });
-
-    }
-
-}
-
 
 

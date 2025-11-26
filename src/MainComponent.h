@@ -3,32 +3,26 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_events/juce_events.h>
 #include "UI/boxComponent.h"
-#include "UI/MidiMessageComponent.h"
-#include "MIDI_Logic/MidiFileManager.h"
-#include  "MIDI_Logic/ParsedMidi.h"
 
+#include "UI/ControlPannel/ControlComponent.h"
+#include  "MIDI_Logic/ParsedMidi.h"
 #include "Misc/MyColours.h"
 #include "UI/Top_nav/TopNavComponent.h"
-
 #include "UI/Arranger/Arranger.h"
+
 #include <iostream>
 
 
-class MainComponent final : public juce::Component,
-                            private juce::Button::Listener,
-                            public juce::ActionListener
+class MainComponent final : public juce::Component
 {
 public:
     // Vars
-    TopNavComponent topNavComponent;
     boxComponent testBox;
 
 
-
-    MidiFileManager midifileManager;
-    //ParsedMidi midiParser;
-    MidiMessage midiMessageBox;
-
+    // Main Panels
+    TopNavComponent topNavComponent;
+    ControlComponent controlComponent;
     Arranger arranger;
 
 
@@ -41,22 +35,8 @@ public:
         testBox.change_text("changing Text");
     }
 
-    void actionListenerCallback(const juce::String &message) override {
-        if (message == "fileLoaded") {
-
-        }
-        else if (message == "midiData") {
-            std::string text = midifileManager.m_ParsedMidi.at(0).printMidiInfo();
-            midiMessageBox.addMessage(text);
-        }
-
-    }
 
 private:
-
-    juce::TextButton openFileButton { "open Midi"};
-
-    void buttonClicked(juce::Button* button) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 
