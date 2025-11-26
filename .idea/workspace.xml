@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Environment/UserInterface/HierarchyView/ViewStyle/@EntryValue" value="SuperTypes" type="string" />
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
     <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
@@ -29,13 +30,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UI/Arranger/Arranger.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UI/Arranger/TopControls.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/ParsedMidi.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MIDI_Logic/TrackChunk.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI/Track/TrackContent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Track/TrackContent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Track/TrackComponent.h" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,11 +98,6 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="myProject" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="myProject" TARGET_NAME="myProject" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="myProject" RUN_TARGET_NAME="myProject">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -142,7 +138,8 @@
       <workItem from="1763727693123" duration="11257000" />
       <workItem from="1763929884117" duration="6075000" />
       <workItem from="1764019713248" duration="4655000" />
-      <workItem from="1764081260964" duration="5071000" />
+      <workItem from="1764081260964" duration="5925000" />
+      <workItem from="1764148657982" duration="6248000" />
     </task>
     <servers />
   </component>

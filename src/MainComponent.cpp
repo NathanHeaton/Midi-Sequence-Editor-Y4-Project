@@ -6,13 +6,13 @@
 
 MainComponent::MainComponent()
 {
+    addAndMakeVisible(arranger);
     addAndMakeVisible(testBox);
     addAndMakeVisible(openFileButton);
-    addAndMakeVisible(testButton);
     addAndMakeVisible(&topNavComponent);
     addAndMakeVisible(midiMessageBox);
-    addAndMakeVisible(testTrack);
-    addAndMakeVisible(patternViewport);
+
+
     test_function();
     midifileManager.addActionListener(this);
 
@@ -31,19 +31,13 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
+    arranger.setBounds(getLocalBounds().withHeight(getHeight()).withTrimmedTop(60).reduced(5));
     //top Nav
     topNavComponent.setBounds(getLocalBounds().withHeight(36));
     //buttons
     // testBox.setBounds(getLocalBounds().withHeight(130));
     openFileButton.setBounds(30,30, 100, 30);
-    testButton.setBounds(130,30,100,30);
-
     // boxes
-
-
-    //tracks
-    testTrack.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(150));
-    patternViewport.setBounds(getLocalBounds().withHeight(350).reduced(20).withTrimmedTop(130).withTrimmedLeft(300));
 
     midiMessageBox.setBounds(getLocalBounds().withHeight(1000).reduced(10).withTrimmedTop(400));
 
@@ -72,6 +66,7 @@ void MainComponent::buttonClicked(juce::Button* button)
             });
 
     }
+
 }
 
 

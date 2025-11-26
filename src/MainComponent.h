@@ -6,11 +6,13 @@
 #include "UI/MidiMessageComponent.h"
 #include "MIDI_Logic/MidiFileManager.h"
 #include  "MIDI_Logic/ParsedMidi.h"
-#include "UI/Track/TrackComponent.h"
+
 #include "Misc/MyColours.h"
 #include "UI/Top_nav/TopNavComponent.h"
-#include "UI/Track/PatternViewport.h"
+
+#include "UI/Arranger/Arranger.h"
 #include <iostream>
+
 
 class MainComponent final : public juce::Component,
                             private juce::Button::Listener,
@@ -21,13 +23,13 @@ public:
     TopNavComponent topNavComponent;
     boxComponent testBox;
 
-    TrackComponent testTrack;
-    PatternViewport patternViewport;
+
 
     MidiFileManager midifileManager;
     //ParsedMidi midiParser;
     MidiMessage midiMessageBox;
 
+    Arranger arranger;
 
 
     MainComponent();
@@ -53,14 +55,8 @@ public:
 private:
 
     juce::TextButton openFileButton { "open Midi"};
-    juce::TextButton testButton {"test!"};
-    juce::DrawableRectangle testAngle;
-    
 
     void buttonClicked(juce::Button* button) override;
-
-
-    void addUIAndMakeVisible();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 
