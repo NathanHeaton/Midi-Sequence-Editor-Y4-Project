@@ -5,24 +5,36 @@
 #include "../Track/PatternViewport.h"
 #include "../Track/HeadingComponent.h"
 #include "../../MIDI_Logic/MidiFileManager.h"
+#include "../../SessionData.h"
 
 #include <iostream>
 
 
 class ControlComponent: public juce::Component,
                         public juce::Button::Listener,
-                        public juce::ActionBroadcaster
+                        public juce::ActionBroadcaster,
+public juce::TextEditor::Listener
 {
 public:
 
     MidiFileManager midifileManager;
     juce::TextButton openFileButton { "open Midi"};
     juce::TextButton createPatternButton { "create pattern"};
+    juce::TextEditor barWidthInput;
+
 
 
     ControlComponent() {
+        addAndMakeVisible(&barWidthInput);
         addAndMakeVisible(openFileButton);
         addAndMakeVisible(createPatternButton);
+
+        barWidthInput.setMultiLine(false);
+        barWidthInput.setJustification(juce::Justification::centredLeft);
+        barWidthInput.setCaretVisible(true);
+        barWidthInput.setText("200");
+        barWidthInput.setInputRestrictions(3,"0123456789.");
+
         openFileButton.addListener(this);
         createPatternButton.addListener(this);
     }
@@ -37,12 +49,23 @@ public:
 
     }
 
+    void textEditorReturnKeyPressed(juce::TextEditor &editor) override {
+        if (&editor == &barWidthInput) {
+            float width = barWidthInput.getText().getFloatValue();
+            SessionData::instance().setBarWidth(width);
+        }
+
+    }
+
+
+
     void resized() override{
         juce::FlexBox row;
         row.flexDirection = juce::FlexBox::Direction::row;
         row.alignItems = juce::FlexBox::AlignItems::flexStart;
         row.items.add(juce::FlexItem (openFileButton).withHeight(40).withWidth(100));
         row.items.add(juce::FlexItem (createPatternButton).withHeight(40).withWidth(100));
+        row.items.add(juce::FlexItem (barWidthInput).withHeight(40).withWidth(100));
         row.performLayout(getLocalBounds());
     }
 

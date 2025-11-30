@@ -9,7 +9,7 @@
 #include "PianoTimelineViewport.h"
 #include "PianoViewport.h"
 #include "PianoRoll/PianoRollTimline.h"
-#include "PianoRoll/PianoKeys.h"
+//#include "PianoRoll/PianoKeys.h"
 
 class PianoRollComponent : public juce::Component
 {
@@ -25,6 +25,8 @@ public:
         addAndMakeVisible(&timelineViewport);
         addAndMakeVisible(&pianoViewport);
         addAndMakeVisible(&timeline);
+
+        addAndMakeVisible(&pianoKeys);
         timelineViewport.setViewedComponent(&timeline);
         pianoViewport.setViewedComponent(&pianoKeys);
 

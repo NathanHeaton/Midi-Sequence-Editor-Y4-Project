@@ -30,9 +30,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2326aaf5-0750-4e8f-970a-86ce89222c25" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/SessionData.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SessionData.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/SessionData.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/ControlPannel/ControlComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/ControlPannel/ControlComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRoll/BarLabels.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRoll/BarLabels.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRoll/PianoRollTimline.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRoll/PianoRollTimline.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRollComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI/Piano_Roll/Panels/PianoRollComponent.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +145,7 @@
       <workItem from="1764081260964" duration="5925000" />
       <workItem from="1764148657982" duration="6248000" />
       <workItem from="1764187518038" duration="13851000" />
-      <workItem from="1764513851209" duration="9450000" />
+      <workItem from="1764513851209" duration="13117000" />
     </task>
     <servers />
   </component>

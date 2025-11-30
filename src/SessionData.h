@@ -39,17 +39,24 @@ class SessionData {
         listeners.call(&Listener::denominatorChanged, newDenominator);
     }
 
+    void setBarWidth(float newBarWidth) {
+        barWidth = newBarWidth;
+
+    }
+
     class Listener {
         public:
         virtual ~Listener() =default;
         virtual void bpmChanged(int newBPM)=0;
         virtual void denominatorChanged(int newDenominator)=0;
         virtual void numeratorChanged(int newNumerator)=0;
+        virtual void barWidthChanged(int newBarWidth)=0;
     };
 
     juce::ListenerList<Listener> listeners;
 
     private:
+    SessionData();
     JUCE_DECLARE_NON_COPYABLE(SessionData);
 
     int BPM =120;

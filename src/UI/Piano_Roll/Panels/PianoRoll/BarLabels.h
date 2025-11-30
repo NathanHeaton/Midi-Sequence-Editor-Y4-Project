@@ -28,6 +28,12 @@ public:
         resized();
     }
 
+    void barWidthChanged(int newBarWidth) override {
+        barWidth = newBarWidth;
+        tempDivision = barWidth / static_cast<float>(beatsPerBar);
+        resized();
+    }
+
 
 
 
