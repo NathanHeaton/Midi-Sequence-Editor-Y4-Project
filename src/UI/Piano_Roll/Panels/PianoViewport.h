@@ -2,31 +2,21 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../../../Misc/MyColours.h"
-#include "PianoKeys.h"
+#include <functional>
 
-class PianoViewport: public juce::Component
+class PianoViewport:  public juce::Viewport
 {
 public:
 
-    PianoKeys pianoRoll;
+    PianoViewport() = default;
 
-    PianoViewport() {
-        addAndMakeVisible(viewport2);
-        addAndMakeVisible(pianoRoll);
-        viewport2.setViewedComponent(&pianoRoll,false);
+    std::function<void(int)> onScrollY;
 
-        viewport2.setScrollBarPosition(true,false);
+    void scrollBarMoved(juce::ScrollBar *scrollBarThatHasMoved, double newRangeStart) override {
+        if (onScrollY) onScrollY(getViewPositionY());
     }
 
-    void resized() override {
-        juce::Rectangle<int> Area = getLocalBounds();
 
-        viewport2.setBounds(Area);
-    }
 
-    juce::Viewport viewport2;
-
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoViewport)
 };
+

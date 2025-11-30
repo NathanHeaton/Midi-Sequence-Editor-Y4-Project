@@ -4,23 +4,35 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-
-#include "PianoTimlineViewport.h"
-#include "PianoViewport.h"
 #include "../../../Misc/MyColours.h"
 
+#include "PianoTimelineViewport.h"
+#include "PianoViewport.h"
+#include "PianoRoll/PianoRollTimline.h"
+#include "PianoRoll/PianoKeys.h"
 
 class PianoRollComponent : public juce::Component
 {
 public:
 
-    PianoTimlineViewport timeline;
-    PianoViewport piano;
+    PianoTimelineViewport timelineViewport;
+    PianoRollTimeline timeline;
+    PianoViewport pianoViewport;
+    PianoKeys pianoKeys;
+
 
     PianoRollComponent() {
+        addAndMakeVisible(&timelineViewport);
+        addAndMakeVisible(&pianoViewport);
         addAndMakeVisible(&timeline);
-        addAndMakeVisible(&piano);
-        label.setText("MidiPattern_1", juce::dontSendNotification);
+        timelineViewport.setViewedComponent(&timeline);
+        pianoViewport.setViewedComponent(&pianoKeys);
+
+        timelineViewport.onScrollY = [this](int y) {
+            pianoViewport.setViewPosition(0,y);
+        };
+
+
     }
 
     void paint(juce::Graphics& g) override
@@ -36,12 +48,12 @@ public:
         row.flexDirection = juce::FlexBox::Direction::row;
         row.alignItems = juce::FlexBox::AlignItems::flexStart;
 
-        row.items.add(juce::FlexItem(piano).withHeight(getHeight()).withWidth(64));
-        row.items.add(juce::FlexItem(timeline).withHeight(getHeight()).withWidth(getWidth()));
+        row.items.add(juce::FlexItem(pianoViewport).withHeight(getHeight()).withWidth(64));
+        row.items.add(juce::FlexItem(timelineViewport).withHeight(getHeight()).withWidth(getWidth()));
 
         row.performLayout(getLocalBounds());
     }
-    juce::Label label;
+
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoRollComponent)

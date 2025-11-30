@@ -2,7 +2,7 @@
 // Created by nathan on 21/11/2025.
 //
 
-#include "../../../Misc/MyColours.h"
+#include "../../../../Misc/MyColours.h"
 #include <juce_gui_extra/juce_gui_extra.h>
 
 class PianoRollTimeline : public juce::Component
