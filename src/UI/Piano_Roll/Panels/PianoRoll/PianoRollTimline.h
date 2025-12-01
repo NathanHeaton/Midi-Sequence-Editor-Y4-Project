@@ -4,10 +4,10 @@
 
 #include "../../../../Misc/MyColours.h"
 #include <juce_gui_extra/juce_gui_extra.h>
-//#include "../../../../SessionData.h"
+#include "../../../../SessionData.h"
 
-class PianoRollTimeline : public juce::Component
-                           // public SessionData::Listener
+class PianoRollTimeline : public juce::Component,
+                           public SessionData::Listener
 {
 public:
 
@@ -20,16 +20,16 @@ public:
     PianoRollTimeline()
     {
         setSize(3000, 800);
-        //SessionData::instance().listeners.add(this);
+        SessionData::instance().listeners.add(this);
     }
-    //
-    // void barWidthChanged(int newBarWidth) override {
-    //     barWidth = newBarWidth;
-    //     tempDivision = barWidth / static_cast<float>(beatsPerBar);
-    //
-    //     repaint();
-    // }
-    //
+
+    void barWidthChanged(int newBarWidth) override {
+        barWidth = newBarWidth;
+        tempDivision = barWidth / static_cast<float>(beatsPerBar);
+
+        repaint();
+    }
+
 
     // --- Component Painting ---
     void paint(juce::Graphics& g) override {
