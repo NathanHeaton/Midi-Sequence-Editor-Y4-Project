@@ -15,7 +15,6 @@ set(JUCE_DIR "/home/nathan/JUCE/install/lib/cmake/JUCE-8.0.10")
 find_package(JUCE CONFIG REQUIRED)
 
 add_subdirectory(src)
-
 file(GLOB IMGUI_SOURCES
         Dependencies/imgui_juce/imgui/*.cpp
 )

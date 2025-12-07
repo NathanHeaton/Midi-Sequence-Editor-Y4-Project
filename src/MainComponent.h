@@ -9,63 +9,81 @@
 #include "UI/Arranger/Arranger.h"
 #include "UI/Piano_Roll/PianoRollWindow.h"
 
-#include <iostream>
+#include <imgui.h>
+#include "backends/imgui_impl_opengl3.h"
 
-class MainComponent final : public juce::Component,
-                            public juce::ActionListener
+#include <imgui_impl_juce/imgui_impl_juce.h>
+#include <juce_opengl/juce_opengl.h>
+
+class MainComponent
+  : public juce::Component
+  , public juce::OpenGLRenderer
 {
 public:
-    // Main Panels
-    TopNavComponent topNavComponent;
-    ControlComponent controlComponent;
-    Arranger arranger;
-
     MainComponent()
     {
-        addAndMakeVisible(&arranger);
-        addAndMakeVisible(&controlComponent);
-        addAndMakeVisible(&topNavComponent);
-        setSize (1960, 1080);
+        setOpaque(true);
+        setSize(1000, 600);
+        setWantsKeyboardFocus(true);
 
-        controlComponent.addActionListener(this);
+        // set up opengl context
+        glctx.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
+        glctx.setRenderer(this);
+        glctx.attachTo(*this);
+        glctx.setContinuousRepainting(true);
     }
 
-    void paint (juce::Graphics& g) override{
-        g.fillAll (MyColours::background);
-        g.setFont (juce::FontOptions (45.0f));
-        g.setColour (juce::Colours::white);
-        g.drawText ("Test Project", getLocalBounds(), juce::Justification::centred, true);
+    ~MainComponent() {
+        glctx.detach();
     }
 
-    void resized() override{
-        juce::FlexBox column;
-        column.flexDirection = juce::FlexBox::Direction::column;
-        column.alignItems = juce::FlexBox::AlignItems::center;
-
-        column.items.add(juce::FlexItem (topNavComponent).withHeight(36).withWidth(getWidth()));
-        column.items.add(juce::FlexItem (controlComponent).withHeight(92).withWidth(getWidth()));
-        column.items.add(juce::FlexItem (arranger).withHeight(800).withWidth(getWidth()));
-
-        column.performLayout(getLocalBounds());
+    void newOpenGLContextCreated() override
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplJuce_Init(*this, glctx);
+        ImGui_ImplOpenGL3_Init();
     }
 
-    void actionListenerCallback(const juce::String &message) override {
-        DBG("main received: " + message);
-        if (message == "open piano roll") {
-                if ( pianoRollWindow == nullptr) {
-                    DBG("open piano roll window is a nullptr");
-                    pianoRollWindow = std::make_unique<PianoRollWindow>();
-                }
-                else {
-                    pianoRollWindow->toFront(true);
-                }
+    void renderOpenGL() override
+    {
+        using namespace juce::gl;
 
-        }
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplJuce_NewFrame();
+        ImGui::NewFrame();
 
+        // imgui begin
+        ImGui::Begin("window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Hello, world");
+        ImGui::End();
+
+        ImGui::ShowDemoWindow();
+        // imgui end
+
+        ImGui::Render();
+
+        // background begin
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // background end
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+
+    void openGLContextClosing() override
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplJuce_Shutdown();
+        ImGui::DestroyContext();
+    }
+
+    // regular ui not used
+    void paint(juce::Graphics &) override {}
+    void resized() override {}
+
 private:
-    std::unique_ptr<PianoRollWindow> pianoRollWindow;
+    juce::OpenGLContext glctx;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
-
-};
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
+  };
