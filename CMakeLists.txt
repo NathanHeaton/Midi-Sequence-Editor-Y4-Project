@@ -16,9 +16,11 @@ find_package(JUCE CONFIG REQUIRED)
 
 add_subdirectory(src)
 
-# --- Force-disable LTO for all JUCE-related targets ---
-get_property(allTargets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-foreach(tgt ${allTargets})
-    set_target_properties(${tgt} PROPERTIES INTERPROCEDURAL_OPTIMIZATION FALSE)
-endforeach()
+file(GLOB IMGUI_SOURCES
+        Dependencies/imgui_juce/imgui/*.cpp
+)
 
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC
+        Dependencies/imgui_juce/imgui
+)
