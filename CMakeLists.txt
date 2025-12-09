@@ -9,17 +9,30 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE OFF)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO OFF)
 set(JUCE_ENABLE_LTO OFF CACHE BOOL "Disable JUCE LTO" FORCE)
 
-# Add JUCE and your source
-#set(JUCE_DIR "/home/idad/Projects/4th_year_project_stuff/JUCE/install/lib/cmake/JUCE-8.0.10")
+# Add JUCE
 set(JUCE_DIR "/home/nathan/JUCE/install/lib/cmake/JUCE-8.0.10")
 find_package(JUCE CONFIG REQUIRED)
 
-add_subdirectory(src)
-file(GLOB IMGUI_SOURCES
-        Dependencies/imgui_juce/imgui/*.cpp
+# Build ImGui library with OpenGL3 backend
+add_library(imgui STATIC
+        Dependencies/imgui/imgui.cpp
+        Dependencies/imgui/imgui_demo.cpp
+        Dependencies/imgui/imgui_draw.cpp
+        Dependencies/imgui/imgui_tables.cpp
+        Dependencies/imgui/imgui_widgets.cpp
+        Dependencies/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC
-        Dependencies/imgui_juce/imgui
+        Dependencies/imgui
+        Dependencies/imgui/backends
 )
+
+# Link OpenGL
+find_package(OpenGL REQUIRED)
+target_link_libraries(imgui PUBLIC OpenGL::GL)
+
+add_subdirectory(Dependencies/imgui_juce)
+
+# Now add your source
+add_subdirectory(src)
