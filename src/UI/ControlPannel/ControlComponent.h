@@ -6,78 +6,39 @@
 #include "../Track/HeadingComponent.h"
 #include "../../MIDI_Logic/MidiFileManager.h"
 #include "../../SessionData.h"
+#include "imgui.h"
 
 #include <iostream>
 
 
-class ControlComponent: public juce::Component,
-                        public juce::Button::Listener,
-                        public juce::ActionBroadcaster,
-public juce::TextEditor::Listener
-{
+class ControlComponent {
 public:
 
     MidiFileManager midifileManager;
-    juce::TextButton openFileButton { "open Midi"};
-    juce::TextButton createPatternButton { "create pattern"};
-    juce::TextEditor barWidthInput;
 
+    float test_vol{0.0f};
+    ControlComponent() =default;
 
+    void ControldPanel() {
 
-    ControlComponent() {
-        addAndMakeVisible(&barWidthInput);
-        addAndMakeVisible(openFileButton);
-        addAndMakeVisible(createPatternButton);
+        ImGui::BeginTable("Control Panel",4);
+        ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
+        ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 200);
+        ImGui::TableSetupColumn("Playback",ImGuiTableColumnFlags_WidthFixed);
 
-        barWidthInput.setMultiLine(false);
-        barWidthInput.setJustification(juce::Justification::centredLeft);
-        barWidthInput.setCaretVisible(true);
-        barWidthInput.setText("200");
-        barWidthInput.setInputRestrictions(3,"0123456789.");
+        ImGui::TableNextColumn();
+        ImGui::Text("Master");
+        ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
+        ImGui::TableNextColumn();
+        if (ImGui::Button("create pattern")) {
 
-        openFileButton.addListener(this);
-        createPatternButton.addListener(this);
-    }
-
-    void paint(juce::Graphics& g) override
-    {
-        g.setColour(MyColours::background);
-        g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
-        g.setColour(MyColours::outline);
-        g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
-        g.drawText ("m_text", getLocalBounds(), juce::Justification::centred, true);
-
-    }
-
-    void textEditorReturnKeyPressed(juce::TextEditor &editor) override {
-        if (&editor == &barWidthInput) {
-            float width = barWidthInput.getText().getFloatValue();
-            SessionData::instance().setBarWidth(width);
         }
-
-    }
-
-
-
-    void resized() override{
-        juce::FlexBox row;
-        row.flexDirection = juce::FlexBox::Direction::row;
-        row.alignItems = juce::FlexBox::AlignItems::flexStart;
-        row.items.add(juce::FlexItem (openFileButton).withHeight(40).withWidth(100));
-        row.items.add(juce::FlexItem (createPatternButton).withHeight(40).withWidth(100));
-        row.items.add(juce::FlexItem (barWidthInput).withHeight(40).withWidth(100));
-        row.performLayout(getLocalBounds());
-    }
-
-    void buttonClicked(juce::Button* button) override {
-        DBG("buttonClicked");
-        if(button == &openFileButton){
+        if (ImGui::Button("load midi")) {
             openMidiFilePicker();
         }
-        else if(button == &createPatternButton) {
-            DBG("sending");
-            juce::ActionBroadcaster::sendActionMessage("open piano roll");
-        }
+        ImGui::TableNextColumn();
+        ImGui::Text("playback controls");
+        ImGui::EndTable();
     }
 
 

@@ -20,13 +20,14 @@ class MainComponent
   , public juce::OpenGLRenderer
 {
 public:
+    TopNavComponent top_nav_component;
+    ControlComponent control_component;
+
     MainComponent()
     {
         setOpaque(true);
-        setSize(1000, 600);
+        setSize(1920, 1080);
         setWantsKeyboardFocus(true);
-
-        // set up opengl context
         glctx.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
         glctx.setRenderer(this);
         glctx.attachTo(*this);
@@ -53,13 +54,16 @@ public:
         ImGui_ImplJuce_NewFrame();
         ImGui::NewFrame();
 
-        // imgui begin
-        ImGui::Begin("window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::Text("Hello, world");
-        ImGui::End();
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize));
 
-        ImGui::ShowDemoWindow();
-        // imgui end
+        ImGui::Begin("Main Window", nullptr, flags);
+
+        top_nav_component.nav();
+
+        control_component.ControldPanel();
+
+        ImGui::End();
 
         ImGui::Render();
 
@@ -78,12 +82,14 @@ public:
         ImGui::DestroyContext();
     }
 
-    // regular ui not used
-    void paint(juce::Graphics &) override {}
-    void resized() override {}
 
 private:
     juce::OpenGLContext glctx;
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar
+    | ImGuiWindowFlags_NoResize
+    | ImGuiWindowFlags_NoMove
+    | ImGuiWindowFlags_NoCollapse
+    | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
   };

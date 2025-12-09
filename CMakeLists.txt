@@ -21,6 +21,7 @@ add_library(imgui STATIC
         Dependencies/imgui/imgui_tables.cpp
         Dependencies/imgui/imgui_widgets.cpp
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
+        src/UI/Arranger/Track.h
 )
 
 target_include_directories(imgui PUBLIC
