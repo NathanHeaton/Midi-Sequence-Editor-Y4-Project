@@ -20,7 +20,7 @@ public:
 
     std::function<void(int)> onScrollY;
 
-    void scrollBarMoved(juce::ScrollBar *scrollBarThatHasMoved, double newRangeStart) override {
+    void scrollBarMoved([[maybe_unused]]juce::ScrollBar *scrollBarThatHasMoved,[[maybe_unused]] double newRangeStart) override {
         if (onScrollY) {
             onScrollY(getViewPositionY());
         }

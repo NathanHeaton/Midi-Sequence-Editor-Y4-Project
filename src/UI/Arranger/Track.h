@@ -11,29 +11,28 @@ public:
     Track() = default;
 
     void newTrack() {
-        ImGui::BeginTable("Track",3);
-        ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
-        ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
-        ImGui::TableSetupColumn("MIDI",ImGuiTableColumnFlags_WidthFixed);
 
+        if (ImGui::BeginTable("Track",3)) {
+            ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
+            ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
+            ImGui::TableSetupColumn("MIDI",ImGuiTableColumnFlags_WidthFixed);
 
-        if (ImGui::TableNextColumn()) {
-            ImGui::Text("Track Title");
-            ImGui::BeginTable("Controls",2);
-            ImGui::TableNextColumn();
-            ImGui::Button("Instrument");
-            ImGui::TableNextColumn();
-            ImGui::Text("vol");
-        }
-        if (ImGui::TableNextColumn()) {
-            ImGui::Text("mute");
-            ImGui::Text("solo");
-        }
-        if (ImGui::TableNextColumn()) {
-            ImGui::Text("MIDI");
-        }
-
-        ImGui::EndTable();
+            if (ImGui::TableNextColumn()) {
+                ImGui::Text("Track Title");
+                ImGui::BeginTable("Controls",2);
+                ImGui::TableNextColumn();
+                ImGui::Button("Instrument");
+                ImGui::TableNextColumn();
+                ImGui::Text("vol");
+            }ImGui::EndTable();
+            if (ImGui::TableNextColumn()) {
+                ImGui::Text("mute");
+                ImGui::Text("solo");
+            }
+            if (ImGui::TableNextColumn()) {
+                ImGui::Text("MIDI");
+            }
+        }ImGui::EndTable();
 
     }
 };

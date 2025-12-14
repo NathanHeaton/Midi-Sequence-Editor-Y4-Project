@@ -47,17 +47,17 @@ class SessionData {
     class Listener {
         public:
         virtual ~Listener() =default;
-        virtual void bpmChanged(int newBPM) {};
-        virtual void denominatorChanged(int newDenominator) {};
-        virtual void numeratorChanged(int newNumerator) {};
-        virtual void barWidthChanged(int newBarWidth) {};
+        virtual void bpmChanged(int /*newBPM*/) {};
+        virtual void denominatorChanged(int /*newDenominator*/) {};
+        virtual void numeratorChanged(int /*newNumerator*/) {};
+        virtual void barWidthChanged(float /*newBarWidth*/) {};
     };
 
     juce::ListenerList<Listener> listeners;
 
     private:
 
-    JUCE_DECLARE_NON_COPYABLE(SessionData);
+    JUCE_DECLARE_NON_COPYABLE(SessionData)
     SessionData() = default;
     int BPM =120;
     int numerator =4;

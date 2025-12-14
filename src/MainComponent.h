@@ -22,6 +22,7 @@ class MainComponent
 public:
     TopNavComponent top_nav_component;
     ControlComponent control_component;
+    Arranger arranger_component;
 
     MainComponent()
     {
@@ -62,6 +63,8 @@ public:
         top_nav_component.nav();
 
         control_component.ControldPanel();
+
+        arranger_component.arranger();
 
         ImGui::End();
 

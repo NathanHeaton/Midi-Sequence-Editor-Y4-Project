@@ -14,10 +14,7 @@ public:
     TopControls topControls;
     PatternViewport patternViewport;
 
-    std::unique_ptr<std::vector<Track>> track;
-
-    // track controls
-    int numTracks = 1;
+    std::vector<std::unique_ptr<Track>> tracks;
     std::vector<std::unique_ptr<HeadingComponent>> trackComponents;
 
     
@@ -27,7 +24,12 @@ public:
 
     void arranger() {
         ImGui::Begin("Arranger");
-        ImGui::End;
+        if (ImGui::BeginTable("arranngerchild",1))
+        for (const auto& track : tracks) {
+            track->newTrack();
+        }
+
+        ImGui::End();
     }
 
 
@@ -35,9 +37,8 @@ public:
 
     void AddTrack()  {
         DBG("adding track");
-        auto newTrack = Track();
-        track->push_back(newTrack);
-
+        auto newTrack =  std::make_unique<Track>(); // create a new track
+        tracks.push_back(std::move(newTrack));
     }
 
 
