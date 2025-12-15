@@ -14,38 +14,8 @@
 
 class SessionData {
     public:
-    static SessionData& instance() {
-        static SessionData instance;
-        return instance;
-    }
-
-    int getBPM() const {return BPM;}
-    int getNumerator() const {return numerator;}
-    int getDenominator() const {return denominator;}
-    float getBarWidth() const {return barWidth;}
-
-    void setBPM(int newBPM) {
-        BPM = newBPM;
-        listeners.call(&Listener::bpmChanged, newBPM);
-    }
-
-    void setNumerator(int newNumerator) {
-        numerator = newNumerator;
-        listeners.call(&Listener::numeratorChanged, newNumerator);
-    }
-
-    void setDenominator(int newDenominator) {
-        denominator = newDenominator;
-        listeners.call(&Listener::denominatorChanged, newDenominator);
-    }
-
-    void setBarWidth(float newBarWidth) {
-        barWidth = newBarWidth;
-
-    }
-
     class Listener {
-        public:
+    public:
         virtual ~Listener() =default;
         virtual void bpmChanged(int /*newBPM*/) {};
         virtual void denominatorChanged(int /*newDenominator*/) {};
@@ -53,16 +23,54 @@ class SessionData {
         virtual void barWidthChanged(float /*newBarWidth*/) {};
     };
 
+    class TimeSignature {
+    public:
+        int numerator;
+        int denominator;
+        TimeSignature(int n, int d): numerator(n), denominator(d) {}
+        void change(int n,int d){numerator=n;denominator=d;}
+        int getNumerator() const {return numerator;}
+        int getDenominator() const {return denominator;}
+    };
+
+    static SessionData& instance() {
+        static SessionData instance;
+        return instance;
+    }
+
+    int getBPM() const {return BPM;}
+    float getBarWidth() const {return barWidth;}
+    int getTrackAmount() const {return TrackAmount;}
+    float getPixelPerBeat() const {return pixelPerBeat;}
+
+    void setPixelPerBeat(float newPixelPerBeat) {pixelPerBeat = newPixelPerBeat;}
+    void setBPM(int newBPM) {
+        BPM = newBPM;
+        listeners.call(&Listener::bpmChanged, newBPM);
+    }
+
+    void setBarWidth(float newBarWidth) {
+        barWidth = newBarWidth;
+    }
+
+    void addTrack() {
+        TrackAmount++;
+    }
+
+    TimeSignature timeSignature{4,4};
     juce::ListenerList<Listener> listeners;
+
 
     private:
 
     JUCE_DECLARE_NON_COPYABLE(SessionData)
     SessionData() = default;
     int BPM =120;
-    int numerator =4;
+    int TrackAmount = 0;
+    float pixelPerBeat = 100.0f;
     float barWidth = 200.0f;
-    int denominator =4;
+
+
 
 
 

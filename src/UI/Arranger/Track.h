@@ -12,11 +12,9 @@ public:
 
     void newTrack() {
 
-        if (ImGui::BeginTable("Track",3)) {
+        if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit, ImVec2(0, 100))) {
             ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
             ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
-            ImGui::TableSetupColumn("MIDI",ImGuiTableColumnFlags_WidthFixed);
-
             if (ImGui::TableNextColumn()) {
                 ImGui::Text("Track Title");
                 ImGui::BeginTable("Controls",2);
@@ -28,9 +26,6 @@ public:
             if (ImGui::TableNextColumn()) {
                 ImGui::Text("mute");
                 ImGui::Text("solo");
-            }
-            if (ImGui::TableNextColumn()) {
-                ImGui::Text("MIDI");
             }
         }ImGui::EndTable();
 

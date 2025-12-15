@@ -11,8 +11,8 @@ class PianoRollTimeline : public juce::Component,
 {
 public:
 
-    float barWidth = SessionData::instance().getBarWidth();
-    int beatsPerBar = SessionData::instance().getDenominator();
+    float barWidth = 1;
+    int beatsPerBar = 1;
     float tempDivision = barWidth / static_cast<float>(beatsPerBar);
 
 
