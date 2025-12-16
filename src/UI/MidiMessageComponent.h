@@ -1,7 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../Misc/MyColours.h"
+#include "../Theme.h"
 
 class MidiMessage : public juce::Component
 {

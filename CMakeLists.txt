@@ -23,6 +23,7 @@ add_library(imgui STATIC
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
         src/UI/Arranger/Track.h
         src/UI/Arranger/Timeline.h
+        src/Theme.h
 )
 
 target_include_directories(imgui PUBLIC

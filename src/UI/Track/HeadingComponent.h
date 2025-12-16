@@ -1,7 +1,7 @@
 //
 // Created by nathan on 21/11/2025.
 //
-#include "../../Misc/MyColours.h"
+#include "../../Theme.h"
 #ifndef MYPROJECT_HEADINGCOMPONENT_H
 #define MYPROJECT_HEADINGCOMPONENT_H
 
@@ -24,11 +24,7 @@ public:
         //soloButton.setButtonText("S");
     }
 
-    void paint(juce::Graphics& g) override {
-        g.fillAll(MyColours::background);
-        g.setColour(MyColours::outline);
-        g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
-    }
+
 
     void resized() override
     {

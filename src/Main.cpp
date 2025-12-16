@@ -1,5 +1,5 @@
 #include "MainComponent.h"
-#include "Misc/MyColours.h"
+#include "Theme.h"
 
 
 /* Main.cpp: main file for application */

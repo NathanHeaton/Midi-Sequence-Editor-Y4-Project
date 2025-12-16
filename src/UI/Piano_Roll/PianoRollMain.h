@@ -4,7 +4,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../../Misc/MyColours.h"
+#include "../../Theme.h"
 #include "Panels/Tools.h"
 #include "Panels/PianoRollComponent.h"
 #include <iostream>
@@ -26,9 +26,7 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        g.setColour(MyColours::background);
         g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
-        g.setColour(MyColours::outline);
         g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
     }
 

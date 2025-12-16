@@ -67,7 +67,7 @@ class SessionData {
     SessionData() = default;
     int BPM =120;
     int TrackAmount = 0;
-    float pixelPerBeat = 100.0f;
+    float pixelPerBeat = 20.0f;
     float barWidth = 200.0f;
 
 

@@ -2,7 +2,7 @@
 // Created by nathan on 21/11/2025.
 //
 
-#include "../../Misc/MyColours.h"
+#include "../../Theme.h"
 #include <juce_gui_extra/juce_gui_extra.h>
 
 #ifndef MYPROJECT_TRACKCONTENT_H

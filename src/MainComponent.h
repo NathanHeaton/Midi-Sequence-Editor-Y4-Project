@@ -4,16 +4,16 @@
 #include <juce_events/juce_events.h>
 #include "UI/ControlPannel/ControlComponent.h"
 #include  "MIDI_Logic/ParsedMidi.h"
-#include "Misc/MyColours.h"
 #include "UI/Top_nav/TopNavComponent.h"
 #include "UI/Arranger/Arranger.h"
 #include "UI/Piano_Roll/PianoRollWindow.h"
-
+#include "Theme.h"
 #include <imgui.h>
 #include "backends/imgui_impl_opengl3.h"
 
 #include <imgui_impl_juce/imgui_impl_juce.h>
 #include <juce_opengl/juce_opengl.h>
+
 
 class MainComponent
   : public juce::Component
@@ -50,7 +50,7 @@ public:
     void renderOpenGL() override
     {
         using namespace juce::gl;
-
+        Theme::applyTheme();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplJuce_NewFrame();
         ImGui::NewFrame();

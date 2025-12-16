@@ -4,6 +4,7 @@
 #pragma once
 #include "imgui.h"
 #include "../../SessionData.h"
+#include  "../../Theme.h"
 
 class Timeline {
 public:
@@ -17,18 +18,22 @@ public:
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
             ImVec2 cursorPos = ImGui::GetCursorScreenPos();
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
             float height = ImGui::GetWindowHeight();
             float scrollX = ImGui::GetScrollX();
-            int barFirst = firstVisableBar(scrollX);
-            int barLast = lastVisableBar(scrollX);
-            auto barsScrolled = firstVisableBar(scrollX)* s->getPixelPerBeat();
+            float width = ImGui::GetWindowWidth();
 
-            draw_list->AddCircle(ImVec2(50,50),30, IM_COL32(255, 255, 255, 255));
+            int firstVisibleBeat = 0;
 
-            for (auto i = barFirst; i < barLast ; i++) {
-                float beatPos = i * s->getPixelPerBeat();
-                draw_list->AddLine(ImVec2(beatPos,0),
-                    ImVec2(beatPos, height), IM_COL32(255, 255, 255, 255),
+            if (scrollX != 0.0) firstVisibleBeat = static_cast<int>(scrollX / s->getPixelPerBeat());
+
+            int lastVisibleBeat = static_cast<int>(scrollX+ width / s->getPixelPerBeat());
+
+            for (auto i = firstVisibleBeat; i <= lastVisibleBeat ; i++) {
+                float beatPos = cursorPos.x + i * s->getPixelPerBeat();
+
+                draw_list->AddLine(ImVec2(beatPos,cursorPos.y),
+                    ImVec2(beatPos, cursorPos.y + height), Theme::currentThemeColours.beatColourPacked,
                     1);
             }
 
@@ -37,21 +42,4 @@ public:
         }ImGui::EndChild();
 
     }
-
-    int firstVisableBar(float scrollX) {
-        auto beats = s->timeSignature.numerator;
-        int firstVisible;
-        if ( scrollX == 0) {firstVisible = 0; }
-        else{firstVisible = static_cast<int>(scrollX / s->getPixelPerBeat());}
-        return firstVisible;
-    }
-
-    int lastVisableBar(float scrollX) {
-        auto beats = s->timeSignature.numerator;
-        int lastVisible;
-        if ( scrollX == 0) {lastVisible = 0; }
-        else{lastVisible = static_cast<int>(scrollX / s->getPixelPerBeat());}
-        return lastVisible;
-    }
-
 };

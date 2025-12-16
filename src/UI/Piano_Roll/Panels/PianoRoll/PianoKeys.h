@@ -2,7 +2,7 @@
 // Created by nathan on 21/11/2025.
 //
 
-#include "../../../../Misc/MyColours.h"
+#include "../../../../Theme.h"
 #include <juce_gui_extra/juce_gui_extra.h>
 
 class PianoKeys : public juce::Component
@@ -31,9 +31,7 @@ public:
     void drawPianoRoll(juce::Graphics& g) {
 
         for (int i = 0; i < WHITE_KEYS; i++) {
-            g.setColour(MyColours::outline);
             g.fillRect(0,i*WHITE_KEY_HEIGHT,64,WHITE_KEY_HEIGHT-2);
-            g.setColour(MyColours::background);
             g.drawRoundedRectangle(getLocalBounds().toFloat(), 0.0f, 2.0f);
         }
     }

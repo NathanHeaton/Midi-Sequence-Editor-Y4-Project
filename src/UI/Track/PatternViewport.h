@@ -9,7 +9,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../../Misc/MyColours.h"
+#include "../../Theme.h"
 #include <iostream>
 #include "TrackContent.h"
 

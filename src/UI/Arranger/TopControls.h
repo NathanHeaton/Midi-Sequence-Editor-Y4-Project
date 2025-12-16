@@ -3,7 +3,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_events/juce_events.h>
 
-#include "../../Misc/MyColours.h"
+#include "../../Theme.h"
 #include <iostream>
 
 
@@ -28,7 +28,6 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        g.setColour(MyColours::background);
         g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
 
     }
