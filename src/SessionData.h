@@ -42,6 +42,7 @@ class SessionData {
     float getBarWidth() const {return barWidth;}
     int getTrackAmount() const {return TrackAmount;}
     float getPixelPerBeat() const {return pixelPerBeat;}
+    float getTrackHeight() const {return TrackHeight;}
 
     void setPixelPerBeat(float newPixelPerBeat) {pixelPerBeat = newPixelPerBeat;}
     void setBPM(int newBPM) {
@@ -57,6 +58,10 @@ class SessionData {
         TrackAmount++;
     }
 
+    void setTrackHeight(float newTrackHeight) {
+        TrackHeight = newTrackHeight;
+    }
+
     TimeSignature timeSignature{4,4};
     juce::ListenerList<Listener> listeners;
 
@@ -67,8 +72,9 @@ class SessionData {
     SessionData() = default;
     int BPM =120;
     int TrackAmount = 0;
-    float pixelPerBeat = 20.0f;
+    float pixelPerBeat = 30.0f;
     float barWidth = 200.0f;
+    float TrackHeight = 100.0f;
 
 
 
