@@ -19,26 +19,26 @@ public:
     float test_vol{0.0f};
     ControlComponent() =default;
 
-    void ControldPanel() {
+    void ControldPanel(auto &state) {
+        if (ImGui::BeginTable("Control Panel",4)) {
+            ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
+            ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 200);
+            ImGui::TableSetupColumn("Playback",ImGuiTableColumnFlags_WidthFixed);
 
-        ImGui::BeginTable("Control Panel",4);
-        ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
-        ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 200);
-        ImGui::TableSetupColumn("Playback",ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableNextColumn();
+            ImGui::Text("Master");
+            ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
+            ImGui::TableNextColumn();
+            if (ImGui::Button("create pattern")) {
+                state.pianoRollWindow = !state.pianoRollWindow;
+            }
+            if (ImGui::Button("load midi")) {
+                openMidiFilePicker();
+            }
+            ImGui::TableNextColumn();
+            ImGui::Text("playback controls");
+        }ImGui::EndTable();
 
-        ImGui::TableNextColumn();
-        ImGui::Text("Master");
-        ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
-        ImGui::TableNextColumn();
-        if (ImGui::Button("create pattern")) {
-
-        }
-        if (ImGui::Button("load midi")) {
-            openMidiFilePicker();
-        }
-        ImGui::TableNextColumn();
-        ImGui::Text("playback controls");
-        ImGui::EndTable();
     }
 
 
@@ -57,6 +57,7 @@ public:
                 }
             });
     }
+
 private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControlComponent)

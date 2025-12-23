@@ -10,35 +10,27 @@ class Tools: public juce::Component
 {
 public:
 
-    //juce::ToolbarButton toolbarButton;
-    // std::unique_ptr<juce::Drawable> createIconDrawable() {
-    //  return juce::Drawable::createFromImageData(
-    //
-    //  )
-    // }
     juce::Label label;
 
-    Tools() {
-        addAndMakeVisible(label);
-        // addAndMakeVisible(toolbarButton);
-        label.setText("&",juce::NotificationType::dontSendNotification);
-        //toolbarButton.setButtonText("D");
-    }
+    Tools() = default;
 
-    void paint(juce::Graphics& g) override
-    {
-        g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
-    }
+    void create() {
+        if ( ImGui::BeginChild("tools",ImVec2(0,10))) {
+            ImGui::BeginTable("toolList",5,ImGuiTableFlags_SizingFixedFit,ImVec2(0,10));
+            ImGui::TableNextColumn();
+            ImGui::Text("d");
+            ImGui::TableNextColumn();
+            ImGui::Text("d");
+            ImGui::TableNextColumn();
+            ImGui::Text("d");
+            ImGui::TableNextColumn();
+            ImGui::Text("d");
+            ImGui::TableNextColumn();
+            ImGui::Text("d");
+            ImGui::EndTable();
+        }
+        ImGui::EndChild();
 
-    void resized() override {
-        juce::FlexBox flex;
-        flex.flexDirection = juce::FlexBox::Direction::row;
-        flex.alignItems = juce::FlexBox::AlignItems::flexStart;
-        flex.items.add(juce::FlexItem(label).withWidth(25).withHeight(25).withMargin(5));
-        flex.items.add(juce::FlexItem(label).withWidth(25).withHeight(25).withMargin(5));
-        flex.items.add(juce::FlexItem(label).withWidth(25).withHeight(25).withMargin(5));
-        //flex.items.add(juce::FlexItem(toolbarButton).withWidth(25).withHeight(25).withMargin(5));
-        flex.performLayout(getLocalBounds());
     }
 
 private:

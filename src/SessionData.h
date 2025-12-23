@@ -10,8 +10,6 @@
 #include <juce_events/juce_events.h>
 #include <juce_data_structures/juce_data_structures.h>
 
-#include "UI/Piano_Roll/Panels/PianoRoll/PianoKeys.h"
-
 class SessionData {
     public:
     class Listener {

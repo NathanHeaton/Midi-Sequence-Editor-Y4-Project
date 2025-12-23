@@ -12,7 +12,9 @@ public:
 
     void newTrack() {
 
-        if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit, ImVec2(0, 100))) {
+        if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit
+            |ImGuiTableFlags_BordersOuter
+            , ImVec2(0, 100))) {
             ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
             ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
             if (ImGui::TableNextColumn()) {

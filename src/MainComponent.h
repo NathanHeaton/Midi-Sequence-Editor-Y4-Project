@@ -6,14 +6,18 @@
 #include  "MIDI_Logic/ParsedMidi.h"
 #include "UI/Top_nav/TopNavComponent.h"
 #include "UI/Arranger/Arranger.h"
-#include "UI/Piano_Roll/PianoRollWindow.h"
 #include "Theme.h"
 #include <imgui.h>
 #include "backends/imgui_impl_opengl3.h"
 
 #include <imgui_impl_juce/imgui_impl_juce.h>
 #include <juce_opengl/juce_opengl.h>
+#include  "UI/Piano_Roll/PianoRollMain.h"
 
+struct windowStateM {
+    bool pianoRollWindow{true};
+    bool setttingsWindow{false};
+};
 
 class MainComponent
   : public juce::Component
@@ -23,6 +27,8 @@ public:
     TopNavComponent top_nav_component;
     ControlComponent control_component;
     Arranger arranger_component;
+    PianoRollMain pianoRollMain;
+    windowStateM state;
 
     MainComponent()
     {
@@ -62,9 +68,15 @@ public:
 
         top_nav_component.nav();
 
-        control_component.ControldPanel();
+        control_component.ControldPanel(state);
 
         arranger_component.arranger();
+        if (state.pianoRollWindow) {
+            pianoRollMain.create();
+        }
+        else if (state.setttingsWindow) {
+
+        }
 
         ImGui::End();
 

@@ -12,19 +12,7 @@ class TopControls: public juce::Component
 public:
     juce::TextButton addTrackButton;
 
-    //juce::ToolbarButton toolbarButton;
-    // std::unique_ptr<juce::Drawable> createIconDrawable() {
-    //  return juce::Drawable::createFromImageData(
-    //
-    //  )
-    // }
-
-    TopControls() {
-        addAndMakeVisible(addTrackButton);
-       // addAndMakeVisible(toolbarButton);
-        addTrackButton.setButtonText("Add Track");
-        //toolbarButton.setButtonText("D");
-    }
+    TopControls() = default;
 
     void paint(juce::Graphics& g) override
     {

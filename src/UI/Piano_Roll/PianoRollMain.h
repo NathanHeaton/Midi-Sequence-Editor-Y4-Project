@@ -8,39 +8,30 @@
 #include "Panels/Tools.h"
 #include "Panels/PianoRollComponent.h"
 #include <iostream>
-
+#include <imgui.h>
+#include "Panels/piano.h"
 
 class PianoRollMain : public juce::Component
 {
 public:
+    Tools toolbar;
+    Piano piano;
 
-    Tools tools;
-    PianoRollComponent pianoRollEditor;
+    PianoRollMain() = default;
 
-    PianoRollMain() {
-        addAndMakeVisible(&tools);
-        addAndMakeVisible(&pianoRollEditor);
-        addAndMakeVisible(label);
-        label.setText("MidiPattern_1", juce::dontSendNotification);
+    void create() {
+        if (ImGui::Begin("pianoRollComponent", nullptr)) {
+            toolbar.create();
+            if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
+                ImGui::TableNextColumn();
+                piano.create();
+                ImGui::TableNextColumn();
+                ImGui::Text("PianoRoll");
+            }ImGui::EndTable();
+
+        }
+        ImGui::End();
     }
-
-    void paint(juce::Graphics& g) override
-    {
-        g.fillRoundedRectangle(getLocalBounds().toFloat(),0.0f);
-        g.drawRoundedRectangle(getLocalBounds().toFloat(),0,2);
-    }
-
-    void resized() override {
-        juce::FlexBox column;
-        column.flexDirection = juce::FlexBox::Direction::column;
-        column.alignItems = juce::FlexBox::AlignItems::flexStart;
-        column.items.add(juce::FlexItem(label).withWidth(getWidth()).withHeight(40).withMargin(8));
-        column.items.add(juce::FlexItem(tools).withWidth(getWidth()).withHeight(40).withMargin(8));
-        column.items.add(juce::FlexItem(pianoRollEditor).withWidth(getWidth()).withFlex(1.0f).withMargin(12));
-
-        column.performLayout(getLocalBounds());
-    }
-    juce::Label label;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoRollMain)

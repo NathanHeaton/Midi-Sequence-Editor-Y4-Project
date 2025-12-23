@@ -24,6 +24,7 @@ add_library(imgui STATIC
         src/UI/Arranger/Track.h
         src/UI/Arranger/Timeline.h
         src/Theme.h
+        src/UI/Piano_Roll/Panels/piano.h
 )
 
 target_include_directories(imgui PUBLIC

@@ -3,53 +3,21 @@
 //
 #pragma once
 
-#include <juce_gui_extra/juce_gui_extra.h>
 #include "../../../Theme.h"
 
-#include "PianoTimelineViewport.h"
-#include "PianoViewport.h"
-#include "PianoRoll/PianoRollTimline.h"
 //#include "PianoRoll/PianoKeys.h"
 
-class PianoRollComponent : public juce::Component
+class PianoRollComponent
 {
 public:
 
-    PianoTimelineViewport timelineViewport;
-    PianoRollTimeline timeline;
-    PianoViewport pianoViewport;
-    PianoKeys pianoKeys;
+    PianoRollComponent() = default;
 
+    void create() {
 
-    PianoRollComponent() {
-        addAndMakeVisible(&timelineViewport);
-        addAndMakeVisible(&pianoViewport);
-        addAndMakeVisible(&timeline);
-
-        addAndMakeVisible(&pianoKeys);
-        timelineViewport.setViewedComponent(&timeline);
-        pianoViewport.setViewedComponent(&pianoKeys);
-
-        timelineViewport.onScrollY = [this](int y) {
-            pianoViewport.setViewPosition(0,y);
-        };
-
-
-    }
-
-
-    void resized() override {
-        juce::FlexBox row;
-        row.flexDirection = juce::FlexBox::Direction::row;
-        row.alignItems = juce::FlexBox::AlignItems::flexStart;
-
-        row.items.add(juce::FlexItem(pianoViewport).withHeight(getHeight()).withWidth(64));
-        row.items.add(juce::FlexItem(timelineViewport).withHeight(getHeight()).withWidth(getWidth()));
-
-        row.performLayout(getLocalBounds());
     }
 
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoRollComponent)
+
 };

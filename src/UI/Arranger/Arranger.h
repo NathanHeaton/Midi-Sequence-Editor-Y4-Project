@@ -46,11 +46,18 @@ public:
             ImGui::TableSetupColumn("Tracks", ImGuiTableColumnFlags_WidthFixed, 400);
 
             ImGui::TableNextColumn();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+            ImGui::Dummy(ImVec2(0,10));
+            ImGui::PopStyleVar();
             for (const auto& track : tracks) {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
                 track->newTrack();
+                ImGui::PopStyleVar();
             }
             ImGui::TableNextColumn();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             timeline.createTimeline();
+            ImGui::PopStyleVar();
         }ImGui::EndTable();
 
 
