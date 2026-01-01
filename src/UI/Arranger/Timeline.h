@@ -40,12 +40,12 @@ public:
 
     void createTimeline() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        if (ImGui::BeginChild("Timeline", ImVec2(0, (s->getTrackHeight() * s->getTrackAmount()) + 10),
+        if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * s->getTrackAmount()),
             false,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
             DrawBars();
             DrawTrackSeparator();
-            ImGui::Dummy(ImVec2(10000, 0));
+            ImGui::Dummy(ImVec2(10000, s->getTrackHeight() * s->getTrackAmount()));
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -65,12 +65,9 @@ public:
         DrawBarBackgrounds(ctx);
         for (int i = ctx.firstVisibleBeat; i <= ctx.lastVisibleBeat; i++) {
             bool barStart = checkIfBarStart(i);
-            if (barStart) {
-                DrawBarLabel(ctx, i);
-            }
             ImVec2 beatPosStart = ImVec2(
                 ctx.cursorPos.x + i * s->getPixelPerBeat(),
-                barStart ? ctx.cursorPos.y : ctx.cursorPos.y + 10
+                ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
 
@@ -102,7 +99,7 @@ public:
     void DrawBackground(const TimelineContext& ctx, int startBeat) {
         ImVec2 rectStart = ImVec2(
             ctx.cursorPos.x + s->getPixelPerBeat() * startBeat,
-            ctx.cursorPos.y + 10
+            ctx.cursorPos.y
         );
         ImVec2 rectEnd = ImVec2(
             rectStart.x + ctx.barWidth,
@@ -125,23 +122,12 @@ public:
         );
     }
 
-    void DrawBarLabel(const TimelineContext& ctx, int beat) {
-        char label[16];
-        int barNumber = beat > 0 ? beat / s->timeSignature.getNumerator() : 0;
-        snprintf(label, sizeof(label), "%d", barNumber);
-
-        ctx.drawList->AddText(
-            ImVec2(beat * s->getPixelPerBeat() + ctx.cursorPos.x + 2, ctx.cursorPos.y),
-            Theme::currentThemeColours.barColourPacked,
-            label
-        );
-    }
 
     void DrawTrackSeparator() {
         TimelineContext ctx;
 
         for (unsigned int i = 0; i < s->getTrackAmount(); i++) {
-            float yPos = ctx.cursorPos.y + 10 + i * s->getTrackHeight();
+            float yPos = ctx.cursorPos.y + i * s->getTrackHeight();
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),

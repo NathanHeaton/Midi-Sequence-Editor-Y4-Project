@@ -12,14 +12,6 @@
 
 class SessionData {
     public:
-    class Listener {
-    public:
-        virtual ~Listener() =default;
-        virtual void bpmChanged(int /*newBPM*/) {};
-        virtual void denominatorChanged(int /*newDenominator*/) {};
-        virtual void numeratorChanged(int /*newNumerator*/) {};
-        virtual void barWidthChanged(float /*newBarWidth*/) {};
-    };
 
     class TimeSignature {
     public:
@@ -42,12 +34,17 @@ class SessionData {
     float getPixelPerBeat() const {return pixelPerBeat;}
     float getTrackHeight() const {return TrackHeight;}
 
+    int getWhiteKeys() const {return WHITE_KEYS;}
+    int getBlackKeys() const {return BLACK_KEYS;}
+    float getBlackGap() const {return Black_Gap;}
+    ImVec2 getWhiteSize() const {return WHITE_SIZE;}
+    ImVec2 getBlackSize() const {return BLACK_SIZE;}
+
     void setPixelPerBeat(float newPixelPerBeat) {pixelPerBeat = newPixelPerBeat;}
     void setBPM(int newBPM) {
         BPM = newBPM;
-        listeners.call(&Listener::bpmChanged, newBPM);
-    }
 
+    }
     void setBarWidth(float newBarWidth) {
         barWidth = newBarWidth;
     }
@@ -61,8 +58,6 @@ class SessionData {
     }
 
     TimeSignature timeSignature{4,4};
-    juce::ListenerList<Listener> listeners;
-
 
     private:
 
@@ -74,6 +69,13 @@ class SessionData {
     float barWidth = 200.0f;
     float TrackHeight = 100.0f;
 
+    int WHITE_KEYS{52};
+    int BLACK_KEYS{36};
+
+    ImVec2 WHITE_SIZE{100,24};
+    ImVec2 BLACK_SIZE{80,15};
+
+    float Black_Gap{WHITE_SIZE.y-BLACK_SIZE.y/2};
 
 
 

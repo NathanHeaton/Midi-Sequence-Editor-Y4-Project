@@ -5,17 +5,18 @@
 #include <imgui.h>
 #include <iostream>
 
-
+#include "../../../SessionData.h"
 class Piano
 {
 public:
-    const int WHITE_KEYS{52};
-    const int BLACK_KEYS{36};
+    int WHITE_KEYS{52};
+    int BLACK_KEYS{36};
 
-    const ImVec2 WHITE_SIZE{100,24};
-    const float Black_Gap{10};
-    const ImVec2 BLACK_SIZE{80,15};
+    ImVec2 WHITE_SIZE{100,24};
+    ImVec2 BLACK_SIZE{80,15};
 
+
+    const float Black_Gap{WHITE_SIZE.y-BLACK_SIZE.y/2};
     Piano() = default;
 
     struct pianoVars {
@@ -31,47 +32,70 @@ public:
             scrollY = ImGui::GetScrollX();
         }
     };
+    void create(float &pianoRollScrollY) {
+        WHITE_KEYS = SessionData::instance().getWhiteKeys();
+        BLACK_KEYS = SessionData::instance().getBlackKeys();
+        WHITE_SIZE = SessionData::instance().getWhiteSize();
+        BLACK_SIZE = SessionData::instance().getBlackSize();
+        if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,0),ImGuiChildFlags_None,
+            ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollbar)) {
 
-
-
-    void create() {
-        if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,400),false,ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
             pianoVars vars;
-            ImGui::Text("200049");
             drawWhiteKey(vars);
+
+            ImGui::SetScrollY(pianoRollScrollY);
+
             drawBlackKey(vars);
             ImGui::Dummy(ImVec2(WHITE_SIZE.x,WHITE_SIZE.y*WHITE_KEYS));
         }
         ImGui::EndChild();
-
     }
-
     void drawWhiteKey(pianoVars &vars) {
         for ( int i{0u}; i < WHITE_KEYS; ++i ) {
             ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + i* WHITE_SIZE.y);
-            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + WHITE_SIZE.x , vars.cursorPos.y + (1 + i)* WHITE_SIZE.y -1);
 
+            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + WHITE_SIZE.x , vars.cursorPos.y + (1 + i)* WHITE_SIZE.y -1);
             vars.drawList->AddRectFilled(
             rectStart, rectEnd,
             Theme::currentThemeColours.barColourPacked,
             6.0f
-        );
-
-        }
+        );        }
     }
-
     void drawBlackKey(pianoVars &vars) {
+        float totalGap = 0;
+        int setOf3Count = 1;
+        int setOf2Count = 1;
         for ( int i{0u}; i < BLACK_KEYS; ++i ) {
+            if (i == 0) {
+                totalGap = totalGap + Black_Gap;
+            }
+            else {
+                totalGap += WHITE_SIZE.y;
+            }
 
-            ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + i* BLACK_SIZE.y + Black_Gap);
-            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + BLACK_SIZE.x , vars.cursorPos.y + (1 + i)* BLACK_SIZE.y + Black_Gap);
+            ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + totalGap);
+            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + BLACK_SIZE.x , vars.cursorPos.y + totalGap + BLACK_SIZE.y );
 
             vars.drawList->AddRectFilled(
             rectStart, rectEnd,
             Theme::currentThemeColours.backgroundPacked,
             6.0f
         );
-
+            if (setOf3Count < 3) {
+                setOf3Count++;
+            }
+            else if (setOf3Count == 3) {
+                setOf3Count++;
+                totalGap += WHITE_SIZE.y;
+            }
+            else if (setOf2Count < 2) {
+                setOf2Count++;
+            }
+            else if (setOf2Count == 2) {
+                setOf3Count = 1;
+                setOf2Count = 1;
+                totalGap += WHITE_SIZE.y;
+            }
         }
     }
 
