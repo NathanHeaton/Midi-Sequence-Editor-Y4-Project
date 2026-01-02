@@ -38,14 +38,24 @@ public:
         }
     };
 
-    void createTimeline() {
+
+    void createTimeline(float &timelineLength, float &xScroll) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * s->getTrackAmount()),
             false,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
             DrawBars();
             DrawTrackSeparator();
-            ImGui::Dummy(ImVec2(10000, s->getTrackHeight() * s->getTrackAmount()));
+            if (timelineLength < SessionData::instance().getBarWidth()* 60)
+            if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
+                s->setTotalBars(s->getTotalBars()+ 4);
+                timelineLength = s->getTotalBars() * s->getBarWidth();
+
+            }
+
+            xScroll = ImGui::GetScrollX();
+            ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * s->getTrackAmount()));
+
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();

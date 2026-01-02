@@ -56,6 +56,7 @@ public:
     void renderOpenGL() override
     {
         using namespace juce::gl;
+
         Theme::applyTheme();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplJuce_NewFrame();

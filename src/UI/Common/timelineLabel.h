@@ -8,37 +8,43 @@
 #include "../../Theme.h"
 
 
+
 class TimelineLabel {
     public:
+    int totalBars = 30;
+
+
+
     TimelineLabel() = default;
 
-    void create() {
-        if (ImGui::BeginChild("Timeline", ImVec2(0, 10),
-            false,
-            ImGuiWindowFlags_NoScrollbar)) {
+    void create(float timelineLength, float &xScroll, float bars) {
+        totalBars = bars;
+        if (ImGui::BeginChild("Timeline", ImVec2(0, 20),
+            false)) {
+            ImGui::SetScrollX(xScroll);
+            ImGui::Dummy(ImVec2(timelineLength,0));
             DrawBarLabel();
-            ImGui::Dummy(ImVec2(10000, 0));
-            ImGui::Text("labels");
-            }
-        ImGui::EndChild();
+        }ImGui::EndChild();
 
     }
 
     void DrawBarLabel() {
-
-        auto cursorPos = ImGui::GetCursorPos();
+        auto cursorPos = ImGui::GetCursorScreenPos();
         auto drawList = ImGui::GetWindowDrawList();
-        int bars = 30;
-        for (int i = 0; i < bars; i++) {
+        const float barWidth = SessionData::instance().getBarWidth();
+
+        for (int bar = 0; bar < totalBars; bar++) {
             char label[16];
-            int barNumber = i;
-            snprintf(label, sizeof(label), "%d", barNumber);
+            snprintf(label, sizeof(label), "%d", bar);
+
             drawList->AddText(
-                ImVec2((bars * (SessionData::instance().getPixelPerBeat() * SessionData::instance().timeSignature.getNumerator()))
-                    + cursorPos.x + 2, cursorPos.y),
-                Theme::currentThemeColours.barColourPacked,
+                ImVec2((bar * barWidth)+cursorPos.x+2,
+                    cursorPos.y),
+                    Theme::currentThemeColours.barColourPacked,
                 label
             );
+            drawList->AddLine(ImVec2(cursorPos.x+bar*barWidth, cursorPos.y),
+                ImVec2(cursorPos.x+bar*barWidth,cursorPos.y+20), Theme::currentThemeColours.barColourPacked,1);
         }
     }
 

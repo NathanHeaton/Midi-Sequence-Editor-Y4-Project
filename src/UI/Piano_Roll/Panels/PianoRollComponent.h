@@ -75,7 +75,7 @@ public:
             bool barStart = checkIfBarStart(i);
             ImVec2 beatPosStart = ImVec2(
                 ctx.cursorPos.x + i * s->getPixelPerBeat(),
-                barStart ? ctx.cursorPos.y : ctx.cursorPos.y + 10
+                barStart ? ctx.cursorPos.y : ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
 
@@ -107,7 +107,7 @@ public:
     void DrawBackground(const TimelineContext& ctx, int startBeat) {
         ImVec2 rectStart = ImVec2(
             ctx.cursorPos.x + s->getPixelPerBeat() * startBeat,
-            ctx.cursorPos.y + 10
+            ctx.cursorPos.y
         );
         ImVec2 rectEnd = ImVec2(
             rectStart.x + ctx.barWidth,
@@ -136,7 +136,7 @@ public:
         float octaveHeight = s->getWhiteSize().y *7;
         int octaves = 7;
         for (unsigned int i = 0; i < octaves; i++) {
-            float yPos = ctx.cursorPos.y + 10 + i * octaveHeight;
+            float yPos = ctx.cursorPos.y + i * octaveHeight;
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),

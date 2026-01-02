@@ -10,19 +10,22 @@
 #include <iostream>
 #include <imgui.h>
 #include "Panels/piano.h"
-
+#include "../Common/timelineLabel.h"
 
 class PianoRollMain : public juce::Component
 {
 public:
     Tools toolbar;
+    TimelineLabel timelineLabel;
     Piano piano;
     PianoRollComponent pianoRoll;
+
+    float timelineXScroll = 0.0f;
+    float timelineLength = SessionData::instance().getBarWidth() * 8;
 
     PianoRollMain() = default;
 
     float pianoRollScrollY;
-
     void create() {
         if (ImGui::Begin("pianoRollComponent", nullptr)) {
             toolbar.create();
@@ -33,6 +36,7 @@ public:
                 ImGui::TableNextColumn();
                 piano.create(pianoRollScrollY);
                 ImGui::TableNextColumn();
+                timelineLabel.create(timelineLength,timelineXScroll,8);
                 pianoRoll.create(pianoRollScrollY);
             }ImGui::EndTable();
 

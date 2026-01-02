@@ -33,6 +33,7 @@ class SessionData {
     int getTrackAmount() const {return TrackAmount;}
     float getPixelPerBeat() const {return pixelPerBeat;}
     float getTrackHeight() const {return TrackHeight;}
+    float getTotalBars() const {return totalBars;}
 
     int getWhiteKeys() const {return WHITE_KEYS;}
     int getBlackKeys() const {return BLACK_KEYS;}
@@ -41,21 +42,13 @@ class SessionData {
     ImVec2 getBlackSize() const {return BLACK_SIZE;}
 
     void setPixelPerBeat(float newPixelPerBeat) {pixelPerBeat = newPixelPerBeat;}
-    void setBPM(int newBPM) {
-        BPM = newBPM;
+    void setBPM(int newBPM) {        BPM = newBPM;    }
+    void addTrack() {        TrackAmount++;    }
+    void setTrackHeight(float newTrackHeight) {TrackHeight = newTrackHeight;}
+    void setTotalBars(float newTotalBars) {totalBars = newTotalBars;}
 
-    }
-    void setBarWidth(float newBarWidth) {
-        barWidth = newBarWidth;
-    }
 
-    void addTrack() {
-        TrackAmount++;
-    }
 
-    void setTrackHeight(float newTrackHeight) {
-        TrackHeight = newTrackHeight;
-    }
 
     TimeSignature timeSignature{4,4};
 
@@ -66,7 +59,6 @@ class SessionData {
     int BPM =120;
     int TrackAmount = 0;
     float pixelPerBeat = 30.0f;
-    float barWidth = 200.0f;
     float TrackHeight = 100.0f;
 
     int WHITE_KEYS{52};
@@ -75,7 +67,11 @@ class SessionData {
     ImVec2 WHITE_SIZE{100,24};
     ImVec2 BLACK_SIZE{80,15};
 
+    float barWidth = timeSignature.getNumerator() * pixelPerBeat;
+
     float Black_Gap{WHITE_SIZE.y-BLACK_SIZE.y/2};
+
+    float totalBars = 30;
 
 
 
