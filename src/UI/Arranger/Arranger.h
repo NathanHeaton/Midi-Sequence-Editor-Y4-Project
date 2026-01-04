@@ -52,7 +52,9 @@ public:
             ImGui::Text("Tracks");
             ImGui::TableNextColumn();
 
-            timelineLabel.create(timelineLength,timelineXScroll,SessionData::instance().getTotalBars());
+            timelineLabel.create(timelineLength,timelineXScroll,
+                SessionData::instance().getTotalBars(),
+                SessionData::instance().getBarWidth());
 
         }ImGui::EndTable();
         ImGui::PopStyleVar();

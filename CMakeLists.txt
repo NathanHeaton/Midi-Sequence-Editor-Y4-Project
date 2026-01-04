@@ -26,6 +26,7 @@ add_library(imgui STATIC
         src/Theme.h
         src/UI/Piano_Roll/Panels/piano.h
         src/UI/Common/timelineLabel.h
+        src/Project_Data/Pattern.h
 )
 
 target_include_directories(imgui PUBLIC

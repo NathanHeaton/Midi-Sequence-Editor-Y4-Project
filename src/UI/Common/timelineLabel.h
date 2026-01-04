@@ -12,13 +12,14 @@
 class TimelineLabel {
     public:
     int totalBars = 30;
-
+    float barWidth;
 
 
     TimelineLabel() = default;
 
-    void create(float timelineLength, float &xScroll, float bars) {
+    void create(float timelineLength, float &xScroll, float bars, float t_barWidth) {
         totalBars = bars;
+        barWidth = t_barWidth;
         if (ImGui::BeginChild("Timeline", ImVec2(0, 20),
             false)) {
             ImGui::SetScrollX(xScroll);
@@ -31,8 +32,6 @@ class TimelineLabel {
     void DrawBarLabel() {
         auto cursorPos = ImGui::GetCursorScreenPos();
         auto drawList = ImGui::GetWindowDrawList();
-        const float barWidth = SessionData::instance().getBarWidth();
-
         for (int bar = 0; bar < totalBars; bar++) {
             char label[16];
             snprintf(label, sizeof(label), "%d", bar);

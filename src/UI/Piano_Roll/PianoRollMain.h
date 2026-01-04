@@ -29,14 +29,18 @@ public:
     void create() {
         if (ImGui::Begin("pianoRollComponent", nullptr)) {
             toolbar.create();
-            if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
 
+            if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
                 ImGui::TableSetupColumn("Piano");
                 ImGui::TableSetupColumn("Piano", ImGuiTableColumnFlags_WidthStretch);
+
                 ImGui::TableNextColumn();
+                ImGui::Dummy(ImVec2(0,20));
                 piano.create(pianoRollScrollY);
                 ImGui::TableNextColumn();
-                timelineLabel.create(timelineLength,timelineXScroll,8);
+                timelineLabel.create(timelineLength,timelineXScroll,
+                    SessionData::instance().getTotalBarsPianoRoll(),
+                    SessionData::instance().getBarWidthPianoRoll());
                 pianoRoll.create(pianoRollScrollY);
             }ImGui::EndTable();
 

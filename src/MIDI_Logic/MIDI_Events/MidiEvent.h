@@ -65,7 +65,38 @@ class MidiEvent {
     void printEventData();
     std::string getMidiData();
 
+    void setPitch(uint8_t newPitch) {
+        if (type == NOTE_ON||type==NOTE_OFF ) {
+            std::get<Note>(m_event_data).m_pitch = newPitch;
+        }
+    }
 
+    void setVelocity(uint8_t newVelocity) {
+        if (type == NOTE_ON||type==NOTE_OFF ) {
+            std::get<Note>(m_event_data).m_velocity = newVelocity;
+        }
+    }
+
+    void setDelta(uint32_t newDelta) {
+        m_delta = newDelta;
+    }
+
+    uint8_t getPitch() {
+        if (type == NOTE_ON||type==NOTE_OFF ) {
+            return std::get<Note>(m_event_data).m_pitch;
+        }
+    }
+
+    uint8_t getVelocity() {
+        if (type == NOTE_ON||type==NOTE_OFF ) {
+            return std::get<Note>(m_event_data).m_velocity;
+        }
+    }
+    uint32_t getDelta() {return m_delta;}
+    uint8_t getChannel() {return m_channel;}
+
+    bool isNoteOn() {if (type == NOTE_ON) return true; return false;}
+    bool isNoteOff() {if (type == NOTE_OFF) return true; return false;}
 };
 
 
