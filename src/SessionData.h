@@ -8,6 +8,8 @@
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <juce_data_structures/juce_data_structures.h>
+#include "Project_Data/Pattern.h"
+
 
 class SessionData {
 public:
@@ -71,6 +73,17 @@ public:
     void addTrack() {TrackAmount++;}
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
+    void addPattern() {
+        std::string title = "untitled" + std::to_string(pattern.size());
+        pattern.emplace_back(Pattern(title));
+    }
+
+    size_t getPatternSize() {return pattern.size();}
+
+    // void addPatternFromMidi(std::string title,std::vector<> events) {
+    //     pattern.emplace_back(Pattern(title));
+    // }
+
     TimeSignature timeSignature{4, 4};
 
 private:
@@ -96,6 +109,9 @@ private:
 
     float totalBars = 30;
     float totalBarsPianoRoll = 30;
+
+    std::vector<Pattern> pattern{};
+
 };
 
 #endif //MYPROJECT_SESSIONDATA_H

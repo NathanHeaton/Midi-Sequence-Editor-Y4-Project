@@ -29,7 +29,11 @@ public:
             ImGui::Text("Master");
             ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
             ImGui::TableNextColumn();
-            if (ImGui::Button("create pattern")) {
+            if (ImGui::Button("New Pattern")) {
+                state.pianoRollWindow = !state.pianoRollWindow;
+                SessionData::instance().addPattern();
+            }
+            if (ImGui::Button("Open Pattern")) {
                 state.pianoRollWindow = !state.pianoRollWindow;
             }
             if (ImGui::Button("load midi")) {

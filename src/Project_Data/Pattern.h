@@ -11,15 +11,29 @@
 
 class Pattern {
     public:
+
+
     struct NoteEventPair {
         size_t onIndex;
         size_t offIndex;
     };
 
-    std::string m_title = "";
-    std::vector<MidiEvent> m_events;
+    std::string m_title;
 
+    std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
+
+    Pattern() {
+        m_title = "untitled";
+    }
+
+    Pattern(std::string t_title) {
+        m_title = t_title;
+    }
+    // from Midi import
+    Pattern(std::string t_title, std::vector<MidiEvent> events) : m_events(events) {
+        m_title = t_title;
+    }
 
     void createNoteEventPairs() {
 
@@ -44,6 +58,7 @@ class Pattern {
                     if (m_events.at(i).getPitch() == pendingNote.pitch &&
                         m_events.at(i).getChannel() == pendingNote.channel) {
                         m_noteEvents.emplace_back(pendingNote.onIndex, i);
+                        pendingEvents.erase(pendingEvents.begin() + i);
                         break;
                     }
                 }
@@ -51,16 +66,11 @@ class Pattern {
         }
     }
 
-    Pattern(std::string t_title) {
-        m_title = t_title;
-    }
-    // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent> events) : m_events(events) {
-        m_title = t_title;
-    }
+    void addNote(MidiEvent noteOn, MidiEvent noteOff) {
+        m_events.emplace_back(noteOn);
+        m_events.emplace_back(noteOff);
+        m_noteEvents.emplace_back(m_events.size() - 1,m_events.size());
 
-    void addNote(MidiEvent note) {
-        m_events.emplace_back(note);
     }
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
