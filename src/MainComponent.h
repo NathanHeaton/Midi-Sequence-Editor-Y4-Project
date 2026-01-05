@@ -69,7 +69,7 @@ public:
 
         top_nav_component.nav();
 
-        control_component.ControldPanel(state);
+        control_component.ControlPanel(state);
 
         arranger_component.arranger();
         if (state.pianoRollWindow) {

@@ -17,28 +17,45 @@ public:
     MidiFileManager midifileManager;
 
     float test_vol{0.0f};
-    ControlComponent() =default;
+    size_t selectedPattern{0};
+    ControlComponent() {
+        SessionData::instance().addPattern();
+    };
 
-    void ControldPanel(auto &state) {
+    void ControlPanel(auto &state) {
+        auto& patterns = SessionData::instance().getPatterns();
         if (ImGui::BeginTable("Control Panel",4)) {
             ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
-            ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 200);
+            ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 400);
             ImGui::TableSetupColumn("Playback",ImGuiTableColumnFlags_WidthFixed);
 
             ImGui::TableNextColumn();
             ImGui::Text("Master");
             ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
             ImGui::TableNextColumn();
+
             if (ImGui::Button("New Pattern")) {
                 state.pianoRollWindow = !state.pianoRollWindow;
                 SessionData::instance().addPattern();
             }
-            if (ImGui::Button("Open Pattern")) {
-                state.pianoRollWindow = !state.pianoRollWindow;
+            if (ImGui::BeginCombo("Open Pattern",
+                patterns.at(selectedPattern).m_title.c_str()))
+                {
+                for (size_t i{0}; i < patterns.size(); i++) {
+                    bool is_selected = (selectedPattern == i);
+                    if (ImGui::Selectable(patterns.at(i).m_title.c_str(), is_selected)) {
+                        selectedPattern = i;
+                    }
+                    if (is_selected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
             }
             if (ImGui::Button("load midi")) {
                 openMidiFilePicker();
             }
+
             ImGui::TableNextColumn();
             ImGui::Text("playback controls");
         }ImGui::EndTable();

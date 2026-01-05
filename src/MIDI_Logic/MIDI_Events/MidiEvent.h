@@ -81,22 +81,24 @@ class MidiEvent {
         m_delta = newDelta;
     }
 
-    uint8_t getPitch() {
+    [[nodiscard]] uint8_t getPitch() const {
         if (type == NOTE_ON||type==NOTE_OFF ) {
             return std::get<Note>(m_event_data).m_pitch;
         }
+        return 0;
     }
 
-    uint8_t getVelocity() {
+    [[nodiscard]] uint8_t getVelocity() const {
         if (type == NOTE_ON||type==NOTE_OFF ) {
             return std::get<Note>(m_event_data).m_velocity;
         }
+        return 0;
     }
-    uint32_t getDelta() {return m_delta;}
-    uint8_t getChannel() {return m_channel;}
+    [[nodiscard]] uint32_t getDelta() const {return m_delta;}
+    [[nodiscard]] uint8_t getChannel() const {return m_channel;}
 
-    bool isNoteOn() {if (type == NOTE_ON) return true; return false;}
-    bool isNoteOff() {if (type == NOTE_OFF) return true; return false;}
+    [[nodiscard]] bool isNoteOn() const {if (type == NOTE_ON) return true; return false;}
+    [[nodiscard]] bool isNoteOff() const {if (type == NOTE_OFF) return true; return false;}
 };
 
 

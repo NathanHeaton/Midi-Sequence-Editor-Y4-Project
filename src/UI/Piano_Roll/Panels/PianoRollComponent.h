@@ -99,6 +99,7 @@ public:
             DrawBars();
             DrawOctaveLines();
             //HandleMouseInput();
+            renderPattern();
 
             pianoRollScrollY = ImGui::GetScrollY();
             ImGui::Dummy(ImVec2(1000,1000));
@@ -163,6 +164,21 @@ public:
                 Theme::currentThemeColours.barColourPacked,
                 1.0f
             );
+        }
+    }
+
+    void renderPattern() {
+        TimelineContext ctx;
+        auto& pattern = SessionData::instance().getCurrentPattern();
+        auto& noteData = pattern.m_events;
+        for (auto notes : pattern.m_noteEvents) {
+
+            float yStart = ctx.cursorPos.y + ctx.scrollY + (noteData.at(notes.onIndex).getPitch()*s->getWhiteSize().y);
+            float xStart = ctx.cursorPos.x + ctx.scrollX;
+            ctx.drawList->AddRectFilled(
+                ImVec2(xStart, yStart),
+                ImVec2(xStart + 60,yStart+ s->getWhiteSize().y),
+                    Theme::currentThemeColours.barColourPacked);
         }
     }
 

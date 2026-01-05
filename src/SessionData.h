@@ -74,8 +74,20 @@ public:
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
     void addPattern() {
-        std::string title = "untitled" + std::to_string(pattern.size());
+        std::string title = "untitled " + std::to_string(pattern.size());
         pattern.emplace_back(Pattern(title));
+    }
+
+    bool anyPatterns() {
+        return !pattern.empty();
+    }
+
+    const std::vector<Pattern>& getPatterns() {
+        return pattern;
+    }
+
+    const Pattern& getCurrentPattern() {
+        return pattern.at(activePattern);
     }
 
     size_t getPatternSize() {return pattern.size();}
@@ -111,6 +123,7 @@ private:
     float totalBarsPianoRoll = 30;
 
     std::vector<Pattern> pattern{};
+    size_t activePattern = 0;
 
 };
 

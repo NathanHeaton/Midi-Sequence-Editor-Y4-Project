@@ -23,9 +23,6 @@ class Pattern {
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
 
-    Pattern() {
-        m_title = "untitled";
-    }
 
     Pattern(std::string t_title) {
         m_title = t_title;
