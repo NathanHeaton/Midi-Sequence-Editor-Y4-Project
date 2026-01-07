@@ -79,7 +79,7 @@ public:
             renderPattern();
 
             pianoRollScrollY = ImGui::GetScrollY();
-            ImGui::Dummy(ImVec2(1000,1000));
+            ImGui::Dummy(ImVec2(1000,s->getWhiteKeys()*s->getWhiteSize().y));
         }
         ImGui::EndChild();
 
@@ -89,6 +89,9 @@ public:
 
 
 private:
+
+    const int octaves = 10;
+
     bool checkIfBarStart(int beat) {
         return beat % s->timeSignature.getNumerator() == 0;
     }
@@ -135,7 +138,6 @@ private:
     void DrawOctaveLines() {
         TimelineContext ctx;
         float octaveHeight = s->getWhiteSize().y *7;
-        int octaves = 7;
         for (unsigned int i = 0; i < octaves; i++) {
             float yPos = ctx.cursorPos.y + i * octaveHeight;
 
@@ -168,7 +170,7 @@ private:
     void DrawNoteGuides() {
         TimelineContext ctx;
         float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;
-        int notes =7*12;
+        int notes = 128;
         bool whiteNote = true;
         for (auto i{0u}; i < notes; i++) {
             float yPos = ctx.cursorPos.y + i * noteGap;
