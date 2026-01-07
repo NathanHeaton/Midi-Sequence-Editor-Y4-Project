@@ -44,29 +44,6 @@ public:
         }
     };
 
-    void DrawNoteGuides() {
-        TimelineContext ctx;
-        float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;
-        int notes =7*12;
-        bool whiteNote = true;
-        for (auto i{0u}; i < notes; i++) {
-            float yPos = ctx.cursorPos.y + i * noteGap;
-            if (notes%2 == 0) {
-                whiteNote= !whiteNote;
-            }
-            ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
-                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos+ noteGap),
-                whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
-
-            ctx.drawList->AddLine(
-                ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
-                ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.beatColourPacked,
-                1.0f
-            );
-        }
-    }
-
     // void HandleMouseInput() {
     //     TimelineContext ctx;
     //
@@ -108,6 +85,10 @@ public:
 
     }
 
+
+
+
+private:
     bool checkIfBarStart(int beat) {
         return beat % s->timeSignature.getNumerator() == 0;
     }
@@ -171,18 +152,39 @@ public:
         TimelineContext ctx;
         auto& pattern = SessionData::instance().getCurrentPattern();
         auto& noteData = pattern.m_events;
-        for (auto notes : pattern.m_noteEvents) {
+        for (auto noteIndices : pattern.m_noteEvents) {
+            float yStart = ctx.cursorPos.y + (noteData.at(noteIndices.onIndex).getPitch()*s->getWhiteSize().y);
+            float xStart = ctx.cursorPos.x;
 
-            float yStart = ctx.cursorPos.y + ctx.scrollY + (noteData.at(notes.onIndex).getPitch()*s->getWhiteSize().y);
-            float xStart = ctx.cursorPos.x + ctx.scrollX;
             ctx.drawList->AddRectFilled(
                 ImVec2(xStart, yStart),
                 ImVec2(xStart + 60,yStart+ s->getWhiteSize().y),
                     Theme::currentThemeColours.barColourPacked);
         }
+
     }
 
 
-private:
+    void DrawNoteGuides() {
+        TimelineContext ctx;
+        float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;
+        int notes =7*12;
+        bool whiteNote = true;
+        for (auto i{0u}; i < notes; i++) {
+            float yPos = ctx.cursorPos.y + i * noteGap;
+            if (notes%2 == 0) {
+                whiteNote= !whiteNote;
+            }
+            ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
+                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos+ noteGap),
+                whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
 
+            ctx.drawList->AddLine(
+                ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
+                ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
+                Theme::currentThemeColours.beatColourPacked,
+                1.0f
+            );
+        }
+    }
 };

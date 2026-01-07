@@ -48,6 +48,7 @@ public:
                     }
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
+                        SessionData::instance().setCurrentPattern(i);
                     }
                 }
                 ImGui::EndCombo();

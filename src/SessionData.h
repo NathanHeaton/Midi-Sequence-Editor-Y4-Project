@@ -9,6 +9,7 @@
 #include <juce_events/juce_events.h>
 #include <juce_data_structures/juce_data_structures.h>
 #include "Project_Data/Pattern.h"
+#include "MIDI_Logic/ParsedMidi.h"
 
 
 class SessionData {
@@ -78,6 +79,11 @@ public:
         pattern.emplace_back(Pattern(title));
     }
 
+    void addPatternFromMidi(std::string title, auto& events) {
+        pattern.emplace_back(Pattern(title,events));
+    }
+
+
     bool anyPatterns() {
         return !pattern.empty();
     }
@@ -89,6 +95,26 @@ public:
     const Pattern& getCurrentPattern() {
         return pattern.at(activePattern);
     }
+
+    void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
+
+    void addParsedMidi(auto& data, std::string title) {
+        parsedMidiFile.emplace_back(data,title);
+        updatePatternWithMidiData();
+    }
+
+    void updatePatternWithMidiData() {
+
+        auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
+        size_t tracks = currentFile.m_tracks.size();
+        for (size_t track = 0; track < tracks; track++) {
+            auto title =  currentFile.m_title + " " + std::to_string(track);
+            addPatternFromMidi(title,currentFile.m_tracks.at(track).Events);
+        }
+        setCurrentPattern(pattern.size()-1);
+
+    }
+
 
     size_t getPatternSize() {return pattern.size();}
 
@@ -108,8 +134,8 @@ private:
     float pixelPerBeatPianoRoll = 45.0f;
     float TrackHeight = 100.0f;
 
-    int WHITE_KEYS{52};
-    int BLACK_KEYS{36};
+    int WHITE_KEYS{75};
+    int BLACK_KEYS{53};
 
     ImVec2 WHITE_SIZE{100, 24};
     ImVec2 BLACK_SIZE{80, 15};
@@ -124,6 +150,9 @@ private:
 
     std::vector<Pattern> pattern{};
     size_t activePattern = 0;
+
+    std::vector<ParsedMidi> parsedMidiFile;
+
 
 };
 

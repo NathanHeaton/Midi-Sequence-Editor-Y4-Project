@@ -14,15 +14,16 @@
 
 class ParsedMidi{
     public:
-    ParsedMidi(const std::vector<uint8_t>& midi_bytes);
+    ParsedMidi(const std::vector<uint8_t>& midi_bytes, std::string title);
     ~ParsedMidi();
 
     //vars
     std::vector<uint8_t> m_bytes;
     int MIDI_FORMAT;
-    int num_of_tracks;
+    size_t num_of_tracks;
     bool SMPTE_time;
     std::vector<uint8_t> m_headerChunkLength;
+    std::string m_title;
 
     // track chunk
     std::vector<TrackChunk> m_tracks;

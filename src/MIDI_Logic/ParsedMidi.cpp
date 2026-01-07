@@ -6,9 +6,9 @@
 
 
 
-ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes) {
+ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes, std::string title) {
     m_bytes = midi_bytes;
-
+    m_title = title;
     MIDI_FORMAT = vector_bytes_to_int(vector_slice(m_bytes,8,9));
     num_of_tracks =  vector_bytes_to_int(vector_slice(m_bytes,10,11));
     SMPTE_time = false;

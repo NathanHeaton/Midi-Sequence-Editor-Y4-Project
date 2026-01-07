@@ -4,8 +4,6 @@ juce_add_gui_app(${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
         PRIVATE
         MIDI_Logic/MIDI_Events/MidiEvent.cpp
-        MIDI_Logic/filePicker.cpp
-        MIDI_Logic/MidiFileManager.cpp
         MIDI_Logic/MidiByteReader.cpp
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp

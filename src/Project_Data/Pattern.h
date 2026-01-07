@@ -28,8 +28,9 @@ class Pattern {
         m_title = t_title;
     }
     // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent> events) : m_events(events) {
+    Pattern(std::string t_title, std::vector<MidiEvent>& events) : m_events(events) {
         m_title = t_title;
+        createNoteEventPairs();
     }
 
     void createNoteEventPairs() {
