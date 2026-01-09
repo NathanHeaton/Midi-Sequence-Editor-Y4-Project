@@ -36,11 +36,11 @@ public:
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();
-            barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBeatPianoRoll();
+            barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll);
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX / session.getPixelPerBeatPianoRoll()) : 0;
-            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeatPianoRoll());
+                static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::arranger)) : 0;
+            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::pianoRoll));
         }
     };
 
@@ -79,7 +79,7 @@ public:
             renderPattern();
 
             pianoRollScrollY = ImGui::GetScrollY();
-            ImGui::Dummy(ImVec2(1000,s->getWhiteKeys()*s->getWhiteSize().y));
+            ImGui::Dummy(ImVec2(s->getPixelPerBar(zoomFactor::pianoRoll)*s->getTotalBarsPianoRoll(),s->getWhiteKeys()*s->getWhiteSize().y));
         }
         ImGui::EndChild();
 
@@ -106,7 +106,7 @@ private:
         for (int i = ctx.firstVisibleBeat; i <= ctx.lastVisibleBeat; i++) {
             bool barStart = checkIfBarStart(i);
             ImVec2 beatPosStart = ImVec2(
-                ctx.cursorPos.x + i * s->getPixelPerBeatPianoRoll(),
+                ctx.cursorPos.x + i * s->getPixelPerBeat(zoomFactor::pianoRoll),
                 barStart ? ctx.cursorPos.y : ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
@@ -155,12 +155,18 @@ private:
         auto& pattern = SessionData::instance().getCurrentPattern();
         auto& noteData = pattern.m_events;
         for (auto noteIndices : pattern.m_noteEvents) {
+
+            float startConvertedDelta = (noteData.at(noteIndices.onIndex).getDelta() / pattern.ticksPerQuarterNote)* s->getPPQ();
+            float S
             float yStart = ctx.cursorPos.y + (noteData.at(noteIndices.onIndex).getPitch()*s->getWhiteSize().y);
-            float xStart = ctx.cursorPos.x;
+            float xStart = ctx.cursorPos.x +
+                (s->getPPQ()/s->getPixelPerBeat(zoomFactor::pianoRoll))*);
+            float xEnd = ctx.cursorPos.x +
+                SessionData::instance().getPixelPerBeat(zoomFactor::pianoRoll)/noteData.at(noteIndices.offIndex).getDelta();
 
             ctx.drawList->AddRectFilled(
                 ImVec2(xStart, yStart),
-                ImVec2(xStart + 60,yStart+ s->getWhiteSize().y),
+                ImVec2(xEnd,yStart+ s->getWhiteSize().y),
                     Theme::currentThemeColours.barColourPacked);
         }
 

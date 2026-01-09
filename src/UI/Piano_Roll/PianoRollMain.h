@@ -21,7 +21,7 @@ public:
     PianoRollComponent pianoRoll;
 
     float timelineXScroll = 0.0f;
-    float timelineLength = SessionData::instance().getBarWidth() * 8;
+    float timelineLength = SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
 
     PianoRollMain() = default;
 
@@ -40,7 +40,7 @@ public:
                 ImGui::TableNextColumn();
                 timelineLabel.create(timelineLength,timelineXScroll,
                     SessionData::instance().getTotalBarsPianoRoll(),
-                    SessionData::instance().getBarWidthPianoRoll());
+                    zoomFactor::pianoRoll);
                 pianoRoll.create(pianoRollScrollY);
             }ImGui::EndTable();
 

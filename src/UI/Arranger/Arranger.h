@@ -25,7 +25,7 @@ public:
     std::vector<std::unique_ptr<HeadingComponent>> trackComponents;
 
 
-    float timelineLength = SessionData::instance().getBarWidth()* SessionData::instance().getTotalBars();
+    float timelineLength = SessionData::instance().getPixelPerBar(zoomFactor::arranger)* SessionData::instance().getTotalBars();
     float timelineXScroll = 0.0f;
     Arranger() {
         AddTrack();
@@ -54,7 +54,7 @@ public:
 
             timelineLabel.create(timelineLength,timelineXScroll,
                 SessionData::instance().getTotalBars(),
-                SessionData::instance().getBarWidth());
+                zoomFactor::arranger);
 
         }ImGui::EndTable();
         ImGui::PopStyleVar();

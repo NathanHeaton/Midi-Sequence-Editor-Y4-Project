@@ -13,13 +13,15 @@ class TimelineLabel {
     public:
     int totalBars = 30;
     float barWidth;
+    float m_zoomFactor;
 
 
     TimelineLabel() = default;
 
-    void create(float timelineLength, float &xScroll, float bars, float t_barWidth) {
+    void create(float timelineLength, float &xScroll, int bars, float t_zoomFactor) {
         totalBars = bars;
-        barWidth = t_barWidth;
+        m_zoomFactor =t_zoomFactor;
+        barWidth = SessionData::instance().getPixelPerBar(m_zoomFactor);
         if (ImGui::BeginChild("Timeline", ImVec2(0, 20),
             false)) {
             ImGui::SetScrollX(xScroll);

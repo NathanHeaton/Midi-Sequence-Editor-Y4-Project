@@ -22,16 +22,19 @@ class Pattern {
 
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
-
+    int ticksPerQuarterNote;
 
     Pattern(std::string t_title) {
         m_title = t_title;
     }
     // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent>& events) : m_events(events) {
+    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks) : m_events(events) {
         m_title = t_title;
+        ticksPerQuarterNote = ticks;
         createNoteEventPairs();
     }
+
+
 
     void createNoteEventPairs() {
 

@@ -30,11 +30,11 @@ public:
             height = ImGui::GetWindowHeight();
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
-            barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBeat();
+            barWidth = SessionData::instance().getPixelPerBar(zoomFactor::arranger);
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX / session.getPixelPerBeat()) : 0;
-            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat());
+                static_cast<int>(scrollX / session.getPixelPer(Division::QUARTER_NOTE, zoomFactor::arranger)) : 0;
+            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::arranger));
         }
     };
 
@@ -46,13 +46,12 @@ public:
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
             DrawBars();
             DrawTrackSeparator();
-            if (timelineLength < SessionData::instance().getBarWidth()* 60)
-            if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
-                s->setTotalBars(s->getTotalBars()+ 4);
-                timelineLength = s->getTotalBars() * s->getBarWidth();
-
+            if (timelineLength < SessionData::instance().getPixelPerBar(zoomFactor::arranger)* 60) {
+                if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
+                    s->setTotalBars(s->getTotalBars()+ 4);
+                    timelineLength = s->getTotalBars() * s->getPixelPerBar(zoomFactor::arranger);
+                }
             }
-
             xScroll = ImGui::GetScrollX();
             ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * s->getTrackAmount()));
 
@@ -76,7 +75,7 @@ public:
         for (int i = ctx.firstVisibleBeat; i <= ctx.lastVisibleBeat; i++) {
             bool barStart = checkIfBarStart(i);
             ImVec2 beatPosStart = ImVec2(
-                ctx.cursorPos.x + i * s->getPixelPerBeat(),
+                ctx.cursorPos.x + i * s->getPixelPerBeat(zoomFactor::arranger),
                 ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
@@ -108,7 +107,7 @@ public:
 
     void DrawBackground(const TimelineContext& ctx, int startBeat) {
         ImVec2 rectStart = ImVec2(
-            ctx.cursorPos.x + s->getPixelPerBeat() * startBeat,
+            ctx.cursorPos.x + s->getPixelPerBeat(zoomFactor::arranger) * startBeat,
             ctx.cursorPos.y
         );
         ImVec2 rectEnd = ImVec2(
