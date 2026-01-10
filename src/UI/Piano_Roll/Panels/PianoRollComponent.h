@@ -3,6 +3,8 @@
 //
 #pragma once
 
+#include <filesystem>
+
 #include "../../../Theme.h"
 #include "../../../SessionData.h"
 
@@ -28,6 +30,7 @@ public:
         int firstVisibleBeat;
         int lastVisibleBeat;
         float barWidth;
+        float noteHeight;
 
         TimelineContext() {
             cursorPos = ImGui::GetCursorScreenPos();
@@ -37,6 +40,7 @@ public:
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();
             barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll);
+            noteHeight = SessionData::instance().getWhiteSize().y * 7 /12;
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::arranger)) : 0;
@@ -152,23 +156,40 @@ private:
 
     void renderPattern() {
         TimelineContext ctx;
-        auto& pattern = SessionData::instance().getCurrentPattern();
+        auto& pattern = s->getCurrentPattern();
         auto& noteData = pattern.m_events;
-        for (auto noteIndices : pattern.m_noteEvents) {
+        int cumaltiveDelta = 0;
+        size_t notePairIndex = 0;
+        size_t index = 0;
 
-            float startConvertedDelta = (noteData.at(noteIndices.onIndex).getDelta() / pattern.ticksPerQuarterNote)* s->getPPQ();
-            float S
-            float yStart = ctx.cursorPos.y + (noteData.at(noteIndices.onIndex).getPitch()*s->getWhiteSize().y);
-            float xStart = ctx.cursorPos.x +
-                (s->getPPQ()/s->getPixelPerBeat(zoomFactor::pianoRoll))*);
-            float xEnd = ctx.cursorPos.x +
-                SessionData::instance().getPixelPerBeat(zoomFactor::pianoRoll)/noteData.at(noteIndices.offIndex).getDelta();
+        for (auto noteIndices : pattern.m_noteEvents) {
+            auto& onIndex = noteData.at(noteIndices.onIndex);
+            auto offIndex = noteData.at(noteIndices.offIndex);
+
+            float startConvertedDelta=0;
+            if (onIndex.m_absoluteTime != 0){startConvertedDelta =
+                onIndex.m_absoluteTime / pattern.ticksPerQuarterNote;}
+
+            float endConvertedDelta=0;
+            if (onIndex.m_absoluteTime != 0){endConvertedDelta =
+                offIndex.m_absoluteTime / pattern.ticksPerQuarterNote;}
+
+            float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startConvertedDelta;
+
+            float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endConvertedDelta ;
+
+            float yStart = ctx.cursorPos.y + (ctx.noteHeight*128.0f) - (noteData.at(noteIndices.onIndex).getPitch()*ctx.noteHeight);
+            float xStart = ctx.cursorPos.x + startPixel;
+            float xEnd =  ctx.cursorPos.x + endPixel;
+            float yEnd = yStart + ctx.noteHeight;
 
             ctx.drawList->AddRectFilled(
                 ImVec2(xStart, yStart),
-                ImVec2(xEnd,yStart+ s->getWhiteSize().y),
+                ImVec2(xEnd,yEnd),
                     Theme::currentThemeColours.barColourPacked);
+
         }
+
 
     }
 

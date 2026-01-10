@@ -90,8 +90,8 @@ public:
         std::string title = "untitled " + std::to_string(pattern.size());
         pattern.emplace_back(Pattern(title));
     }
-    void addPatternFromMidi(std::string title, auto& events) {
-        pattern.emplace_back(Pattern(title,events));
+    void addPatternFromMidi(std::string title, auto& events, int ticks) {
+        pattern.emplace_back(title,events, ticks);
     }
     bool anyPatterns() {
         return !pattern.empty();
@@ -113,21 +113,32 @@ public:
     void updatePatternWithMidiData() {
 
         auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
+
         size_t tracks = currentFile.m_tracks.size();
-        for (size_t track = 0; track < tracks; track++) {
-            auto title =  currentFile.m_title + " " + std::to_string(track);
-            addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote;
+        DBG("format: "<< currentFile.MIDI_FORMAT);
+        if (currentFile.MIDI_FORMAT == 0) {
+            std::vector<MidiEvent> combinedTracks;
+            auto title =  currentFile.m_title + " ";
+            for (size_t track = 0; track < tracks; track++) {
+
+                combinedTracks.insert(combinedTracks.end(), currentFile.m_tracks.at(track).Events.begin() ,currentFile.m_tracks.at(track).Events.end());
+            }
+            addPatternFromMidi(title,combinedTracks, currentFile.ticksInQuarterNote);
+        }
+        else {
+            for (size_t track = 0; track < tracks; track++) {
+                auto title =  currentFile.m_title + " " + std::to_string(track);
+                addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
+            }
+
         }
         setCurrentPattern(pattern.size()-1);
-
     }
 
 
     size_t getPatternSize() {return pattern.size();}
 
-    // void addPatternFromMidi(std::string title,std::vector<> events) {
-    //     pattern.emplace_back(Pattern(title));
-    // }
+
 
     TimeSignature timeSignature{4, 4};
 

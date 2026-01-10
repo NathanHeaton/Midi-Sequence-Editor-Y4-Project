@@ -49,21 +49,27 @@ class Pattern {
             }
         };
         std::vector<PendingNoteEvent> pendingEvents;
+        int cumulativeTime=0;
 
         for (size_t i=0; i<m_events.size(); i++) {
-            if (m_events.at(i).isNoteOn()) {
-                pendingEvents.emplace_back(i,m_events.at(i).getPitch(),m_events.at(i).getChannel());
-            }
-            else if (m_events.at(i).isNoteOff()) {
+            cumulativeTime += m_events.at(i).getDelta();
+            DBG("total time per note"<<cumulativeTime);
+            m_events.at(i).m_absoluteTime = cumulativeTime;
+
+            if (m_events.at(i).isNoteOff() || (m_events.at(i).getVelocity() == 0 && m_events.at(i).isNoteOn())) {
                 for (PendingNoteEvent pendingNote : pendingEvents) {
                     if (m_events.at(i).getPitch() == pendingNote.pitch &&
                         m_events.at(i).getChannel() == pendingNote.channel) {
                         m_noteEvents.emplace_back(pendingNote.onIndex, i);
                         pendingEvents.erase(pendingEvents.begin() + i);
                         break;
-                    }
+                        }
                 }
             }
+            else if (m_events.at(i).isNoteOn()) {
+                pendingEvents.emplace_back(i,m_events.at(i).getPitch(),m_events.at(i).getChannel());
+            }
+
         }
     }
 
