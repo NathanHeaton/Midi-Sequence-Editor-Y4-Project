@@ -5,19 +5,20 @@
 #ifndef MYPROJECT_SESSIONDATA_H
 #define MYPROJECT_SESSIONDATA_H
 
-#include <juce_core/juce_core.h>
+//#include <juce_core/juce_core.h>
+#include <imgui.h>
 #include "Project_Data/Pattern.h"
 #include "MIDI_Logic/ParsedMidi.h"
 
-namespace Division {
-    const float WhOLE = 4.0f;
+inline namespace Division {
+    const float WHOLE = 4.0f;
     const float QUARTER_NOTE = 1.0f;
     const float EIGHT_NOTE = 0.5;
 }
 
-namespace zoomFactor {
-    float arranger = 1.0f;
-    float pianoRoll = 2.2f;
+inline namespace zoomFactor {
+    inline float arranger = 1.0f;
+    inline float pianoRoll = 2.2f;
 }
 
 
@@ -85,11 +86,13 @@ public:
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
     void addPattern() {
+        std::cout << "Adding pattern..." << std::endl;
         std::string title = "untitled " + std::to_string(pattern.size());
-        pattern.emplace_back(Pattern(title, getPixelPerBar(zoomFactor::pianoRoll)));
+        pattern.emplace_back(Pattern(title));
     }
     void addPatternFromMidi(std::string title, auto& events, int ticks) {
-        pattern.emplace_back(title,events, ticks,getPixelPerBar(zoomFactor::pianoRoll));
+        std::cout << "Adding pattern from mifi..." << std::endl;
+        pattern.emplace_back(title, events, ticks);
     }
     bool anyPatterns() {
         return !pattern.empty();
@@ -105,15 +108,15 @@ public:
 
     void addParsedMidi(auto& data, std::string title) {
         parsedMidiFile.emplace_back(data,title);
+        std::cout << "moving onto pattern" << std::endl;
         updatePatternWithMidiData();
     }
 
     void updatePatternWithMidiData() {
-
+        std::cout << "Adding pattern...2" << std::endl;
         auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
 
         size_t tracks = currentFile.m_tracks.size();
-        DBG("format: "<< currentFile.MIDI_FORMAT);
         if (currentFile.MIDI_FORMAT == 0) {
             std::vector<MidiEvent> combinedTracks;
             auto title =  currentFile.m_title + " ";
@@ -141,7 +144,7 @@ public:
     TimeSignature timeSignature{4, 4};
 
 private:
-    JUCE_DECLARE_NON_COPYABLE(SessionData)
+    //JUCE_DECLARE_NON_COPYABLE(SessionData)
     SessionData() = default;
 
     int PPQ = 960;

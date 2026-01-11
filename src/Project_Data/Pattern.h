@@ -5,12 +5,15 @@
 #ifndef MYPROJECT_PATTERN_H
 #define MYPROJECT_PATTERN_H
 
-#include <stdlib.h>
+#include <iostream>
+#include <ostream>
 #include <string>
 #include "../MIDI_Logic/MIDI_Events/MidiEvent.h"
 
+class SessionData;
+
 class Pattern {
-    public:
+public:
 
 
     struct NoteEventPair {
@@ -26,22 +29,39 @@ class Pattern {
 
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
-    int ticksPerQuarterNote;
+    int ticksPerQuarterNote = 960;
     int m_bars{8};
 
-    Pattern(std::string t_title, auto barLength) {
-        m_barLength = barLength;
+    Pattern(std::string t_title) {
+        std::cout<<"Pattern created"<<std::endl;
         m_title = t_title;
     }
     // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks, auto barLength) : m_events(events) {
+    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks)
+        : m_events(events), ticksPerQuarterNote(ticks) {
+        std::cout <<"Pattern constructor start - title: " << t_title << std::endl;
+        std::cout <<"Events count: " << events.size() << std::endl;
+        std::cout <<"Ticks: " << ticks << std::endl;
+
         m_title = t_title;
-        ticksPerQuarterNote = ticks;
+
+        std::cout <<"About to create note event pairs" << std::endl;
         createNoteEventPairs();
-        setLastBar();
+        std::cout <<"Note event pairs created: " << m_noteEvents.size() << std::endl;
+
+        std::cout <<"About to set last bar" << std::endl;
+        //printNoteIndices();
+        //setLastBar();
+        std::cout <<"Pattern constructor complete" << std::endl;
     }
 
+    void printNoteIndices() {
+        for (size_t i=0; i<m_noteEvents.size(); i++) {
+            std::cout<< "off index:"<< m_noteEvents.at(i).offIndex<<std::endl;
+        }
+    }
 
+    auto& getSession();
 
     void createNoteEventPairs() {
 

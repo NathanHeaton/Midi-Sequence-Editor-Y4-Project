@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <vector>
 #include <stdexcept>
-#include "juce_core/system/juce_PlatformDefs.h"
+
 
 class MidiByteReader {
 

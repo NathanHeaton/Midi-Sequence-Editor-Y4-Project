@@ -15,7 +15,7 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes, std::string title
     ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));
     m_headerChunkLength = vector_slice(m_bytes,4,7);
 
-
+    std::cout << "ParsedMidi 1" << std::endl;
     get_length_of_tracks();
     // if (MIDI_FORMAT == 0)
     // {
@@ -35,9 +35,8 @@ ParsedMidi::~ParsedMidi() {
 
 void ParsedMidi::createMidiChunk(int track) {
     int length = vector_bytes_to_int(vector_slice(m_bytes,track,track+3));
-    DBG(vector_to_HexString(vector_slice(m_bytes,track,track+3)));
+    std::cout << "ParsedMidi 2" << std::endl;
     trackLength.insert(trackLength.begin(),length);
-    DBG("length: " << length );
 }
 
 
@@ -47,8 +46,6 @@ bool ParsedMidi::validateTrackChunk(int trackStart) {
         return true;
     }
     else {
-        DBG(vector_to_HexString(vector_slice(m_bytes,trackStart,trackStart+3)));
-        DBG("Wrong track chunk size");
         return false;
     }
 }
@@ -60,40 +57,33 @@ void ParsedMidi::get_length_of_tracks() {
 
     for (int i = 0; i < num_of_tracks; i++) {
         std::vector<uint8_t> slice = vector_slice(m_bytes,byte,byte+3);
-        DBG(vector_to_HexString(slice));
         int length = vector_bytes_to_int(slice);
         trackLength.push_back(length);
-        DBG("track "<<i<<" length: " << length);
 
         std::vector<uint8_t> chunkBytes = vector_slice(m_bytes,byte+4,byte+3+length);
-
+        std::cout << "creating track chunk" << std::endl;
         TrackChunk newTrackChunk(chunkBytes);
+        std::cout << "created track chunk" << std::endl;
         m_tracks.push_back(newTrackChunk);
         // move to next byte
         byte = check_if_next_track_valid(byte,length);
     }
+    std::cout << "finished function" << std::endl;
 }
 
 int ParsedMidi::check_if_next_track_valid(int byte,int track_length) {
     if (byte + track_length + 8 < m_bytes.size()  ) {
         byte = byte + track_length + 4;
         if (validateTrackChunk(byte)) {
-            DBG("next chunk is valid");
             byte = byte + 4;
         }
-        DBG("byte: "<<byte);
-        DBG(vector_to_HexString(vector_slice(m_bytes,byte,byte+3)));
     }
     else if (byte + track_length <= m_bytes.size()  ) {
-        DBG("EOF");
     }
     else {
-        DBG("accessing byte"<<byte+track_length);
-        DBG("about to go out side of file bounds");
     }
     return byte;
 }
-
 
 void ParsedMidi::establishSMPTE() {
 

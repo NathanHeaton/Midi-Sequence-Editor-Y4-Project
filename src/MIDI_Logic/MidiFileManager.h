@@ -53,7 +53,9 @@ public:
             else {
                 DBG("file bytes are invalid: "<<vector_to_HexString(vector_slice(bytes,0,4)));
             }
+            DBG("got to session call");
             SessionData::instance().addParsedMidi(bytes, m_fileName);
+            DBG("got past session call");
             sendActionMessage("midiData");
         }
         else {        DBG("file not opened");    }

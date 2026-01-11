@@ -6,6 +6,10 @@
 #define MYPROJECT_UTILS_H
 #include <charconv>
 #include <format>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <math.h>
 
 // returns a slice of a vector
 template <typename T>
@@ -19,8 +23,8 @@ std::vector<T> vector_slice(const std::vector<T>& a, int start_point, int end_po
 
 // returns bytes in a hex string
 template <typename T>
-juce::String vector_to_HexString(std::vector<T> a) {
-    juce::String s;
+std::string vector_to_HexString(std::vector<T> a) {
+    std::string s;
     for( int i = 0; i < a.size(); i++ ) {
         s = s + std::format("{:X}",a.at(i));
     }

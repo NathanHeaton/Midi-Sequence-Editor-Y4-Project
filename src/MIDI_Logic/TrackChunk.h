@@ -6,11 +6,10 @@
 #define MYPROJECT_TRACKCHUNK_H
 #include <cstdint>
 #include <vector>
-#include <juce_core/juce_core.h>
 #include "MIDI_Events/MidiEvent.h"
-#include "juce_events/juce_events.h"
 #include "MidiByteReader.h"
 #include "../utils.h"
+#include <iostream>
 #include "MIDI_Events/MidiStructs.h"
 
 class TrackChunk {

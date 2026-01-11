@@ -7,8 +7,6 @@
 #include <cstdint>
 #include <vector>
 #include <iostream>
-#include <juce_core/juce_core.h>
-#include "juce_core/system/juce_PlatformDefs.h"
 #include  "../utils.h"
 #include  "TrackChunk.h"
 
@@ -34,7 +32,7 @@ class ParsedMidi{
 
 
     int ticksInQuarterNote;
-    const juce::String CHUNK_TITLE_HEX = "4D54726B";
+    const std::string CHUNK_TITLE_HEX = "4D54726B";
     const int HEADER_END = 14;
     std::string printMidiInfo();
 

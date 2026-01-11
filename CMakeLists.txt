@@ -27,7 +27,6 @@ add_library(imgui STATIC
         src/UI/Piano_Roll/Panels/piano.h
         src/UI/Common/timelineLabel.h
         src/Project_Data/Pattern.h
-        src/Project_Data/Pattern.cpp
 )
 
 target_include_directories(imgui PUBLIC
@@ -41,5 +40,5 @@ target_link_libraries(imgui PUBLIC OpenGL::GL)
 
 add_subdirectory(Dependencies/imgui_juce)
 
-# Now add your source
+# Source
 add_subdirectory(src)
