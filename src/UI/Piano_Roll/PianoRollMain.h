@@ -26,6 +26,7 @@ public:
     PianoRollMain() = default;
 
     float pianoRollScrollY;
+    float pianoRollScrollX;
     void create() {
         if (ImGui::Begin("pianoRollComponent", nullptr)) {
             toolbar.create();
@@ -41,7 +42,7 @@ public:
                 timelineLabel.create(timelineLength,timelineXScroll,
                     SessionData::instance().getTotalBarsPianoRoll(),
                     zoomFactor::pianoRoll);
-                pianoRoll.create(pianoRollScrollY);
+                pianoRoll.create(pianoRollScrollY,timelineXScroll, timelineLength);
             }ImGui::EndTable();
 
         }

@@ -6,8 +6,6 @@
 #define MYPROJECT_SESSIONDATA_H
 
 #include <juce_core/juce_core.h>
-#include <juce_events/juce_events.h>
-#include <juce_data_structures/juce_data_structures.h>
 #include "Project_Data/Pattern.h"
 #include "MIDI_Logic/ParsedMidi.h"
 
@@ -88,10 +86,10 @@ public:
 
     void addPattern() {
         std::string title = "untitled " + std::to_string(pattern.size());
-        pattern.emplace_back(Pattern(title));
+        pattern.emplace_back(Pattern(title, getPixelPerBar(zoomFactor::pianoRoll)));
     }
     void addPatternFromMidi(std::string title, auto& events, int ticks) {
-        pattern.emplace_back(title,events, ticks);
+        pattern.emplace_back(title,events, ticks,getPixelPerBar(zoomFactor::pianoRoll));
     }
     bool anyPatterns() {
         return !pattern.empty();

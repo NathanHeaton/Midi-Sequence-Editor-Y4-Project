@@ -18,20 +18,27 @@ class Pattern {
         size_t offIndex;
     };
 
+
+    float m_barLength;
+
+
     std::string m_title;
 
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
     int ticksPerQuarterNote;
+    int m_bars{8};
 
-    Pattern(std::string t_title) {
+    Pattern(std::string t_title, auto barLength) {
+        m_barLength = barLength;
         m_title = t_title;
     }
     // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks) : m_events(events) {
+    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks, auto barLength) : m_events(events) {
         m_title = t_title;
         ticksPerQuarterNote = ticks;
         createNoteEventPairs();
+        setLastBar();
     }
 
 
@@ -53,15 +60,14 @@ class Pattern {
 
         for (size_t i=0; i<m_events.size(); i++) {
             cumulativeTime += m_events.at(i).getDelta();
-            DBG("total time per note"<<cumulativeTime);
             m_events.at(i).m_absoluteTime = cumulativeTime;
 
             if (m_events.at(i).isNoteOff() || (m_events.at(i).getVelocity() == 0 && m_events.at(i).isNoteOn())) {
-                for (PendingNoteEvent pendingNote : pendingEvents) {
-                    if (m_events.at(i).getPitch() == pendingNote.pitch &&
-                        m_events.at(i).getChannel() == pendingNote.channel) {
-                        m_noteEvents.emplace_back(pendingNote.onIndex, i);
-                        pendingEvents.erase(pendingEvents.begin() + i);
+                for (auto it{pendingEvents.begin()};it< pendingEvents.end();it++) {
+                    if (m_events.at(i).getPitch() == it->pitch &&
+                        m_events.at(i).getChannel() == it->channel) {
+                        m_noteEvents.emplace_back(it->onIndex, i);
+                        pendingEvents.erase(it);
                         break;
                         }
                 }
@@ -72,6 +78,9 @@ class Pattern {
 
         }
     }
+
+    // TODO: create search algo to find highest delta in file
+    void setLastBar();
 
     void addNote(MidiEvent noteOn, MidiEvent noteOff) {
         m_events.emplace_back(noteOn);

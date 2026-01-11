@@ -43,7 +43,7 @@ public:
             noteHeight = SessionData::instance().getWhiteSize().y * 7 /12;
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::arranger)) : 0;
+                static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::pianoRoll)) : 0;
             lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::pianoRoll));
         }
     };
@@ -71,26 +71,25 @@ public:
     //     if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
     //     }
     // }
-    void create(float &pianoRollScrollY) {
+
+    void create(float &scrollY,float &scrollX, float& lengthX) {
         if (ImGui::BeginChild("piano grid",ImVec2(0,0),
             ImGuiChildFlags_None,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
-
             DrawNoteGuides();
             DrawBars();
             DrawOctaveLines();
             //HandleMouseInput();
             renderPattern();
-
-            pianoRollScrollY = ImGui::GetScrollY();
+            scrollY = ImGui::GetScrollY();
+            scrollX = ImGui::GetScrollX();
+            auto& pattern = s->getCurrentPattern();
+            lengthX = s->getPixelPerBar(zoomFactor::pianoRoll)*pattern.m_bars;
             ImGui::Dummy(ImVec2(s->getPixelPerBar(zoomFactor::pianoRoll)*s->getTotalBarsPianoRoll(),s->getWhiteKeys()*s->getWhiteSize().y));
         }
         ImGui::EndChild();
 
     }
-
-
-
 
 private:
 
@@ -143,7 +142,7 @@ private:
         TimelineContext ctx;
         float octaveHeight = s->getWhiteSize().y *7;
         for (unsigned int i = 0; i < octaves; i++) {
-            float yPos = ctx.cursorPos.y + i * octaveHeight;
+            float yPos = ctx.cursorPos.y + i * octaveHeight + ( s->getWhiteSize().y*5);
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
@@ -158,9 +157,6 @@ private:
         TimelineContext ctx;
         auto& pattern = s->getCurrentPattern();
         auto& noteData = pattern.m_events;
-        int cumaltiveDelta = 0;
-        size_t notePairIndex = 0;
-        size_t index = 0;
 
         for (auto noteIndices : pattern.m_noteEvents) {
             auto& onIndex = noteData.at(noteIndices.onIndex);
@@ -168,14 +164,13 @@ private:
 
             float startConvertedDelta=0;
             if (onIndex.m_absoluteTime != 0){startConvertedDelta =
-                onIndex.m_absoluteTime / pattern.ticksPerQuarterNote;}
+                static_cast<float>(onIndex.m_absoluteTime) / pattern.ticksPerQuarterNote;}
 
             float endConvertedDelta=0;
-            if (onIndex.m_absoluteTime != 0){endConvertedDelta =
-                offIndex.m_absoluteTime / pattern.ticksPerQuarterNote;}
+            if (offIndex.m_absoluteTime != 0){endConvertedDelta =
+                static_cast<float>(offIndex.m_absoluteTime) / pattern.ticksPerQuarterNote;}
 
             float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startConvertedDelta;
-
             float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endConvertedDelta ;
 
             float yStart = ctx.cursorPos.y + (ctx.noteHeight*128.0f) - (noteData.at(noteIndices.onIndex).getPitch()*ctx.noteHeight);
@@ -199,11 +194,12 @@ private:
         float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;
         int notes = 128;
         bool whiteNote = true;
+        int octaveNoteIndex = 0;
+        int noteOffset = 5;
+
         for (auto i{0u}; i < notes; i++) {
             float yPos = ctx.cursorPos.y + i * noteGap;
-            if (notes%2 == 0) {
-                whiteNote= !whiteNote;
-            }
+
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos+ noteGap),
                 whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
@@ -214,6 +210,13 @@ private:
                 Theme::currentThemeColours.beatColourPacked,
                 1.0f
             );
+
+            if (((octaveNoteIndex+noteOffset)% 12 < 7 || (octaveNoteIndex+noteOffset)%12 > 7) && (octaveNoteIndex+noteOffset)% 12 != 0 ) {
+                whiteNote= !whiteNote;
+            }
+
+            octaveNoteIndex++;
+
         }
     }
 };
