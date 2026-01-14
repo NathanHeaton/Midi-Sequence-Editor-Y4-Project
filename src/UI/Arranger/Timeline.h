@@ -94,8 +94,7 @@ public:
     }
 
     void DrawBarBackgrounds(const TimelineContext& ctx) {
-        int beatsPerBar = s->timeSignature.getNumerator();
-        int beatsPerBackground = beatsPerBar * 2;
+        int beatsPerBackground = s->timeSignature.getNumerator() * 2;
         int firstBackgroundBeat = (ctx.firstVisibleBeat / beatsPerBackground) * beatsPerBackground;
         int backgroundIndex = firstBackgroundBeat / beatsPerBackground;
         bg_tone = (backgroundIndex % 2) == 0;
@@ -111,7 +110,7 @@ public:
             ctx.cursorPos.y
         );
         ImVec2 rectEnd = ImVec2(
-            rectStart.x + ctx.barWidth,
+            rectStart.x + s->getPixelPerBar(zoomFactor::arranger)*2,
             ctx.cursorPos.y + ctx.height
         );
         ctx.drawList->AddRectFilled(

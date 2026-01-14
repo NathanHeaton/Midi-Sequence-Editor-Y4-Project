@@ -33,7 +33,7 @@ class TrackChunk {
     void handlePitchBend(uint32_t delta, uint8_t channel, uint8_t status);
 
     std::vector<MidiEvent> Events;
-
+    bool m_noteTrack = false;
 
     const std::vector<uint8_t>& m_trackBytes;
     MidiByteReader m_midiReader;

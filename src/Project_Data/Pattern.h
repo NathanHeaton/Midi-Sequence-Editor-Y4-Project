@@ -29,90 +29,65 @@ public:
 
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
-    int ticksPerQuarterNote = 960;
+    int ticksInMidiFile{0};
     int m_bars{8};
 
     Pattern(std::string t_title) {
-        std::cout<<"Pattern created"<<std::endl;
         m_title = t_title;
     }
     // from Midi import
-    Pattern(std::string t_title, std::vector<MidiEvent>& events, int ticks)
-        : m_events(events), ticksPerQuarterNote(ticks) {
-        std::cout <<"Pattern constructor start - title: " << t_title << std::endl;
-        std::cout <<"Events count: " << events.size() << std::endl;
-        std::cout <<"Ticks: " << ticks << std::endl;
-
+    Pattern(std::string t_title, std::vector<MidiEvent>& events, int midiTicks)
+        : m_events(events), ticksInMidiFile(midiTicks) {
         m_title = t_title;
-
-        std::cout <<"About to create note event pairs" << std::endl;
+        convertMidiTicksToPPQ();
         createNoteEventPairs();
-        std::cout <<"Note event pairs created: " << m_noteEvents.size() << std::endl;
-
-        std::cout <<"About to set last bar" << std::endl;
-        //printNoteIndices();
-        //setLastBar();
-        std::cout <<"Pattern constructor complete" << std::endl;
-    }
-
-    void printNoteIndices() {
-        for (size_t i=0; i<m_noteEvents.size(); i++) {
-            std::cout<< "off index:"<< m_noteEvents.at(i).offIndex<<std::endl;
+        if (!m_events.empty()) {
+            setLastBar();
         }
     }
+    void createNoteEventPairs();
 
-    auto& getSession();
+    void convertMidiTicksToPPQ();
 
-    void createNoteEventPairs() {
-
-        struct PendingNoteEvent {
-            uint8_t pitch;
-            uint8_t channel;
-            size_t onIndex;
-            PendingNoteEvent(size_t t_onIndex,uint8_t t_pitch, uint8_t t_chan) {
-                onIndex = t_onIndex;
-                pitch = t_pitch;
-                channel = t_chan;
-            }
-        };
-        std::vector<PendingNoteEvent> pendingEvents;
-        int cumulativeTime=0;
-
-        for (size_t i=0; i<m_events.size(); i++) {
-            cumulativeTime += m_events.at(i).getDelta();
-            m_events.at(i).m_absoluteTime = cumulativeTime;
-
-            if (m_events.at(i).isNoteOff() || (m_events.at(i).getVelocity() == 0 && m_events.at(i).isNoteOn())) {
-                for (auto it{pendingEvents.begin()};it< pendingEvents.end();it++) {
-                    if (m_events.at(i).getPitch() == it->pitch &&
-                        m_events.at(i).getChannel() == it->channel) {
-                        m_noteEvents.emplace_back(it->onIndex, i);
-                        pendingEvents.erase(it);
-                        break;
-                        }
-                }
-            }
-            else if (m_events.at(i).isNoteOn()) {
-                pendingEvents.emplace_back(i,m_events.at(i).getPitch(),m_events.at(i).getChannel());
-            }
-
-        }
-    }
-
-    // TODO: create search algo to find highest delta in file
     void setLastBar();
 
-    void addNote(MidiEvent noteOn, MidiEvent noteOff) {
-        m_events.emplace_back(noteOn);
-        m_events.emplace_back(noteOff);
-        m_noteEvents.emplace_back(m_events.size() - 1,m_events.size());
+    const void addNote(uint8_t t_pitch, int absoluteTime, uint32_t endDelta) {
+        uint8_t channel = 0;
+        uint8_t velocity = 127;
+        uint8_t status = 0x80;
+        uint32_t delta = 0;
+        size_t index = 0;
 
+        for ( index; index < m_events.size(); index++) {
+            if (absoluteTime >= m_events.at(index).m_absoluteTime) {
+                printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
+                delta = absoluteTime - m_events.at(index).m_absoluteTime;
+                break;
+            }
+        }
+
+        MidiEvent noteOn(delta,status,Note{t_pitch,velocity},channel);
+        noteOn.m_absoluteTime = absoluteTime;
+        status = 0x90;
+        MidiEvent noteOff(endDelta,status,Note{t_pitch,velocity},channel);
+        noteOff.m_absoluteTime = absoluteTime + endDelta;
+        m_events.insert(m_events.begin()+index,noteOn);
+        m_events.insert(m_events.begin()+index,noteOff);
+
+        //TODO: change later to add specific note instead of recaluculating
+        createNoteEventPairs();
     }
+
+    void updateEventDeltas() {
+        //for ()
+    }
+
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
 
     }
+
 
 };
 #endif //MYPROJECT_PATTERN_H

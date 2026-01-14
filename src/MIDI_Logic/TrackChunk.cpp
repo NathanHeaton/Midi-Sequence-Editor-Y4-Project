@@ -7,7 +7,7 @@
 #include <filesystem>
 
 TrackChunk::TrackChunk(std::vector<uint8_t>& bytes) : m_trackBytes(bytes), m_midiReader(bytes){
-    std::cout << "ParsedMidi 3" << std::endl;
+
     createNoteEvents();
     //printMidiInfo();
 }
@@ -17,7 +17,6 @@ TrackChunk::~TrackChunk() {
 }
 
 void TrackChunk::createNoteEvents() {
-    std::cout << "Track 5" << std::endl;
     while (!m_endofTrack && m_midiReader.index < m_trackBytes.size()) {
         uint32_t delta = m_midiReader.readVariableLength();
         uint8_t status;
@@ -71,10 +70,8 @@ void TrackChunk::createNoteEvents() {
 }
 
 void TrackChunk::handleMetaEvent(uint32_t delta, uint8_t status) {
-    std::cout << "meta" << std::endl;
     uint8_t event = m_midiReader.readNext();
     uint32_t length = 0;
-    std::cout << "reading len" << std::endl;
 
     if (event == 0x00 || event == 0x20) {
         length = m_midiReader.readVariableLength();// finds the length of the data
@@ -83,7 +80,6 @@ void TrackChunk::handleMetaEvent(uint32_t delta, uint8_t status) {
         length = m_midiReader.readVariableLength();// finds the length of the data
     }
     else if (event == 0x2F) {
-        std::cout << "ending track" << std::endl;
         m_endofTrack = true;
         return; // this line
     }
@@ -93,9 +89,7 @@ void TrackChunk::handleMetaEvent(uint32_t delta, uint8_t status) {
     std::vector<uint8_t> dataBytes = m_midiReader.readNextN(length);// adds all the meta event data
 
     MidiEvent midi_event(delta, status,{event, length,dataBytes} );
-    std::cout << "pushing events" << std::endl;
     Events.push_back(midi_event);
-    std::cout << "pushed events" << std::endl;
 }
 
 void TrackChunk::handleSysExEvent(uint32_t delta, uint8_t status) {
@@ -107,6 +101,7 @@ void TrackChunk::handleSysExEvent(uint32_t delta, uint8_t status) {
 }
 
 void TrackChunk::handleNote(uint32_t delta, uint8_t channel, uint8_t status) {
+    if (!m_noteTrack){m_noteTrack = true;}
     uint8_t pitch = m_midiReader.readNext();
     uint8_t velocity = m_midiReader.readNext();
     Note note = {pitch, velocity};

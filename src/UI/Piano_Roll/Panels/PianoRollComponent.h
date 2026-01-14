@@ -48,29 +48,28 @@ public:
         }
     };
 
-    // void HandleMouseInput() {
-    //     TimelineContext ctx;
-    //
-    //     ImVec2 mousePos = ImGui::GetMousePos();
-    //     bool isHovered = ImGui::IsWindowHovered();
-    //
-    //     if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-    //         float relativeX = mousePos.x - ctx.cursorPos.x + ctx.scrollX;
-    //         float relativeY = mousePos.y - ctx.cursorPos.y + ctx.scrollY;
-    //
-    //         int beat = static_cast<int>(relativeX / s->getPixelPerBeatPianoRoll());
-    //         float noteGap = (s->getWhiteSize().y * 7.0f) / 12.0f;
-    //         int note = static_cast<int>(relativeY / noteGap);
-    //
-    //         note = std::clamp(note, 0, 83);
-    //
-    //         printf("Clicked at beat: %d, note: %d\n", beat, note);
-    //         // TODO: Add note to SessionData or wherever you store notes
-    //     }
-    //
-    //     if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-    //     }
-    // }
+    void HandleMouseInput() {
+        TimelineContext ctx;
+
+        ImVec2 mousePos = ImGui::GetMousePos();
+        bool isHovered = ImGui::IsWindowHovered();
+
+        if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            float relativeX = mousePos.x - ctx.cursorPos.x + ctx.scrollX;
+            float relativeY = mousePos.y - ctx.cursorPos.y;
+            int beat = static_cast<int>(relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
+            int absoluteTime = beat * s->getPPQ();
+            int pitch = static_cast<int>(relativeY / ctx.noteHeight);
+            pitch = std::clamp(pitch, 0, 127);
+            pitch = 127 - pitch;
+            printf("Clicked at beat: %d, note: %d\n", beat, pitch);
+            int duration = s->getPPQ();
+            s->addNoteToPattern(pitch,  absoluteTime,  duration);
+        }
+
+        if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+        }
+    }
 
     void create(float &scrollY,float &scrollX, float& lengthX) {
         if (ImGui::BeginChild("piano grid",ImVec2(0,0),
@@ -79,13 +78,15 @@ public:
             DrawNoteGuides();
             DrawBars();
             DrawOctaveLines();
-            //HandleMouseInput();
+            HandleMouseInput();
             renderPattern();
+
+
             scrollY = ImGui::GetScrollY();
             scrollX = ImGui::GetScrollX();
             auto& pattern = s->getCurrentPattern();
-            lengthX = s->getPixelPerBar(zoomFactor::pianoRoll)*pattern.m_bars;
-            ImGui::Dummy(ImVec2(s->getPixelPerBar(zoomFactor::pianoRoll)*s->getTotalBarsPianoRoll(),s->getWhiteKeys()*s->getWhiteSize().y));
+            lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+            ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
         }
         ImGui::EndChild();
 
@@ -124,9 +125,7 @@ private:
         if (ctx.firstVisibleBeat % increment == 0) {
             bg_tone = !bg_tone;
         }
-
     }
-
 
     void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, bool barStart) {
         ctx.drawList->AddLine(
@@ -162,16 +161,16 @@ private:
             auto& onIndex = noteData.at(noteIndices.onIndex);
             auto offIndex = noteData.at(noteIndices.offIndex);
 
-            float startConvertedDelta=0;
-            if (onIndex.m_absoluteTime != 0){startConvertedDelta =
-                static_cast<float>(onIndex.m_absoluteTime) / pattern.ticksPerQuarterNote;}
+            float startDelta =0;
+            if (onIndex.m_absoluteTime != 0){startDelta =
+                static_cast<float>(onIndex.m_absoluteTime) / s->getPPQ();}
 
-            float endConvertedDelta=0;
-            if (offIndex.m_absoluteTime != 0){endConvertedDelta =
-                static_cast<float>(offIndex.m_absoluteTime) / pattern.ticksPerQuarterNote;}
+            float endDelta=0;
+            if (offIndex.m_absoluteTime != 0){endDelta =
+                static_cast<float>(offIndex.m_absoluteTime) / s->getPPQ();}
 
-            float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startConvertedDelta;
-            float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endConvertedDelta ;
+            float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
+            float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
 
             float yStart = ctx.cursorPos.y + (ctx.noteHeight*128.0f) - (noteData.at(noteIndices.onIndex).getPitch()*ctx.noteHeight);
             float xStart = ctx.cursorPos.x + startPixel;

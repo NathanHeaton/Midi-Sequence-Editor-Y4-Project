@@ -52,6 +52,7 @@ public:
             }
             else {
                 DBG("file bytes are invalid: "<<vector_to_HexString(vector_slice(bytes,0,4)));
+                return;
             }
             DBG("got to session call");
             SessionData::instance().addParsedMidi(bytes, m_fileName);

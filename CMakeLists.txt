@@ -10,7 +10,7 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO OFF)
 set(JUCE_ENABLE_LTO OFF CACHE BOOL "Disable JUCE LTO" FORCE)
 
 # Add JUCE
-set(JUCE_DIR "../../JUCE/install/lib/cmake/JUCE-8.0.10")
+set(JUCE_DIR "/home/idad/Projects/4th_year_project_stuff/JUCE/install/lib/cmake/JUCE-8.0.10")
 find_package(JUCE CONFIG REQUIRED)
 
 # Build ImGui library with OpenGL3 backend

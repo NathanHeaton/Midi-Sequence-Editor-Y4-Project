@@ -90,9 +90,9 @@ public:
         std::string title = "untitled " + std::to_string(pattern.size());
         pattern.emplace_back(Pattern(title));
     }
-    void addPatternFromMidi(std::string title, auto& events, int ticks) {
+    void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
         std::cout << "Adding pattern from mifi..." << std::endl;
-        pattern.emplace_back(title, events, ticks);
+        pattern.emplace_back(title, events, fileTicks);
     }
     bool anyPatterns() {
         return !pattern.empty();
@@ -100,8 +100,13 @@ public:
     const std::vector<Pattern>& getPatterns() {
         return pattern;
     }
+
     const Pattern& getCurrentPattern() {
         return pattern.at(activePattern);
+    }
+
+    void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
+        pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta);
     }
 
     void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
@@ -113,8 +118,7 @@ public:
     }
 
     void updatePatternWithMidiData() {
-        std::cout << "Adding pattern...2" << std::endl;
-        auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
+        const auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
 
         size_t tracks = currentFile.m_tracks.size();
         if (currentFile.MIDI_FORMAT == 0) {
@@ -127,11 +131,7 @@ public:
             addPatternFromMidi(title,combinedTracks, currentFile.ticksInQuarterNote);
         }
         else {
-            for (size_t track = 0; track < tracks; track++) {
-                auto title =  currentFile.m_title + " " + std::to_string(track);
-                addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
-            }
-
+            loopThroughTracks(currentFile);
         }
         setCurrentPattern(pattern.size()-1);
     }
@@ -179,6 +179,17 @@ private:
 
     std::vector<ParsedMidi> parsedMidiFile;
 
+
+    void loopThroughTracks(auto currentFile) {
+        size_t tracks = currentFile.m_tracks.size();
+        for (size_t track = 0; track < tracks; track++) {
+            auto title =  currentFile.m_title + " " + std::to_string(track);
+            if (currentFile.m_tracks.at(track).m_noteTrack) {
+                addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
+            }
+            else{std::cout << "skipping non note track" << std::endl;}
+        }
+    }
 
 };
 

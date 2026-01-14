@@ -14,8 +14,6 @@ ParsedMidi::ParsedMidi(const std::vector<uint8_t>& midi_bytes, std::string title
     SMPTE_time = false;
     ticksInQuarterNote = vector_bytes_to_int(vector_slice(m_bytes,12,13));
     m_headerChunkLength = vector_slice(m_bytes,4,7);
-
-    std::cout << "ParsedMidi 1" << std::endl;
     get_length_of_tracks();
     // if (MIDI_FORMAT == 0)
     // {
@@ -35,7 +33,6 @@ ParsedMidi::~ParsedMidi() {
 
 void ParsedMidi::createMidiChunk(int track) {
     int length = vector_bytes_to_int(vector_slice(m_bytes,track,track+3));
-    std::cout << "ParsedMidi 2" << std::endl;
     trackLength.insert(trackLength.begin(),length);
 }
 
@@ -61,14 +58,11 @@ void ParsedMidi::get_length_of_tracks() {
         trackLength.push_back(length);
 
         std::vector<uint8_t> chunkBytes = vector_slice(m_bytes,byte+4,byte+3+length);
-        std::cout << "creating track chunk" << std::endl;
         TrackChunk newTrackChunk(chunkBytes);
-        std::cout << "created track chunk" << std::endl;
         m_tracks.push_back(newTrackChunk);
         // move to next byte
         byte = check_if_next_track_valid(byte,length);
     }
-    std::cout << "finished function" << std::endl;
 }
 
 int ParsedMidi::check_if_next_track_valid(int byte,int track_length) {
