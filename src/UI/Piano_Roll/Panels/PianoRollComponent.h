@@ -55,15 +55,17 @@ public:
         bool isHovered = ImGui::IsWindowHovered();
 
         if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            float relativeX = mousePos.x - ctx.cursorPos.x + ctx.scrollX;
+            float relativeX = mousePos.x - ctx.cursorPos.x;
             float relativeY = mousePos.y - ctx.cursorPos.y;
+
             int beat = static_cast<int>(relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
             int absoluteTime = beat * s->getPPQ();
             int pitch = static_cast<int>(relativeY / ctx.noteHeight);
             pitch = std::clamp(pitch, 0, 127);
             pitch = 127 - pitch;
-            printf("Clicked at beat: %d, note: %d\n", beat, pitch);
+            printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
             int duration = s->getPPQ();
+
             s->addNoteToPattern(pitch,  absoluteTime,  duration);
         }
 

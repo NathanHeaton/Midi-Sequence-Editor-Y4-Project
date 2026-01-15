@@ -57,18 +57,38 @@ public:
         uint8_t status = 0x80;
         uint32_t delta = 0;
         size_t index = 0;
+        size_t endNoteIndex = 0;
 
-        for ( index; index < m_events.size(); index++) {
+        if (m_events.empty()) {
+            delta = absoluteTime;
+        }
+        else {
+            for (index; index < m_events.size(); index++) {
+                if (absoluteTime >= m_events.at(index).m_absoluteTime ) {
+                    delta = static_cast<uint32_t>(absoluteTime - m_events.at(index).m_absoluteTime);
+                    if (index + 1 < m_events.size()) {
+                        m_events.at(index+1).setDelta(m_events.at(index+1).getDelta()-endDelta);
+                    }
+                    break;
+                }
+            }
 
-                if (absoluteTime <= m_events.at(index).m_absoluteTime ) {
-                printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
-                delta = absoluteTime - m_events.at(index).m_absoluteTime;
-                break;
+            for (auto endNoteI = index; endNoteI < m_events.size(); endNoteI++) {
+                if (endDelta+absoluteTime >= m_events.at(endNoteI).m_absoluteTime ) {
+                    printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
+                    if (index + 1 < m_events.size()) {
+                        m_events.at(index+1).setDelta(m_events.at(index+1).getDelta()-endDelta);
+                    }
+                    break;
+                }
             }
         }
 
+        printf("On Delta: %d absolute of note to insert: %d\n",delta,absoluteTime);
+
         MidiEvent noteOn(delta,status,Note{t_pitch,velocity},channel);
         noteOn.m_absoluteTime = absoluteTime;
+
         status = 0x90;
         MidiEvent noteOff(endDelta,status,Note{t_pitch,velocity},channel);
         noteOff.m_absoluteTime = absoluteTime + endDelta;
@@ -76,14 +96,14 @@ public:
         m_events.insert(m_events.begin()+index,noteOff);
 
         //TODO: change later to add specific note instead of recaluculating
-        updateEventDeltas(index,endDelta);
+        //updateEventDeltas(index,endDelta);
         createNoteEventPairs();
     }
 
     void updateEventDeltas(auto startIndex, auto deltaIncrement) {
-        for (int i = startIndex+1; i < m_events.size(); i++) {
-            m_events.at(i).m_delta += deltaIncrement;
-        }
+        // for (int i = startIndex+1; i < m_events.size(); i++) {
+        //     m_events.at(i).m_delta += deltaIncrement;
+        // }
     }
 
 
