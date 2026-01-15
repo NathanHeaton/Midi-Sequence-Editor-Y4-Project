@@ -59,9 +59,7 @@ public:
         size_t index = 0;
 
         for ( index; index < m_events.size(); index++) {
-            // if( index == 0 && absoluteTime == 0) {
-            //     break;
-            // }
+
                 if (absoluteTime <= m_events.at(index).m_absoluteTime ) {
                 printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
                 delta = absoluteTime - m_events.at(index).m_absoluteTime;
