@@ -50,9 +50,9 @@ void Pattern::createNoteEventPairs(){
 }
 
 void Pattern::convertMidiTicksToPPQ() {
-
     for (auto& event : m_events) {
-        uint32_t newDelta = static_cast<uint32_t>(static_cast<float>(event.getDelta()) / static_cast<float>(SessionData::instance().getPPQ()));
+        uint32_t newDelta = static_cast<uint32_t>(event.getDelta()/(static_cast<float>(ticksInMidiFile))*
+            SessionData::instance().getPPQ());
         event.setDelta(newDelta);
     }
 }

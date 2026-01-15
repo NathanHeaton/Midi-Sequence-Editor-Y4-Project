@@ -59,7 +59,10 @@ public:
         size_t index = 0;
 
         for ( index; index < m_events.size(); index++) {
-            if (absoluteTime >= m_events.at(index).m_absoluteTime) {
+            // if( index == 0 && absoluteTime == 0) {
+            //     break;
+            // }
+                if (absoluteTime <= m_events.at(index).m_absoluteTime ) {
                 printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
                 delta = absoluteTime - m_events.at(index).m_absoluteTime;
                 break;
@@ -75,11 +78,14 @@ public:
         m_events.insert(m_events.begin()+index,noteOff);
 
         //TODO: change later to add specific note instead of recaluculating
+        updateEventDeltas(index,endDelta);
         createNoteEventPairs();
     }
 
-    void updateEventDeltas() {
-        //for ()
+    void updateEventDeltas(auto startIndex, auto deltaIncrement) {
+        for (int i = startIndex+1; i < m_events.size(); i++) {
+            m_events.at(i).m_delta += deltaIncrement;
+        }
     }
 
 
