@@ -30,7 +30,6 @@ public:
     void create() {
         if (ImGui::Begin("pianoRollComponent", nullptr)) {
             toolbar.create();
-
             if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
                 ImGui::TableSetupColumn("Piano");
                 ImGui::TableSetupColumn("Piano", ImGuiTableColumnFlags_WidthStretch);

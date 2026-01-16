@@ -15,21 +15,22 @@ public:
     Tools() = default;
 
     void create() {
-        if ( ImGui::BeginChild("tools",ImVec2(0,10))) {
-            ImGui::BeginTable("toolList",5,ImGuiTableFlags_SizingFixedFit,ImVec2(0,10));
-            ImGui::TableNextColumn();
-            ImGui::Text("d");
-            ImGui::TableNextColumn();
-            ImGui::Text("d");
-            ImGui::TableNextColumn();
-            ImGui::Text("d");
-            ImGui::TableNextColumn();
-            ImGui::Text("d");
-            ImGui::TableNextColumn();
-            ImGui::Text("d");
-            ImGui::EndTable();
-        }
-        ImGui::EndChild();
+
+        ImGui::Separator();
+        ImGui::BeginTable("toolList",5,ImGuiTableFlags_SizingFixedFit,ImVec2(0,0));
+        ImGui::TableNextColumn();
+        ImGui::Text("d");
+        ImGui::TableNextColumn();
+        ImGui::Text("d");
+        ImGui::TableNextColumn();
+        ImGui::Text("d");
+        ImGui::TableNextColumn();
+        ImGui::Text("d");
+        ImGui::TableNextColumn();
+        ImGui::Text("d");
+        ImGui::EndTable();
+        ImGui::Separator();
+
 
     }
 
