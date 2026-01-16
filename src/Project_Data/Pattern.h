@@ -51,52 +51,88 @@ public:
 
     void setLastBar();
 
-    const void addNote(uint8_t t_pitch, int absoluteTime, uint32_t endDelta) {
+
+    size_t findInsertionPoint(uint32_t absoluteTime) {
+        size_t i = 0;
+        for (i; i < m_events.size(); i++) {
+            if (m_events.at(i).m_absoluteTime > absoluteTime ) {
+                break;
+            }
+        }
+        return i;
+    }
+
+    void insertEvent(MidiEvent event, size_t index) {
+
+    }
+
+
+    const void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta) {
         uint8_t channel = 0;
         uint8_t velocity = 127;
-        uint8_t status = 0x80;
-        uint32_t delta = 0;
-        size_t index = 0;
-        size_t endNoteIndex = 0;
+        uint32_t onDelta = 0;
+        uint32_t offAbsoluteTime = absoluteTime + endDelta;
+        size_t startNoteI = 0;
+        size_t endNoteI = 0;
 
+        printf("check if empty \n ");
         if (m_events.empty()) {
-            delta = absoluteTime;
+            onDelta = absoluteTime;
         }
         else {
-            for (index; index < m_events.size(); index++) {
-                if (absoluteTime >= m_events.at(index).m_absoluteTime ) {
-                    delta = static_cast<uint32_t>(absoluteTime - m_events.at(index).m_absoluteTime);
-                    if (index + 1 < m_events.size()) {
-                        m_events.at(index+1).setDelta(m_events.at(index+1).getDelta()-endDelta);
-                    }
-                    break;
+            printf("not empty \n ");
+            for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
+                if (m_events[startNoteI].m_absoluteTime > absoluteTime) {
+                    break;  // Found first event AFTER our insertion point
                 }
             }
 
-            for (auto endNoteI = index; endNoteI < m_events.size(); endNoteI++) {
-                if (endDelta+absoluteTime >= m_events.at(endNoteI).m_absoluteTime ) {
-                    printf("absoluteTime of previous note: %d absolute of note to insert: %d\n",m_events.at(index).m_absoluteTime,absoluteTime);
-                    if (index + 1 < m_events.size()) {
-                        m_events.at(index+1).setDelta(m_events.at(index+1).getDelta()-endDelta);
-                    }
-                    break;
+            auto noteAfter = m_events[startNoteI];
+            if (startNoteI == 0) {
+                onDelta = absoluteTime;
+                m_events[startNoteI].setDelta(m_events[startNoteI].m_absoluteTime - absoluteTime);
+            } else {
+                onDelta = absoluteTime - m_events[startNoteI - 1].m_absoluteTime;
+                if (startNoteI < m_events.size()) {
+                    m_events[startNoteI].setDelta(
+                        m_events[startNoteI].m_absoluteTime - absoluteTime
+                    );
                 }
             }
         }
 
-        printf("On Delta: %d absolute of note to insert: %d\n",delta,absoluteTime);
-
-        MidiEvent noteOn(delta,status,Note{t_pitch,velocity},channel);
+        MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
         noteOn.m_absoluteTime = absoluteTime;
+        printf("point before insertion");
+        m_events.insert(m_events.begin()+startNoteI,noteOn);
 
-        status = 0x90;
-        MidiEvent noteOff(endDelta,status,Note{t_pitch,velocity},channel);
+
+        endNoteI = findInsertionPoint(offAbsoluteTime);
+
+        for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
+            if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
+                break;
+            }
+        }
+        if (endNoteI == 0) {
+            endDelta = offAbsoluteTime;
+            m_events[0].setDelta(m_events[0].m_absoluteTime - offAbsoluteTime);
+        }
+        else {
+            endDelta = offAbsoluteTime - m_events[endNoteI - 1].m_absoluteTime;
+            if (endNoteI < m_events.size()) {
+                m_events[endNoteI].setDelta(
+                    m_events[endNoteI].m_absoluteTime - offAbsoluteTime
+                );
+            }
+        }
+        MidiEvent noteOff(endDelta,0x80,Note{t_pitch,velocity},channel);
+
         noteOff.m_absoluteTime = absoluteTime + endDelta;
-        m_events.insert(m_events.begin()+index,noteOn);
-        m_events.insert(m_events.begin()+index,noteOff);
-
+        m_events.insert(m_events.begin()+endNoteI,noteOff);
+        printf("On Delta: %d absolute of note to insert: %d\n endDeltaOf note: %d\n\n ",onDelta,absoluteTime,endDelta);
         //TODO: change later to add specific note instead of recaluculating
-        //updateEventDeltas(index,endDelta);
+        m_noteEvents.clear();
         createNoteEventPairs();
     }
 

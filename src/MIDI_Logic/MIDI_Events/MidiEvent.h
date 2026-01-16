@@ -98,6 +98,8 @@ class MidiEvent {
     }
     [[nodiscard]] uint32_t getDelta() const {return m_delta;}
     [[nodiscard]] uint8_t getChannel() const {return m_channel;}
+    [[nodiscard]] uint8_t getStatus() const {return m_status;}
+    [[nodiscard]] uint8_t getAbsoluteTime() const {return m_absoluteTime;}
 
     [[nodiscard]] bool isNoteOn() const {if (type == NOTE_ON) return true; return false;}
     [[nodiscard]] bool isNoteOff() const {if (type == NOTE_OFF) return true; return false;}
