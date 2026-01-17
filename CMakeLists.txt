@@ -10,7 +10,9 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO OFF)
 set(JUCE_ENABLE_LTO OFF CACHE BOOL "Disable JUCE LTO" FORCE)
 
 # Add JUCE
-set(JUCE_DIR "/home/idad/Projects/4th_year_project_stuff/JUCE/install/lib/cmake/JUCE-8.0.10")
+# set(JUCE_DIR "/home/idad/Projects/4th_year_project_stuff/JUCE/install/lib/cmake/JUCE-8.0.10")
+set(JUCE_DIR "../../JUCE/install/lib/cmake/JUCE-8.0.10")
+
 find_package(JUCE CONFIG REQUIRED)
 
 # Build ImGui library with OpenGL3 backend
@@ -21,13 +23,6 @@ add_library(imgui STATIC
         Dependencies/imgui/imgui_tables.cpp
         Dependencies/imgui/imgui_widgets.cpp
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-        src/UI/Arranger/Track.h
-        src/UI/Arranger/Timeline.h
-        src/Theme.h
-        src/UI/Piano_Roll/Panels/piano.h
-        src/UI/Common/timelineLabel.h
-        src/Project_Data/Pattern.h
-        src/SetupAssets.h
 )
 
 target_include_directories(imgui PUBLIC
@@ -43,3 +38,10 @@ add_subdirectory(Dependencies/imgui_juce)
 
 # Source
 add_subdirectory(src)
+
+#add_custom_command(TARGET myProject POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_SOURCE_DIR}/assets
+#        $<TARGET_FILE_DIR:myProject>/assets
+#        COMMENT "Copying assets to build directory"
+#)

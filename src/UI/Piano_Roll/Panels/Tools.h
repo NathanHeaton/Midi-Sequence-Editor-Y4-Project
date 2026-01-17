@@ -1,9 +1,9 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-
 #include "../../../Theme.h"
 #include <iostream>
+#include "../../../SetupAssets.h"
 
 
 class Tools: public juce::Component
@@ -19,7 +19,10 @@ public:
         ImGui::Separator();
         ImGui::BeginTable("toolList",5,ImGuiTableFlags_SizingFixedFit,ImVec2(0,0));
         ImGui::TableNextColumn();
-        ImGui::Text("d");
+        ImGui::ImageButton("play_button"
+            , (void*)(intptr_t)ImGui::GetID("play_button")
+            , ImVec2(32, 32)
+            );
         ImGui::TableNextColumn();
         ImGui::Text("d");
         ImGui::TableNextColumn();
@@ -30,8 +33,6 @@ public:
         ImGui::Text("d");
         ImGui::EndTable();
         ImGui::Separator();
-
-
     }
 
 private:

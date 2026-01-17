@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 #include "Theme.h"
-
+#include "SetupAssets.h"
 
 /* Main.cpp: main file for application */
 
@@ -34,10 +34,14 @@ public:
 
     void initialise(const juce::String &commandLine) override
     {
+        ASSETS.LoadAll();
         juce::ignoreUnused (commandLine);
         win.reset(new MainWindow(getApplicationName()));
     }
-    void shutdown() override { win = nullptr; }
+    void shutdown() override {
+        ASSETS.Cleanup();
+        win = nullptr;
+    }
 
 private:
     std::unique_ptr<MainWindow> win;
