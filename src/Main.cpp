@@ -34,9 +34,9 @@ public:
 
     void initialise(const juce::String &commandLine) override
     {
-        ASSETS.LoadAll();
         juce::ignoreUnused (commandLine);
         win.reset(new MainWindow(getApplicationName()));
+
     }
     void shutdown() override {
         ASSETS.Cleanup();

@@ -51,6 +51,8 @@ public:
         ImGui::CreateContext();
         ImGui_ImplJuce_Init(*this, glctx);
         ImGui_ImplOpenGL3_Init();
+
+        ASSETS.LoadAll(); // after glcontext is setup
     }
 
     void renderOpenGL() override

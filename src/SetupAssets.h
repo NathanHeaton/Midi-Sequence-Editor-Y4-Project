@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <GL/gl.h>
 
 // Ai code //
@@ -22,10 +23,9 @@ public:
     IconTexture snipIcon;
 
     IconTexture boxSelect;
-
     void LoadAll();
+    void Cleanup();
 
-    void Cleanup() ;
 };
 
 extern AssetManager ASSETS;
