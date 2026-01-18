@@ -3,7 +3,7 @@
 //
 #pragma once
 #include "imgui.h"
-#include "../../SessionData.h"
+#include "../../Singletons/SessionData.h"
 #include "../../Theme.h"
 
 class Timeline {

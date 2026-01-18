@@ -5,7 +5,7 @@
 #include "TopControls.h"
 #include "Track.h"
 #include "Timeline.h"
-#include "../../SessionData.h"
+#include "../../Singletons/SessionData.h"
 #include "../Common/timelineLabel.h"
 #include <iostream>
 

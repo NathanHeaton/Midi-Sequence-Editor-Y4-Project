@@ -5,7 +5,7 @@
 #include "../Track/PatternViewport.h"
 #include "../Track/HeadingComponent.h"
 #include "../../MIDI_Logic/MidiFileManager.h"
-#include "../../SessionData.h"
+#include "../../Singletons/SessionData.h"
 #include "imgui.h"
 
 #include <iostream>

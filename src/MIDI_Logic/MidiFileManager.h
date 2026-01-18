@@ -6,7 +6,7 @@
 #include <iostream>
 #include "ParsedMidi.h"
 #include  "../utils.h"
-#include  "../SessionData.h"
+#include "../Singletons/SessionData.h"
 
 class MidiFileManager : public juce::ActionBroadcaster
 {

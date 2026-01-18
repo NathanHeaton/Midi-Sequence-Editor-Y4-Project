@@ -1,5 +1,5 @@
 #include "Pattern.h"
-#include "../SessionData.h"
+#include "../Singletons/SessionData.h"
 #include <iostream>
 
 //

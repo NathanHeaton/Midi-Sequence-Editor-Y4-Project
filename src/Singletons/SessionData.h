@@ -7,8 +7,8 @@
 
 //#include <juce_core/juce_core.h>
 #include <imgui.h>
-#include "Project_Data/Pattern.h"
-#include "MIDI_Logic/ParsedMidi.h"
+#include "../Project_Data/Pattern.h"
+#include "../MIDI_Logic/ParsedMidi.h"
 
 inline namespace Division {
     const float WHOLE = 4.0f;
@@ -148,7 +148,6 @@ private:
     SessionData() = default;
 
     int PPQ = 960;
-
     int BPM = 120;
     int TrackAmount = 0;
 
