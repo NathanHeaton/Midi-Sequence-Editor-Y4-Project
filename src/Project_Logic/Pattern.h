@@ -87,7 +87,8 @@ public:
                 }
             }
 
-            auto noteAfter = m_events[startNoteI];
+            //auto noteAfter = m_events[startNoteI];
+            //printf(note)
             if (startNoteI == 0) {
                 onDelta = absoluteTime;
                 m_events[startNoteI].setDelta(m_events[startNoteI].m_absoluteTime - absoluteTime);

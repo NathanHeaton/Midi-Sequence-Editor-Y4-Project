@@ -7,7 +7,7 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/MidiByteReader.cpp
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
-        Project_Data/Pattern.cpp
+        Project_Logic/Pattern.cpp
         SetupAssets.cpp
         Main.cpp)
 

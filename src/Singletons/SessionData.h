@@ -7,7 +7,7 @@
 
 //#include <juce_core/juce_core.h>
 #include <imgui.h>
-#include "../Project_Data/Pattern.h"
+#include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
 
 inline namespace Division {

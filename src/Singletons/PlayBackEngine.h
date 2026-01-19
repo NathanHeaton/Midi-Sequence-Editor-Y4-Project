@@ -19,13 +19,13 @@ class PlayBackEngine {
     }
 
     void startPlaying() {
-
+        midiPlayer.playCurrentPattern();
         m_playing = true;
     }
 
     private:
     bool m_playing{false};
-    //MidiPlayer midiPlayer;
+    MidiPlayer midiPlayer;
 
     PlayBackEngine() = default;
 

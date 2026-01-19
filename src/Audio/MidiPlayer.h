@@ -7,12 +7,9 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Singletons/SessionData.h"
 
-class MidiPlayer : public juce::AudioSource, juce::Timer{
+class MidiPlayer : public juce::Timer{
 public:
-    MidiPlayer() {
-        audioDeviceManager.initialiseWithDefaultDevices(0,2);
-        //audioDeviceManager.addAudioCallback(this);
-    }
+    MidiPlayer() =default;
 
     ~MidiPlayer() {
         //audioDeviceManager.removeAudioCallback(this);
@@ -27,7 +24,7 @@ public:
     }
 
     void timerCallback() override {
-        if (eventIndex>= pattern->m_events.size()) {
+        if (eventIndex >= pattern->m_events.size()) {
             stopTimer();
             return;
         }
@@ -35,9 +32,11 @@ public:
         double elapsed = (juce::Time::getMillisecondCounterHiRes() - startTime);
         double secondsPerTick = 60.0 /(SessionData::instance().getBPM() * SessionData::instance().getPPQ());
 
-        auto& event = pattern->m_events[eventIndex];
-        double eventTime = event.getAbsoluteTime();
 
+        auto& event = pattern->m_events[eventIndex];
+        double eventTime = static_cast<double>(event.getAbsoluteTime()) * secondsPerTick * 1000;
+
+        DBG("time in milliseconds of next event: "<<eventTime<<" elapsed Time: "<<elapsed);
         if (elapsed >= eventTime) {
             DBG("Playing note at"<< elapsed<< "s"<<" Note pitch: "<< event.getPitch());
             eventIndex++;
@@ -47,8 +46,6 @@ public:
 
 
 private:
-    juce::AudioDeviceManager audioDeviceManager;
-    juce::MidiMessageSequence midiMessageSequence;
 
     const Pattern* pattern = nullptr;
     int bpm = 120;

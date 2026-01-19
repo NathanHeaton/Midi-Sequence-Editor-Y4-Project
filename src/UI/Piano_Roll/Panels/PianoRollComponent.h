@@ -13,7 +13,6 @@
 class PianoRollComponent
 {
 public:
-
     PianoRollComponent() = default;
 
     SessionData* s = &SessionData::instance();
@@ -68,30 +67,25 @@ public:
 
             s->addNoteToPattern(pitch,  absoluteTime,  duration);
         }
-
         if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
         }
     }
 
     void create(float &scrollY,float &scrollX, float& lengthX) {
         if (ImGui::BeginChild("piano grid",ImVec2(0,0),
-            ImGuiChildFlags_None,
-            ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
+            ImGuiChildFlags_None)) {
             DrawNoteGuides();
             DrawBars();
             DrawOctaveLines();
             HandleMouseInput();
             renderPattern();
-
-
+            ImGui::SetScrollX(scrollX);
             scrollY = ImGui::GetScrollY();
-            scrollX = ImGui::GetScrollX();
             auto& pattern = s->getCurrentPattern();
             lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
             ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
         }
         ImGui::EndChild();
-
     }
 
 private:
@@ -182,13 +176,9 @@ private:
             ctx.drawList->AddRectFilled(
                 ImVec2(xStart, yStart),
                 ImVec2(xEnd,yEnd),
-                    Theme::currentThemeColours.barColourPacked);
-
+                    Theme::currentThemeColours.barColourPacked, 3.0f);
         }
-
-
     }
-
 
     void DrawNoteGuides() {
         TimelineContext ctx;
@@ -197,12 +187,20 @@ private:
         bool whiteNote = true;
         int octaveNoteIndex = 0;
         int noteOffset = 5;
+        float intialGap = (s->getWhiteSize().y * 5.0f)/8.0f;
+        bool firstNote = true;
+
 
         for (auto i{0u}; i < notes; i++) {
-            float yPos = ctx.cursorPos.y + i * noteGap;
-
+            float yPos;
+            if (i < 8) {
+                yPos = ctx.cursorPos.y + i * intialGap;
+            }
+            else {
+                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + intialGap *8;
+            }
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
-                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos+ noteGap),
+                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + noteGap ),
                 whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
 
             ctx.drawList->AddLine(
@@ -211,13 +209,11 @@ private:
                 Theme::currentThemeColours.beatColourPacked,
                 1.0f
             );
-
             if (((octaveNoteIndex+noteOffset)% 12 < 7 || (octaveNoteIndex+noteOffset)%12 > 7) && (octaveNoteIndex+noteOffset)% 12 != 0 ) {
                 whiteNote= !whiteNote;
             }
-
             octaveNoteIndex++;
-
+            firstNote = false;
         }
     }
 };
