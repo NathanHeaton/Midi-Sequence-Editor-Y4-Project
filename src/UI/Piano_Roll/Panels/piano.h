@@ -31,7 +31,7 @@ public:
         BLACK_SIZE = SessionData::instance().getBlackSize();
         blackGap = SessionData::instance().getBlackGap();
         if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,0),ImGuiChildFlags_None,
-            ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollbar)) {
+            ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
 
             pianoVars vars;
             drawWhiteKey(vars);

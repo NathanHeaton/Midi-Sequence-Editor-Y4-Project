@@ -32,20 +32,34 @@ public:
         if (ImGui::Begin("pianoRollComponent", nullptr)) {
             toolbar.create();
             if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("Piano");
-                ImGui::TableSetupColumn("Piano", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("gap");
+                ImGui::TableSetupColumn("timeline", ImGuiTableColumnFlags_WidthStretch);
                 ImGui::TableNextColumn();
                 ImGui::Dummy(ImVec2(0,35));
-                piano.create(pianoRollScrollY);
                 ImGui::TableNextColumn();
-                if (ImGui::BeginChild("custom_scroll", ImVec2(0, 15), false, ImGuiWindowFlags_HorizontalScrollbar)) {
+                if (ImGui::BeginChild("horizontalScroll", ImVec2(0, 15), false, ImGuiWindowFlags_HorizontalScrollbar)) {
                     ImGui::Dummy(ImVec2(timelineLength, 15));
                     timelineXScroll = ImGui::GetScrollX();
                 }ImGui::EndChild();
                 timelineLabel.create(timelineLength,timelineXScroll,
-                    SessionData::instance().getTotalBarsPianoRoll(),
-                    zoomFactor::pianoRoll);
+                SessionData::instance().getTotalBarsPianoRoll(),
+                zoomFactor::pianoRoll);
+            }
+            ImGui::EndTable();
+
+            if (ImGui::BeginTable("table", 3, ImGuiTableFlags_SizingFixedFit)) {
+                ImGui::TableSetupColumn("Piano");
+                ImGui::TableSetupColumn("sequence grid", ImGuiTableColumnFlags_WidthStretch, 0);
+                ImGui::TableSetupColumn("verticalScroll",ImGuiTableColumnFlags_WidthFixed,15);
+                ImGui::TableNextColumn();
+                piano.create(pianoRollScrollY);
+                ImGui::TableNextColumn();
                 pianoRoll.create(pianoRollScrollY,timelineXScroll, timelineLength);
+                ImGui::TableNextColumn();
+                if (ImGui::BeginChild("custom_scroll", ImVec2(15, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
+                    ImGui::Dummy(ImVec2(15, SessionData::instance().getWhiteKeys() * SessionData::instance().getWhiteSize().y));
+                    pianoRollScrollY = ImGui::GetScrollY();
+                }ImGui::EndChild();
             }ImGui::EndTable();
         }ImGui::End();
     }

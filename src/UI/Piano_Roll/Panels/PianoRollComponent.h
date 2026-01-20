@@ -30,6 +30,7 @@ public:
         int lastVisibleBeat;
         float barWidth;
         float noteHeight;
+        float intialGap;
 
         TimelineContext() {
             cursorPos = ImGui::GetCursorScreenPos();
@@ -40,6 +41,7 @@ public:
             scrollY = ImGui::GetScrollY();
             barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll);
             noteHeight = SessionData::instance().getWhiteSize().y * 7 /12;
+            intialGap = (SessionData::instance().getWhiteSize().y * 5.0f)/8.0f;
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::pianoRoll)) : 0;
@@ -59,7 +61,9 @@ public:
 
             int beat = static_cast<int>(relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
             int absoluteTime = beat * s->getPPQ();
+            printf("relativeY: %d\n", relativeY);
             int pitch = static_cast<int>(relativeY / ctx.noteHeight);
+            printf("pitch: %d\n", pitch);
             pitch = std::clamp(pitch, 0, 127);
             pitch = 127 - pitch;
             printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
@@ -73,14 +77,16 @@ public:
 
     void create(float &scrollY,float &scrollX, float& lengthX) {
         if (ImGui::BeginChild("piano grid",ImVec2(0,0),
-            ImGuiChildFlags_None)) {
+            ImGuiChildFlags_None,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
             DrawNoteGuides();
             DrawBars();
             DrawOctaveLines();
             HandleMouseInput();
             renderPattern();
+
             ImGui::SetScrollX(scrollX);
-            scrollY = ImGui::GetScrollY();
+            ImGui::SetScrollY(scrollY);
+
             auto& pattern = s->getCurrentPattern();
             lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
             ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
@@ -167,8 +173,9 @@ private:
 
             float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
             float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
+            auto pitch =  noteData.at(noteIndices.onIndex).getPitch();
 
-            float yStart = ctx.cursorPos.y + (ctx.noteHeight*128.0f) - (noteData.at(noteIndices.onIndex).getPitch()*ctx.noteHeight);
+            float yStart = ctx.cursorPos.y + ( ctx.height - ((noteData.at(noteIndices.onIndex).getPitch()+1)*ctx.noteHeight));
             float xStart = ctx.cursorPos.x + startPixel;
             float xEnd =  ctx.cursorPos.x + endPixel;
             float yEnd = yStart + ctx.noteHeight;
@@ -187,17 +194,16 @@ private:
         bool whiteNote = true;
         int octaveNoteIndex = 0;
         int noteOffset = 5;
-        float intialGap = (s->getWhiteSize().y * 5.0f)/8.0f;
         bool firstNote = true;
 
 
         for (auto i{0u}; i < notes; i++) {
             float yPos;
             if (i < 8) {
-                yPos = ctx.cursorPos.y + i * intialGap;
+                yPos = ctx.cursorPos.y + i * ctx.intialGap;
             }
             else {
-                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + intialGap *8;
+                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + ctx.intialGap *8;
             }
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + noteGap ),
