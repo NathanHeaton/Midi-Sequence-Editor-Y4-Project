@@ -27,6 +27,7 @@ add_library(imgui STATIC
         src/Audio/MidiPlayer.h
         src/Singletons/PlayBackEngine.h
         src/Audio/AuidoPlayer.h
+        src/Audio/SineWave.h
 )
 
 target_include_directories(imgui PUBLIC

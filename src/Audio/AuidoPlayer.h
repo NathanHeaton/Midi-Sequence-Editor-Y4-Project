@@ -6,4 +6,9 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 
-//class AuidoPlayer {}
+class AuidoPlayer {
+    public:
+
+    private:
+    juce::MidiOutput midiOutput;
+};

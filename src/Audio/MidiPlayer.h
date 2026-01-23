@@ -7,15 +7,28 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Singletons/SessionData.h"
 
-class MidiPlayer : public juce::Timer{
+
+class MidiPlayer : public juce::Timer, public juce::AudioSource{
 public:
-    MidiPlayer() =default;
+
+    MidiPlayer() {
+        auto deviceIndex = juce::MidiOutput::getAvailableDevices();
+        for (auto& device : deviceIndex) {
+            DBG("devices "<<device.name << device.identifier);
+        }
+        midiOutput = juce::MidiOutput::openDevice(deviceIndex[0].identifier);
+    }
 
     ~MidiPlayer() {
         //audioDeviceManager.removeAudioCallback(this);
     }
 
     //void loadMidi(const )
+
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override {
+        tempSynth.setCurrentPlaybackSampleRate(sampleRate);
+
+    }
 
     void playCurrentPattern() {
         pattern = &SessionData::instance().getCurrentPattern();
@@ -39,6 +52,13 @@ public:
         DBG("time in milliseconds of next event: "<<eventTime<<" elapsed Time: "<<elapsed);
         if (elapsed >= eventTime) {
             DBG("Playing note at"<< elapsed<< "s"<<" Note pitch: "<< event.getPitch());
+            auto note = juce::MidiMessage::noteOn(0, event.getPitch(), event.getVelocity());
+            if (event.isNoteOff()) {
+                note = juce::MidiMessage::noteOff(0, event.getPitch(), event.getVelocity());
+            }
+
+            midiOutput->sendMessageNow(note);
+
             eventIndex++;
         }
     }
@@ -46,7 +66,8 @@ public:
 
 
 private:
-
+    juce::Synthesiser tempSynth;
+    std::unique_ptr<juce::MidiOutput> midiOutput;
     const Pattern* pattern = nullptr;
     int bpm = 120;
     size_t eventIndex = 0;

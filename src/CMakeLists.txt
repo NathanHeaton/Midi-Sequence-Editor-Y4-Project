@@ -22,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE
         juce::juce_gui_extra
         juce::juce_opengl
+        juce::juce_audio_devices
         imgui
         imgui_impl_juce
         PUBLIC
