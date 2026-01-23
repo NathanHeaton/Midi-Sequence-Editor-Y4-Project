@@ -7,12 +7,10 @@
 //
 
 void Pattern::setLastBar() {
-    const auto ppq = SessionData::instance().getPPQ();
-    int endDelta = m_events.back().m_absoluteTime;
-    std::cout << "highest delta in track" <<endDelta << std::endl;
-    std::cout <<"bars: "<< static_cast<float>(endDelta) / static_cast<float>(ppq) << std::endl;
+    const auto barSize = SessionData::instance().getPPQ() * SessionData::instance().timeSignature.getNumerator();
+    int endAbsolute = m_events.back().m_absoluteTime;
 
-    float bars = static_cast<float>(endDelta) / static_cast<float>(ppq);
+    float bars = static_cast<float>(endAbsolute) / static_cast<float>(barSize);
     m_bars = ceil(bars);
 }
 
