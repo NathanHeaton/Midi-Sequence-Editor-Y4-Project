@@ -4,7 +4,7 @@
 #include "../../../Theme.h"
 #include <iostream>
 #include "../../../SetupAssets.h"
-#include "../../../Singletons/PlayBackEngine.h"
+#include "../../../Singletons/PlayBackManager.h"
 
 class Tools: public juce::Component
 {
@@ -23,7 +23,7 @@ public:
             , (void*)(intptr_t)ASSETS.playIcon.textureID
             , ImVec2(32, 32)
             )) {
-            PlayBackEngine::instance().startPlaying();
+            PlayBackManager::instance().startPlaying();
         }
         ImGui::TableNextColumn();
         ImGui::Text("d");

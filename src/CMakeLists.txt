@@ -23,6 +23,7 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_gui_extra
         juce::juce_opengl
         juce::juce_audio_devices
+        juce::juce_audio_basics
         imgui
         imgui_impl_juce
         PUBLIC

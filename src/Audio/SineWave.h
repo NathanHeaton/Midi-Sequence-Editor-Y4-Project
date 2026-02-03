@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <juce_audio_devices/juce_audio_devices.h>
+//#include <juce_audio_devices/juce_audio_devices.h>
+//#include <juce_audio_basics/juce_audio_basics.h>
 
 class SineWaveSound : public juce::SynthesiserSound {
 public:
@@ -13,10 +14,13 @@ public:
 };
 
 
-class SineWave : public juce::SynthesiserVoice {
+class SineWaveVoice : public juce::SynthesiserVoice {
     public:
         bool canPlaySound(juce::SynthesiserSound* sound) override
     { return dynamic_cast<SineWaveSound*>(sound) != nullptr; }
+
+    void pitchWheelMoved(int newPitchWheelValue) override{};
+    void controllerMoved(int controllerNumber, int newControllerValue) override{};
 
     void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override {
             currentAngle = 0.0;
@@ -34,9 +38,16 @@ class SineWave : public juce::SynthesiserVoice {
         }
 
     void renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override {
-        for (int i = 0; i < numSamples; ++i) {
-            outputBuffer.setSample(0, startSample + i, level * std::sin(currentAngle));
-            currentAngle += angleDelta;
+        if (angleDelta != 0.0f) {
+            while (--numSamples >= 0) {
+                auto currentSample = (float)(std::sin(currentAngle) * level);
+
+                for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
+                    outputBuffer.addSample(i, startSample, currentSample);
+
+                currentAngle += angleDelta;
+                ++startSample;
+            }
         }
     }
 

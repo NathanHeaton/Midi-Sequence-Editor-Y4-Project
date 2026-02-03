@@ -1,37 +1,23 @@
-//
-// Created by nathan on 18/01/2026.
-//
+// MidiPlayer.h
 #pragma once
-
 #include <juce_audio_devices/juce_audio_devices.h>
-#include <juce_audio_utils/juce_audio_utils.h>
 #include "../Singletons/SessionData.h"
 
-
-class MidiPlayer : public juce::Timer, public juce::AudioSource{
+class MidiPlayer : public juce::Timer {
 public:
-
-    MidiPlayer() {
-        auto deviceIndex = juce::MidiOutput::getAvailableDevices();
-        for (auto& device : deviceIndex) {
-            DBG("devices "<<device.name << device.identifier);
+    MidiPlayer(AudioManager& audioMgr) : audioManager(audioMgr) {
+        auto devices = juce::MidiOutput::getAvailableDevices();
+        for (auto& device : devices) {
+            DBG("devices " << device.name << " " << device.identifier);
         }
-        midiOutput = juce::MidiOutput::openDevice(deviceIndex[0].identifier);
-    }
-
-    ~MidiPlayer() {
-        //audioDeviceManager.removeAudioCallback(this);
-    }
-
-    //void loadMidi(const )
-
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override {
-        tempSynth.setCurrentPlaybackSampleRate(sampleRate);
-
+        if (!devices.isEmpty()) {
+            midiOutput = juce::MidiOutput::openDevice(devices[0].identifier);
+        }
     }
 
     void playCurrentPattern() {
         pattern = &SessionData::instance().getCurrentPattern();
+        eventIndex = 0;
         startTime = juce::Time::getMillisecondCounterHiRes();
         startTimer(1);
     }
@@ -43,34 +29,40 @@ public:
         }
 
         double elapsed = (juce::Time::getMillisecondCounterHiRes() - startTime);
-        double secondsPerTick = 60.0 /(SessionData::instance().getBPM() * SessionData::instance().getPPQ());
-
+        double secondsPerTick = 60.0 / (SessionData::instance().getBPM() *
+                                        SessionData::instance().getPPQ());
 
         auto& event = pattern->m_events[eventIndex];
-        double eventTime = static_cast<double>(event.getAbsoluteTime()) * secondsPerTick * 1000;
+        double eventTime = static_cast<double>(event.getAbsoluteTime()) *
+                          secondsPerTick * 1000;
 
-        DBG("time in milliseconds of next event: "<<eventTime<<" elapsed Time: "<<elapsed);
         if (elapsed >= eventTime) {
-            DBG("Playing note at"<< elapsed<< "s"<<" Note pitch: "<< event.getPitch());
-            auto note = juce::MidiMessage::noteOn(0, event.getPitch(), event.getVelocity());
+            DBG("Playing note at " << elapsed << "s, pitch: " << event.getPitch());
+
+            juce::MidiMessage note;
             if (event.isNoteOff()) {
-                note = juce::MidiMessage::noteOff(0, event.getPitch(), event.getVelocity());
+                note = juce::MidiMessage::noteOff(1, event.getPitch());
+            } else {
+                note = juce::MidiMessage::noteOn(1, event.getPitch(),
+                                                 (juce::uint8)event.getVelocity());
             }
 
-            midiOutput->sendMessageNow(note);
+            // Send to internal synth
+            audioManager.addMidiMessage(note);
+
+            // Send to external MIDI device
+            if (midiOutput != nullptr) {
+                midiOutput->sendMessageNow(note);
+            }
 
             eventIndex++;
         }
     }
 
-
-
 private:
-    juce::Synthesiser tempSynth;
+    AudioManager& audioManager;
     std::unique_ptr<juce::MidiOutput> midiOutput;
     const Pattern* pattern = nullptr;
-    int bpm = 120;
     size_t eventIndex = 0;
     double startTime = 0;
 };
-

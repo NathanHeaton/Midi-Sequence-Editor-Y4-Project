@@ -24,6 +24,11 @@ inline namespace zoomFactor {
 
 class SessionData {
 public:
+    static SessionData& instance() {
+        static SessionData instance;
+        return instance;
+    }
+
     class TimeSignature {
     public:
         TimeSignature(int n, int d) : numerator(n), denominator(d) {}
@@ -40,12 +45,6 @@ public:
         int numerator;
         int denominator;
     };
-
-    static SessionData& instance() {
-        static SessionData instance;
-        return instance;
-    }
-
     // Getters
     [[nodiscard]] int getBPM() const { return BPM; }
     [[nodiscard]] int getPPQ() const { return PPQ; }
