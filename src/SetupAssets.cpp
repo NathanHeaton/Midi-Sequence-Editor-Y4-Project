@@ -39,13 +39,19 @@ IconTexture LoadTextureFromFile(const char* filename) {
 
 void AssetManager::LoadAll() {
     playIcon = LoadTextureFromFile("assets/icons/play.png");
-    //pauseIcon = LoadTextureFromFile("assets/icons/pause.svg");
-    //stopIcon = LoadTextureFromFile("../assets/icons/stop.svg");
-    //boxSelect = loadTextureFromFile("../assets/icons/box_select.svg");
+    pauseIcon = LoadTextureFromFile("assets/icons/pause.svg");
+    stopIcon = LoadTextureFromFile("../assets/icons/stop.svg");
+    boxSelect = LoadTextureFromFile("../assets/icons/box_select.svg");
+    zoomIn = LoadTextureFromFile("assets/icons/zoom_in.svg");
+    zoomOut = LoadTextureFromFile("assets/icons/zoom_out.svg");
 }
 
 void AssetManager::Cleanup() {
     glDeleteTextures(1, &playIcon.textureID);
     glDeleteTextures(1, &pauseIcon.textureID);
     glDeleteTextures(1, &stopIcon.textureID);
+    glDeleteTextures(1, &boxSelect.textureID);
+    glDeleteTextures(1, &zoomIn.textureID);
+    glDeleteTextures(1, &zoomOut.textureID);
+
 }

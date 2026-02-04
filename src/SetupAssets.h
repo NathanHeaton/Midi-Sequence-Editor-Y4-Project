@@ -21,6 +21,9 @@ public:
     IconTexture instrumentIcon;
     IconTexture divisionSnapIcon;
     IconTexture snipIcon;
+    IconTexture saveIcon;
+    IconTexture zoomIn;
+    IconTexture zoomOut;
 
     IconTexture boxSelect;
     void LoadAll();

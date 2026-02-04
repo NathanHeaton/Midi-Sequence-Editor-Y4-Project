@@ -26,9 +26,19 @@ public:
             PlayBackManager::instance().startPlaying();
         }
         ImGui::TableNextColumn();
-        ImGui::Text("d");
+        if (ImGui::ImageButton("zoom_in"
+            , (void*)(intptr_t)ASSETS.zoomIn.textureID
+            , ImVec2(32, 32)
+            )) {
+            zoomFactor::pianoRoll += 0.15;
+            }
         ImGui::TableNextColumn();
-        ImGui::Text("d");
+        if (ImGui::ImageButton("zoom_out"
+            , (void*)(intptr_t)ASSETS.zoomOut.textureID
+            , ImVec2(32, 32)
+            )) {
+            zoomFactor::pianoRoll -= 0.15;
+            }
         ImGui::TableNextColumn();
         ImGui::Text("d");
         ImGui::TableNextColumn();
