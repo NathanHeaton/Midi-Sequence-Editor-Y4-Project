@@ -62,10 +62,6 @@ public:
         return i;
     }
 
-    void insertEvent(MidiEvent event, size_t index) {
-
-    }
-
 
     const void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta) {
         uint8_t channel = 0;

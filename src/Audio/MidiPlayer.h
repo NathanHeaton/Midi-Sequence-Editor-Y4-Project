@@ -23,20 +23,22 @@ public:
     }
 
     void timerCallback() override {
+
         if (eventIndex >= pattern->m_events.size()) {
             stopTimer();
             return;
         }
 
         double elapsed = (juce::Time::getMillisecondCounterHiRes() - startTime);
-        double secondsPerTick = 60.0 / (SessionData::instance().getBPM() *
-                                        SessionData::instance().getPPQ());
-
+        double msPerTick = (60000.0 / static_cast<double>(SessionData::instance().getBPM())) / SessionData::instance().getPPQ() ;
+        DBG("msperTick"<<msPerTick);
         auto& event = pattern->m_events[eventIndex];
-        double eventTime = static_cast<double>(event.getAbsoluteTime()) *
-                          secondsPerTick * 1000;
 
-        if (elapsed >= eventTime) {
+        double eventInMs = msPerTick * event.getAbsoluteTime();
+
+        DBG("elapsed time " << elapsed <<" absolute " << event.m_absoluteTime<<"event time: "<< eventInMs<<" pitch: " << event.getAbsoluteTime());
+
+        if (elapsed >= eventInMs) {
             DBG("Playing note at " << elapsed << "s, pitch: " << event.getPitch());
 
             juce::MidiMessage note;
@@ -47,13 +49,13 @@ public:
                                                  (juce::uint8)event.getVelocity());
             }
 
-            // Send to internal synth
-            audioManager.addMidiMessage(note);
-
-            // Send to external MIDI device
-            if (midiOutput != nullptr) {
-                midiOutput->sendMessageNow(note);
-            }
+            // // Send to internal synth
+            // audioManager.addMidiMessage(note);
+            //
+            // // Send to external MIDI device
+            // if (midiOutput != nullptr) {
+            //     midiOutput->sendMessageNow(note);
+            // }
 
             eventIndex++;
         }

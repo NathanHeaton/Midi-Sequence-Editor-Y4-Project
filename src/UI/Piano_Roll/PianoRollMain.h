@@ -42,7 +42,7 @@ public:
                     timelineXScroll = ImGui::GetScrollX();
                 }ImGui::EndChild();
                 timelineLabel.create(timelineLength,timelineXScroll,
-                SessionData::instance().getTotalBarsPianoRoll(),
+                SessionData::instance().getCurrentPattern().m_bars,
                 zoomFactor::pianoRoll);
             }
             ImGui::EndTable();

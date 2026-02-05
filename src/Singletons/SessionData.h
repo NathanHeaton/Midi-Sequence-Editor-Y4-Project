@@ -46,7 +46,7 @@ public:
         int denominator;
     };
     // Getters
-    [[nodiscard]] int getBPM() const { return BPM; }
+    [[nodiscard]] double getBPM() const { return BPM; }
     [[nodiscard]] int getPPQ() const { return PPQ; }
 
     [[nodiscard]] int getTrackAmount() const { return TrackAmount; }
@@ -147,7 +147,7 @@ private:
     SessionData() = default;
 
     int PPQ = 960;
-    int BPM = 120;
+    double BPM = 120;
     int TrackAmount = 0;
 
     const float pixelPerQuarterNote = 32.0f;
