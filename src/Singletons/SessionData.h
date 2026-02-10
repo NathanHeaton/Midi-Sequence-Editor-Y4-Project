@@ -103,8 +103,8 @@ private:
     int WHITE_KEYS{75};
     int BLACK_KEYS{53};
 
-    ImVec2 WHITE_SIZE{100, 24};
-    ImVec2 BLACK_SIZE{80, 15};
+    ImVec2 WHITE_SIZE{100, 32};
+    ImVec2 BLACK_SIZE{WHITE_SIZE.x * 0.8f, WHITE_SIZE.y * 0.625f};
 
     float barWidth = timeSignature.getNumerator() * pixelPerBeat;
     float barWidthPianoRoll ;//= timeSignature.getNumerator() * pixelPerBeatPianoRoll;
