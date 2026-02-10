@@ -23,7 +23,7 @@ public:
             , (void*)(intptr_t)ASSETS.playIcon.textureID
             , ImVec2(32, 32)
             )) {
-            PlayBackManager::instance().startPlaying();
+            PlayBackManager::instance().togglePlay();
         }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("zoom_in"

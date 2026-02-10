@@ -19,9 +19,10 @@ class PlayBackManager {
         return m_playing;
     }
 
-    void startPlaying() {
-        player.playCurrentPattern();
-        m_playing = true;
+    void togglePlay() {
+        m_playing = !m_playing;
+        if (m_playing) {player.playCurrentPattern();}
+        else{ player.pauseCurrentPattern();}
     }
 
     private:
