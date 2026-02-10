@@ -30,6 +30,7 @@ void Pattern::createNoteEventPairs(){
 
     for (size_t i=0; i < m_events.size(); i++) {
         cumulativeTime += m_events.at(i).getDelta();
+        printf("when note created %d",cumulativeTime);
         m_events.at(i).m_absoluteTime = cumulativeTime;
         if (m_events.at(i).isNoteOff() || (m_events.at(i).getVelocity() == 0 && m_events.at(i).isNoteOn())) {
             for (auto it{pendingEvents.begin()};it< pendingEvents.end();it++) {

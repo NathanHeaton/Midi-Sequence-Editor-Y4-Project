@@ -16,8 +16,9 @@ class PatternManager {
     }
 
     void addPattern() {
-        std::string defaultTitle = "unamed";
+        std::string defaultTitle = "unamed_" + std::to_string(unamedPatterns);
         pattern.emplace_back(Pattern(defaultTitle));
+        unamedPatterns++;
     }
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
         pattern.emplace_back(title, events, fileTicks);
@@ -72,6 +73,7 @@ class PatternManager {
 
     std::vector<Pattern> pattern{};
     size_t activePattern = 0;
+    u_int unamedPatterns = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;
 

@@ -31,15 +31,18 @@ public:
 
         double elapsed = (juce::Time::getMillisecondCounterHiRes() - startTime);
         double msPerTick = (60000.0 / static_cast<double>(SessionData::instance().getBPM())) / SessionData::instance().getPPQ() ;
-        DBG("msperTick"<<msPerTick);
+        //DBG("msperTick"<<msPerTick);
         auto& event = pattern->m_events[eventIndex];
 
-        double eventInMs = msPerTick * event.getAbsoluteTime();
 
-        DBG("elapsed time " << elapsed <<" absolute " << event.m_absoluteTime<<"event time: "<< eventInMs<<" pitch: " << event.getAbsoluteTime());
+        double eventInMs = msPerTick * static_cast<double>(event.getAbsoluteTime());
+
+        DBG(elapsed << "ms " << eventInMs << " ms");
+
+        //DBG("elapsed time " << elapsed <<" absolute " << event.m_absoluteTime<<"event time: "<< eventInMs<<" pitch: " << event.getAbsoluteTime());
 
         if (elapsed >= eventInMs) {
-            DBG("Playing note at " << elapsed << "s, pitch: " << event.getPitch());
+            //DBG("Playing note at " << elapsed << "s, pitch: " << event.getPitch());
 
             juce::MidiMessage note;
             if (event.isNoteOff()) {
@@ -49,7 +52,7 @@ public:
                                                  (juce::uint8)event.getVelocity());
             }
 
-            // Send to internal synth
+            //Send to internal synth
             audioManager.addMidiMessage(note);
 
             // Send to external MIDI device

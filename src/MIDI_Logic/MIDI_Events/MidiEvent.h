@@ -44,7 +44,7 @@ class MidiEvent {
     uint32_t m_delta;
     uint8_t m_status;
 
-    int m_absoluteTime;
+    uint32_t m_absoluteTime;
 
     // note data
     MidiEvent(uint32_t delta, uint8_t status, Note event, uint8_t channel);// for note events
@@ -99,7 +99,7 @@ class MidiEvent {
     [[nodiscard]] uint32_t getDelta() const {return m_delta;}
     [[nodiscard]] uint8_t getChannel() const {return m_channel;}
     [[nodiscard]] uint8_t getStatus() const {return m_status;}
-    [[nodiscard]] uint8_t getAbsoluteTime() const {return m_absoluteTime;}
+    [[nodiscard]] uint32_t getAbsoluteTime() const {return m_absoluteTime;}
 
     [[nodiscard]] bool isNoteOn() const {if (type == NOTE_ON) return true; return false;}
     [[nodiscard]] bool isNoteOff() const {if (type == NOTE_OFF) return true; return false;}
