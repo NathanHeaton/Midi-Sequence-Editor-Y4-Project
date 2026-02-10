@@ -6,7 +6,7 @@
 #include <iostream>
 #include "ParsedMidi.h"
 #include  "../utils.h"
-#include "../Singletons/SessionData.h"
+#include "../Singletons/PatternManager.h"
 
 class MidiFileManager : public juce::ActionBroadcaster
 {
@@ -55,7 +55,7 @@ public:
                 return;
             }
             DBG("got to session call");
-            SessionData::instance().addParsedMidi(bytes, m_fileName);
+            PatternManager::instance().addParsedMidi(bytes, m_fileName);
             DBG("got past session call");
             sendActionMessage("midiData");
         }

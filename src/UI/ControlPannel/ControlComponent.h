@@ -19,11 +19,11 @@ public:
     float test_vol{0.0f};
     size_t selectedPattern{0};
     ControlComponent() {
-        SessionData::instance().addPattern();
+        PatternManager::instance().addPattern();
     };
 
     void ControlPanel(auto &state) {
-        auto& patterns = SessionData::instance().getPatterns();
+        auto& patterns = PatternManager::instance().getPatterns();
         if (ImGui::BeginTable("Control Panel",4)) {
             ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
             ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 400);
@@ -36,7 +36,7 @@ public:
 
             if (ImGui::Button("New Pattern")) {
                 state.pianoRollWindow = !state.pianoRollWindow;
-                SessionData::instance().addPattern();
+                PatternManager::instance().addPattern();
             }
             if (ImGui::BeginCombo("Open Pattern",
                 patterns.at(selectedPattern).m_title.c_str()))
@@ -48,7 +48,7 @@ public:
                     }
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
-                        SessionData::instance().setCurrentPattern(i);
+                        PatternManager::instance().setCurrentPattern(i);
                     }
                 }
                 ImGui::EndCombo();

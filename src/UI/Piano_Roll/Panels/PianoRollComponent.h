@@ -7,7 +7,7 @@
 
 #include "../../../Theme.h"
 #include "../../../Singletons/SessionData.h"
-
+#include "../../../Singletons/PatternManager.h"
 //#include "PianoRoll/PianoKeys.h"
 
 class PianoRollComponent
@@ -69,7 +69,7 @@ public:
             printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
             int duration = s->getPPQ();
 
-            s->addNoteToPattern(pitch,  absoluteTime,  duration);
+            PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
         }
         if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
         }
@@ -87,7 +87,7 @@ public:
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
 
-            auto& pattern = s->getCurrentPattern();
+            auto& pattern = PatternManager::instance().getCurrentPattern();
             lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
             ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
         }
@@ -156,7 +156,7 @@ private:
 
     void renderPattern() {
         TimelineContext ctx;
-        auto& pattern = s->getCurrentPattern();
+        auto& pattern = PatternManager::instance().getCurrentPattern();
         auto& noteData = pattern.m_events;
 
         for (auto noteIndices : pattern.m_noteEvents) {

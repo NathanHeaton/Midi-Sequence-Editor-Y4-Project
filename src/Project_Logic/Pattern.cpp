@@ -1,7 +1,7 @@
 #include "Pattern.h"
 #include "../Singletons/SessionData.h"
 #include <iostream>
-
+#include <cmath>
 //
 // Created by nathan on 11/01/2026.
 //

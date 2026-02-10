@@ -16,7 +16,7 @@ public:
     }
 
     void playCurrentPattern() {
-        pattern = &SessionData::instance().getCurrentPattern();
+        pattern = &PatternManager::instance().getCurrentPattern();
         eventIndex = 0;
         startTime = juce::Time::getMillisecondCounterHiRes();
         startTimer(1);
@@ -49,13 +49,13 @@ public:
                                                  (juce::uint8)event.getVelocity());
             }
 
-            // // Send to internal synth
-            // audioManager.addMidiMessage(note);
-            //
-            // // Send to external MIDI device
-            // if (midiOutput != nullptr) {
-            //     midiOutput->sendMessageNow(note);
-            // }
+            // Send to internal synth
+            audioManager.addMidiMessage(note);
+
+            // Send to external MIDI device
+            if (midiOutput != nullptr) {
+                midiOutput->sendMessageNow(note);
+            }
 
             eventIndex++;
         }

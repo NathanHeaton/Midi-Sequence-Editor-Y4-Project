@@ -7,8 +7,6 @@
 
 //#include <juce_core/juce_core.h>
 #include <imgui.h>
-#include "../Project_Logic/Pattern.h"
-#include "../MIDI_Logic/ParsedMidi.h"
 
 inline namespace Division {
     const float WHOLE = 4.0f;
@@ -84,62 +82,6 @@ public:
     void addTrack() {TrackAmount++;}
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
-    void addPattern() {
-        std::cout << "Adding pattern..." << std::endl;
-        std::string title = "untitled " + std::to_string(pattern.size());
-        pattern.emplace_back(Pattern(title));
-    }
-    void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
-        std::cout << "Adding pattern from mifi..." << std::endl;
-        pattern.emplace_back(title, events, fileTicks);
-    }
-    bool anyPatterns() {
-        return !pattern.empty();
-    }
-    const std::vector<Pattern>& getPatterns() {
-        return pattern;
-    }
-
-    const Pattern& getCurrentPattern() {
-        return pattern.at(activePattern);
-    }
-
-    void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta);
-    }
-
-    void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
-
-    void addParsedMidi(auto& data, std::string title) {
-        parsedMidiFile.emplace_back(data,title);
-        std::cout << "moving onto pattern" << std::endl;
-        updatePatternWithMidiData();
-    }
-
-    void updatePatternWithMidiData() {
-        const auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
-
-        size_t tracks = currentFile.m_tracks.size();
-        if (currentFile.MIDI_FORMAT == 0) {
-            std::vector<MidiEvent> combinedTracks;
-            auto title =  currentFile.m_title + " ";
-            for (size_t track = 0; track < tracks; track++) {
-
-                combinedTracks.insert(combinedTracks.end(), currentFile.m_tracks.at(track).Events.begin() ,currentFile.m_tracks.at(track).Events.end());
-            }
-            addPatternFromMidi(title,combinedTracks, currentFile.ticksInQuarterNote);
-        }
-        else {
-            loopThroughTracks(currentFile);
-        }
-        setCurrentPattern(pattern.size()-1);
-    }
-
-
-    size_t getPatternSize() {return pattern.size();}
-
-
-
     TimeSignature timeSignature{4, 4};
 
 private:
@@ -172,22 +114,6 @@ private:
     int totalBars = 30;
     int totalBarsPianoRoll = 30;
 
-    std::vector<Pattern> pattern{};
-    size_t activePattern = 0;
-
-    std::vector<ParsedMidi> parsedMidiFile;
-
-
-    void loopThroughTracks(auto currentFile) {
-        size_t tracks = currentFile.m_tracks.size();
-        for (size_t track = 0; track < tracks; track++) {
-            auto title =  currentFile.m_title + " " + std::to_string(track);
-            if (currentFile.m_tracks.at(track).m_noteTrack) {
-                addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
-            }
-            else{std::cout << "skipping non note track" << std::endl;}
-        }
-    }
 
 };
 
