@@ -63,6 +63,7 @@ public:
     }
 
 
+
     const void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta) {
         uint8_t channel = 0;
         uint8_t velocity = 127;
@@ -79,12 +80,9 @@ public:
             printf("not empty \n ");
             for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
                 if (m_events[startNoteI].m_absoluteTime > absoluteTime) {
-                    break;  // Found first event AFTER our insertion point
+                    break; // first note
                 }
             }
-
-            //auto noteAfter = m_events[startNoteI];
-            //printf(note)
             if (startNoteI == 0) {
                 onDelta = absoluteTime;
                 m_events[startNoteI].setDelta(m_events[startNoteI].m_absoluteTime - absoluteTime);
@@ -97,7 +95,6 @@ public:
                 }
             }
         }
-
         MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
         noteOn.m_absoluteTime = absoluteTime;
         printf("point before insertion");
@@ -131,6 +128,37 @@ public:
         //TODO: change later to add specific note instead of recaluculating
         m_noteEvents.clear();
         createNoteEventPairs();
+    }
+
+    void removeNote(uint8_t t_pitch, uint32_t absoluteTime) {
+        if (m_events.empty()) {
+            return;
+        }
+        for (auto i{0u};i<m_noteEvents.size();i++){
+            auto& note = m_noteEvents.at(i);
+            auto& onNote = m_events.at(note.onIndex);
+            auto& offNote = m_events.at(note.offIndex);
+            if (onNote.m_absoluteTime < absoluteTime &&
+                offNote.m_absoluteTime > absoluteTime) {
+                if (onNote.getPitch() == t_pitch) {
+                    printf("deleting note at pitch %d at time %d\n", onNote.getPitch(), onNote.getAbsoluteTime() );
+                    printf("onindex %d offindex %d\n",note.onIndex,note.offIndex);
+                    printf("size %d\n ", m_events.size());
+
+                    auto offDelta = offNote.getDelta();
+                    if (note.offIndex + 1 < m_events.size()) {
+                        m_events[note.offIndex + 1].setDelta(m_events[note.offIndex + 1].getDelta() +offDelta );
+                    }
+                    //for m_events
+                    m_events.erase(m_events.begin() + note.offIndex);
+                    m_events.erase(m_events.begin() + note.onIndex);
+                    m_noteEvents.erase(m_noteEvents.begin() + i);
+                    printf("after size %d\n ", m_events.size());
+                }
+            }
+        }
+
+
     }
 
     void updateEventDeltas(auto startIndex, auto deltaIncrement) {

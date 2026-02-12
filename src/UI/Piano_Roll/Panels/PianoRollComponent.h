@@ -72,6 +72,22 @@ public:
             PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
         }
         if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            float relativeX = mousePos.x - ctx.cursorPos.x;
+            float relativeY = mousePos.y - ctx.cursorPos.y;
+
+            float beat = relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
+            int absoluteTime = beat * s->getPPQ();
+            printf("relativeY: %d\n", relativeY);
+            int pitch = static_cast<int>(relativeY / ctx.noteHeight);
+            printf("pitch: %d\n", pitch);
+
+            pitch = std::clamp(pitch, 0, 127);
+            pitch = 127 - pitch;
+
+            printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
+
+            PatternManager::instance().removeNoteFromPattern(pitch,absoluteTime);
+
         }
     }
 

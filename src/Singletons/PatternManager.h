@@ -41,6 +41,10 @@ class PatternManager {
         pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta);
     }
 
+    void removeNoteFromPattern(uint8_t t_pitch, uint32_t inputtedTime) {
+        pattern.at(activePattern).removeNote(t_pitch, inputtedTime);
+    }
+
     void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
 
     void addParsedMidi(auto& data, std::string title) {
