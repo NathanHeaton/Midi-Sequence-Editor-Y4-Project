@@ -141,9 +141,10 @@ public:
             if (onNote.m_absoluteTime < absoluteTime &&
                 offNote.m_absoluteTime > absoluteTime) {
                 if (onNote.getPitch() == t_pitch) {
-                    printf("deleting note at pitch %d at time %d\n", onNote.getPitch(), onNote.getAbsoluteTime() );
-                    printf("onindex %d offindex %d\n",note.onIndex,note.offIndex);
-                    printf("size %d\n ", m_events.size());
+                    auto onDelta = onNote.getDelta();
+                    if (note.onIndex + 1 < m_events.size()) {
+                        m_events[note.onIndex + 1].setDelta(m_events[note.onIndex + 1].getDelta() +onDelta );
+                    }
 
                     auto offDelta = offNote.getDelta();
                     if (note.offIndex + 1 < m_events.size()) {
@@ -152,13 +153,12 @@ public:
                     //for m_events
                     m_events.erase(m_events.begin() + note.offIndex);
                     m_events.erase(m_events.begin() + note.onIndex);
-                    m_noteEvents.erase(m_noteEvents.begin() + i);
-                    printf("after size %d\n ", m_events.size());
+                    m_noteEvents.clear();
+                    createNoteEventPairs();
+                    break;
                 }
             }
         }
-
-
     }
 
     void updateEventDeltas(auto startIndex, auto deltaIncrement) {
@@ -167,11 +167,41 @@ public:
         // }
     }
 
+    void printEvents() {
+        printf("Events ==========\n");
+        int count{0};
+        for (auto event : m_events) {
+            printf("Note index %d =======\n", count);
+            if (event.isNoteOff()) {
+                printf("note is note off\n");
+                printf("pitch %d\n",event.getPitch());
+            }
+            else if (event.isNoteOn()) {
+                printf("note is note on\n");
+                printf("pitch %d\n",event.getPitch());
+            }
+            else {
+                printf("note is other\n");
+            }
+            count++;
+        }
+    }
+
+    void printNotePairs() {
+        printf("NotePairs\n");
+        for (auto i{0u};i<m_noteEvents.size();i++) {
+            printf("pair index %d\n",i);
+            printf("note on index %d\n ",m_noteEvents.at(i).onIndex);
+            printf("note off index %d\n ",m_noteEvents.at(i).offIndex);
+        }
+    }
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
 
     }
+
+
 
 
 };

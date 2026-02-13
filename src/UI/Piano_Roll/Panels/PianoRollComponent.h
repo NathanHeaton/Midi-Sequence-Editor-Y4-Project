@@ -176,7 +176,7 @@ private:
         auto& noteData = pattern.m_events;
 
         for (auto noteIndices : pattern.m_noteEvents) {
-            auto& onIndex = noteData.at(noteIndices.onIndex);
+            auto onIndex = noteData.at(noteIndices.onIndex);
             auto offIndex = noteData.at(noteIndices.offIndex);
 
             float startDelta =0;
