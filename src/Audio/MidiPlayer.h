@@ -1,7 +1,9 @@
 // MidiPlayer.h
 #pragma once
 #include <juce_audio_devices/juce_audio_devices.h>
+#include "AudioManager.h"
 #include "../Singletons/SessionData.h"
+#include  "../Singletons/PatternManager.h"
 
 class MidiPlayer : public juce::Timer {
 public:
@@ -14,9 +16,14 @@ public:
             midiOutput = juce::MidiOutput::openDevice(devices[0].identifier);
         }
     }
+    void setPlayingPtr(bool* playingPTR) {
+        m_playingPtr = playingPTR;
+    }
+
+    void setPlaying(bool playing);
+    bool isPlaying() const;
 
     void playCurrentPattern() {
-        playing = true;
         pattern = &PatternManager::instance().getCurrentPattern();
         eventIndex = 0;
         startTime = juce::Time::getMillisecondCounterHiRes();
@@ -24,16 +31,15 @@ public:
     }
 
     void pauseCurrentPattern() {
-        playing = false;
         midiOutput->clearAllPendingMessages();
         offMessageForPlayingEvents();
     }
 
     void timerCallback() override {
         if (eventIndex >= pattern->m_events.size()) {
+            setPlaying(false);
             stopTimer();
             currentPatternElapsed = 0;
-            playing = false;
             return;
         }
         double elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
@@ -62,7 +68,7 @@ public:
             }
             eventIndex++;
         }
-        if (!playing) {
+        if (!isPlaying()) {
             currentPatternElapsed += elapsed;
             stopTimer();
         }
@@ -98,5 +104,5 @@ private:
     size_t eventIndex = 0;
     double startTime = 0;
     double currentPatternElapsed = 0;
-    bool playing = false;
+    bool* m_playingPtr{nullptr};
 };

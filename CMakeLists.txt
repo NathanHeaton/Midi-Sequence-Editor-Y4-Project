@@ -24,10 +24,6 @@ add_library(imgui STATIC
         Dependencies/imgui/imgui_tables.cpp
         Dependencies/imgui/imgui_widgets.cpp
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-        src/Audio/MidiPlayer.h
-        src/Singletons/PlayBackManager.h
-        src/Audio/SineWave.h
-        src/Audio/AudioManager.h
 )
 
 target_include_directories(imgui PUBLIC

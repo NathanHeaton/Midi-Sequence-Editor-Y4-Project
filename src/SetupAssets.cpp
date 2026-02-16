@@ -39,11 +39,11 @@ IconTexture LoadTextureFromFile(const char* filename) {
 
 void AssetManager::LoadAll() {
     playIcon = LoadTextureFromFile("assets/icons/play.png");
-    pauseIcon = LoadTextureFromFile("assets/icons/pause.svg");
-    stopIcon = LoadTextureFromFile("../assets/icons/stop.svg");
-    boxSelect = LoadTextureFromFile("../assets/icons/box_select.svg");
-    zoomIn = LoadTextureFromFile("assets/icons/zoom_in.svg");
-    zoomOut = LoadTextureFromFile("assets/icons/zoom_out.svg");
+    pauseIcon = LoadTextureFromFile("assets/icons/pause.png");
+    stopIcon = LoadTextureFromFile("../assets/icons/stop.png");
+    boxSelect = LoadTextureFromFile("../assets/icons/box_select.png");
+    zoomIn = LoadTextureFromFile("assets/icons/zoom_in.png");
+    zoomOut = LoadTextureFromFile("assets/icons/zoom_out.png");
 }
 
 void AssetManager::Cleanup() {

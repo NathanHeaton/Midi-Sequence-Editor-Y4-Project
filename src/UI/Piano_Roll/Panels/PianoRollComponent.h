@@ -65,7 +65,7 @@ public:
             int pitch = static_cast<int>(relativeY / ctx.noteHeight);
             printf("pitch: %d\n", pitch);
             pitch = std::clamp(pitch, 0, 127);
-            pitch = 127 - pitch;
+             pitch = 127 - pitch;
             printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
             int duration = s->getPPQ();
 

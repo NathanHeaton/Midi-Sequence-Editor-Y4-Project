@@ -1,8 +1,6 @@
 //
 // Created by nathan on 18/01/2026.
 //
-
-
 #pragma once
 #include "../Audio/AudioManager.h"
 #include "../Audio/MidiPlayer.h"
@@ -24,18 +22,17 @@ class PlayBackManager {
         if (m_playing) {player.playCurrentPattern();}
         else{ player.pauseCurrentPattern();}
     }
+    void setPlaying(bool playing) {
+        m_playing = playing;
 
+    }
     private:
-    PlayBackManager();
 
+    PlayBackManager() {
+        player.setPlayingPtr(&m_playing);
+    };
     bool m_playing{false};
     AudioManager m_audioManager;
-
     MidiPlayer player = MidiPlayer(m_audioManager);
 
-
-
 };
-
-inline PlayBackManager::PlayBackManager() {
-}

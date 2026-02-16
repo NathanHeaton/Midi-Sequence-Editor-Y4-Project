@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
         Project_Logic/Pattern.cpp
+        Audio/MidiPlayer.cpp
         SetupAssets.cpp
         Main.cpp)
 

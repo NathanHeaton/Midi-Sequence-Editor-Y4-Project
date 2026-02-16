@@ -6,7 +6,6 @@
 #define MYPROJECT_PATTERN_H
 
 #include <iostream>
-#include <ostream>
 #include <string>
 #include "../MIDI_Logic/MIDI_Events/MidiEvent.h"
 

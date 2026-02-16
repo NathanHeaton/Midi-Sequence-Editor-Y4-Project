@@ -20,7 +20,8 @@ public:
         ImGui::BeginTable("toolList",5,ImGuiTableFlags_SizingFixedFit,ImVec2(0,0));
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("play_button"
-            , (void*)(intptr_t)ASSETS.playIcon.textureID
+            , !PlayBackManager::instance().isPlaying() ? (void*)(intptr_t)ASSETS.playIcon.textureID :
+            (void*)(intptr_t)ASSETS.pauseIcon.textureID
             , ImVec2(32, 32)
             )) {
             PlayBackManager::instance().togglePlay();
