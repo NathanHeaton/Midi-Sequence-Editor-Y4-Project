@@ -26,12 +26,14 @@ public:
     void pauseCurrentPattern() {
         playing = false;
         midiOutput->clearAllPendingMessages();
+        offMessageForPlayingEvents();
     }
 
     void timerCallback() override {
         if (eventIndex >= pattern->m_events.size()) {
             stopTimer();
             currentPatternElapsed = 0;
+            playing = false;
             return;
         }
         double elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
@@ -44,11 +46,14 @@ public:
         if (elapsed >= eventInMs) {
             juce::MidiMessage note;
             if (event.isNoteOff()) {
-                note = juce::MidiMessage::noteOff(1, event.getPitch());
+                note = juce::MidiMessage::noteOff(event.getChannel(), event.getPitch());
+                removePlayedEvents(event);
             } else {
-                note = juce::MidiMessage::noteOn(1, event.getPitch(),
+                note = juce::MidiMessage::noteOn(event.getChannel(), event.getPitch(),
                                                  (juce::uint8)event.getVelocity());
+                m_playingEvents.push_back(note);
             }
+
             //Send to internal synth
             audioManager.addMidiMessage(note);
             // Send to external MIDI device
@@ -63,7 +68,30 @@ public:
         }
     }
 
+    void removePlayedEvents(auto& event) {
+        for (auto i{0u};i < m_playingEvents.size(); ++i) {
+            if (m_playingEvents.at(i).getChannel() == event.getChannel() &&
+                m_playingEvents.at(i).getNoteNumber() == event.getPitch()) {
+                m_playingEvents.erase(m_playingEvents.begin()+i);
+                }
+        }
+    }
+
+    void offMessageForPlayingEvents() {
+        for (auto event : m_playingEvents) {
+            juce::MidiMessage note = juce::MidiMessage::noteOff(event.getChannel(), event.getNoteNumber());
+            //Send to internal synth
+            audioManager.addMidiMessage(note);
+            // Send to external MIDI device
+            if (midiOutput != nullptr) {
+                midiOutput->sendMessageNow(note);
+            }
+        }
+        m_playingEvents.clear();
+    }
+
 private:
+    std::vector<juce::MidiMessage> m_playingEvents;
     AudioManager& audioManager;
     std::unique_ptr<juce::MidiOutput> midiOutput;
     const Pattern* pattern = nullptr;
