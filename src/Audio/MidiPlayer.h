@@ -8,6 +8,18 @@
 class MidiPlayer : public juce::Timer {
 public:
     MidiPlayer(AudioManager& audioMgr) : audioManager(audioMgr) {
+    }
+
+    ~MidiPlayer() {
+        cleanUp();
+    }
+
+    void cleanUp() {// clean up called before singleton deconstucting
+        stopTimer();
+        midiOutput.reset();
+    }
+
+    void intialiseMidiPlayer() {
         auto devices = juce::MidiOutput::getAvailableDevices();
         for (auto& device : devices) {
             DBG("devices " << device.name << " " << device.identifier);
@@ -16,6 +28,7 @@ public:
             midiOutput = juce::MidiOutput::openDevice(devices[0].identifier);
         }
     }
+
     void setPlayingPtr(bool* playingPTR) {
         m_playingPtr = playingPTR;
     }
@@ -55,8 +68,7 @@ public:
                 note = juce::MidiMessage::noteOff(event.getChannel(), event.getPitch());
                 removePlayedEvents(event);
             } else {
-                note = juce::MidiMessage::noteOn(event.getChannel(), event.getPitch(),
-                                                 (juce::uint8)event.getVelocity());
+                note = juce::MidiMessage::noteOn(event.getChannel(), event.getPitch(), event.getVelocity());
                 m_playingEvents.push_back(note);
             }
 

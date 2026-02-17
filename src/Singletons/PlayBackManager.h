@@ -17,6 +17,10 @@ class PlayBackManager {
         return m_playing;
     }
 
+    void shutDown() {
+        player.cleanUp();
+    }
+
     void togglePlay() {
         m_playing = !m_playing;
         if (m_playing) {player.playCurrentPattern();}
@@ -30,6 +34,9 @@ class PlayBackManager {
 
     PlayBackManager() {
         player.setPlayingPtr(&m_playing);
+        juce::MessageManager::callAsync([this]() {
+        player.intialiseMidiPlayer();
+        });
     };
     bool m_playing{false};
     AudioManager m_audioManager;

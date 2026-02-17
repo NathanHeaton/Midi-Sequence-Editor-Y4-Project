@@ -1,7 +1,7 @@
 #include "MainComponent.h"
 #include "Theme.h"
 #include "SetupAssets.h"
-
+#include "Singletons/PlayBackManager.h"
 /* Main.cpp: main file for application */
 
 class MainWindow : public juce::DocumentWindow
@@ -40,6 +40,7 @@ public:
     }
     void shutdown() override {
         ASSETS.Cleanup();
+        PlayBackManager::instance().shutDown();
         win = nullptr;
     }
 

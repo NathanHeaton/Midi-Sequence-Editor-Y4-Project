@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME}
         Project_Logic/Pattern.cpp
         Audio/MidiPlayer.cpp
         SetupAssets.cpp
+        UI/Piano_Roll/Panels/PianoRoll.cpp
         Main.cpp)
 
 target_compile_definitions(${PROJECT_NAME}

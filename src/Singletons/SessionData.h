@@ -20,6 +20,7 @@ inline namespace zoomFactor {
 }
 
 
+
 class SessionData {
 public:
     static SessionData& instance() {
@@ -46,6 +47,7 @@ public:
     // Getters
     [[nodiscard]] double getBPM() const { return BPM; }
     [[nodiscard]] int getPPQ() const { return PPQ; }
+
 
     [[nodiscard]] int getTrackAmount() const { return TrackAmount; }
     [[nodiscard]] float getTrackHeight() const { return TrackHeight; }
@@ -82,7 +84,9 @@ public:
     void addTrack() {TrackAmount++;}
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
+
     TimeSignature timeSignature{4, 4};
+
 
 private:
     //JUCE_DECLARE_NON_COPYABLE(SessionData)

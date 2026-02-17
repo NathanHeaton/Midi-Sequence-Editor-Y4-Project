@@ -4,7 +4,6 @@
 
 #include <imgui.h>
 
-#include "juce_core/system/juce_PlatformDefs.h"
 #ifndef MYPROJECT_THEME_H
 #define MYPROJECT_THEME_H
 

@@ -7,8 +7,13 @@
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
 
+struct noteCoordinate {
+    uint8_t pitch;
+    uint32_t absoluteTime;
+};
+
 class PatternManager {
-    public:
+public:
 
     static PatternManager& instance(){
         static PatternManager singleton;
@@ -41,8 +46,10 @@ class PatternManager {
         pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta);
     }
 
-    void removeNoteFromPattern(uint8_t t_pitch, uint32_t inputtedTime) {
-        pattern.at(activePattern).removeNote(t_pitch, inputtedTime);
+    void removeNoteFromPattern(noteCoordinate noteCoordinate ) {
+        std::vector<struct noteCoordinate> coords;
+        coords.push_back(noteCoordinate);
+        pattern.at(activePattern).removeSelection(coords);
     }
 
     void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}

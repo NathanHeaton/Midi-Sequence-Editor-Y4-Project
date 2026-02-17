@@ -24,6 +24,10 @@ public:
     IconTexture saveIcon;
     IconTexture zoomIn;
     IconTexture zoomOut;
+    IconTexture editIcon;
+    IconTexture cutIcon;
+    IconTexture moveIcon;
+
 
     IconTexture boxSelect;
     void LoadAll();

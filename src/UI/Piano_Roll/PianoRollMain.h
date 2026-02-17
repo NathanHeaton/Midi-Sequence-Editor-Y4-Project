@@ -12,6 +12,8 @@
 #include "Panels/piano.h"
 #include "../Common/timelineLabel.h"
 
+
+
 class PianoRollMain : public juce::Component
 {
 public:
@@ -29,7 +31,7 @@ public:
     float pianoRollScrollX;
 
     void create() {
-        if (ImGui::Begin("pianoRollComponent", nullptr)) {
+        if (ImGui::Begin("pianoRollComponent", nullptr, ImGuiWindowFlags_NoMove)) {
             toolbar.create();
             if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
                 ImGui::TableSetupColumn("gap");

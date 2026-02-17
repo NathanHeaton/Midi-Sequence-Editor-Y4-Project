@@ -12,7 +12,7 @@
 
 AssetManager ASSETS;
 
-IconTexture LoadTextureFromFile(const char* filename) {
+IconTexture loadTextureFromFile(const char* filename) {
     IconTexture result = {0, 0, 0};
 
     // Load image
@@ -38,20 +38,30 @@ IconTexture LoadTextureFromFile(const char* filename) {
 }
 
 void AssetManager::LoadAll() {
-    playIcon = LoadTextureFromFile("assets/icons/play.png");
-    pauseIcon = LoadTextureFromFile("assets/icons/pause.png");
-    stopIcon = LoadTextureFromFile("../assets/icons/stop.png");
-    boxSelect = LoadTextureFromFile("../assets/icons/box_select.png");
-    zoomIn = LoadTextureFromFile("assets/icons/zoom_in.png");
-    zoomOut = LoadTextureFromFile("assets/icons/zoom_out.png");
+    playIcon = loadTextureFromFile("assets/icons/play.png");
+    pauseIcon = loadTextureFromFile("assets/icons/pause.png");
+    //stopIcon = loadTextureFromFile("../assets/icons/stop.png");
+    boxSelect = loadTextureFromFile("assets/icons/box_select.png");
+    editIcon = loadTextureFromFile("assets/icons/edit.png");
+    cutIcon = loadTextureFromFile("assets/icons/cut.png");
+    divisionSnapIcon = loadTextureFromFile("assets/icons/snapping.png");
+    zoomIn = loadTextureFromFile("assets/icons/zoom_in.png");
+    zoomOut = loadTextureFromFile("assets/icons/zoom_out.png");
+    moveIcon = loadTextureFromFile("assets/icons/move.png");
+    deleteIcon = loadTextureFromFile("assets/icons/delete.png");
 }
 
 void AssetManager::Cleanup() {
     glDeleteTextures(1, &playIcon.textureID);
     glDeleteTextures(1, &pauseIcon.textureID);
-    glDeleteTextures(1, &stopIcon.textureID);
+    //glDeleteTextures(1, &stopIcon.textureID);
     glDeleteTextures(1, &boxSelect.textureID);
     glDeleteTextures(1, &zoomIn.textureID);
     glDeleteTextures(1, &zoomOut.textureID);
+    glDeleteTextures(1, &moveIcon.textureID);
+    glDeleteTextures(1, &divisionSnapIcon.textureID);
+    glDeleteTextures(1, &deleteIcon.textureID);
+    glDeleteTextures(1, &editIcon.textureID);
+    glDeleteTextures(1, &cutIcon.textureID);
 
 }

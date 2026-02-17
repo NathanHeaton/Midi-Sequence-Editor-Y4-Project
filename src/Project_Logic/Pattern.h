@@ -11,19 +11,16 @@
 
 class SessionData;
 
+struct noteCoordinate;
+
 class Pattern {
 public:
-
-
     struct NoteEventPair {
         size_t onIndex;
         size_t offIndex;
     };
 
-
     float m_barLength;
-
-
     std::string m_title;
 
     std::vector<MidiEvent> m_events;
@@ -45,11 +42,14 @@ public:
         }
     }
     void createNoteEventPairs();
-
     void convertMidiTicksToPPQ();
-
     void setLastBar();
 
+    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta);
+    void removeNote(uint8_t t_pitch, uint32_t absoluteTime);
+
+    void removeSelection(noteCoordinate t_event);
+    void removeSelection(std::vector<noteCoordinate> t_events);
 
     size_t findInsertionPoint(uint32_t absoluteTime) {
         size_t i = 0;
@@ -61,104 +61,6 @@ public:
         return i;
     }
 
-
-
-    const void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta) {
-        uint8_t channel = 0;
-        uint8_t velocity = 127;
-        uint32_t onDelta = 0;
-        uint32_t offAbsoluteTime = absoluteTime + endDelta;
-        size_t startNoteI = 0;
-        size_t endNoteI = 0;
-
-        printf("check if empty \n ");
-        if (m_events.empty()) {
-            onDelta = absoluteTime;
-        }
-        else {
-            printf("not empty \n ");
-            for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
-                if (m_events[startNoteI].m_absoluteTime > absoluteTime) {
-                    break; // first note
-                }
-            }
-            if (startNoteI == 0) {
-                onDelta = absoluteTime;
-                m_events[startNoteI].setDelta(m_events[startNoteI].m_absoluteTime - absoluteTime);
-            } else {
-                onDelta = absoluteTime - m_events[startNoteI - 1].m_absoluteTime;
-                if (startNoteI < m_events.size()) {
-                    m_events[startNoteI].setDelta(
-                        m_events[startNoteI].m_absoluteTime - absoluteTime
-                    );
-                }
-            }
-        }
-        MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
-        noteOn.m_absoluteTime = absoluteTime;
-        printf("point before insertion");
-        m_events.insert(m_events.begin()+startNoteI,noteOn);
-
-
-        endNoteI = findInsertionPoint(offAbsoluteTime);
-
-        for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
-            if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
-                break;
-            }
-        }
-        if (endNoteI == 0) {
-            endDelta = offAbsoluteTime;
-            m_events[0].setDelta(m_events[0].m_absoluteTime - offAbsoluteTime);
-        }
-        else {
-            endDelta = offAbsoluteTime - m_events[endNoteI - 1].m_absoluteTime;
-            if (endNoteI < m_events.size()) {
-                m_events[endNoteI].setDelta(
-                    m_events[endNoteI].m_absoluteTime - offAbsoluteTime
-                );
-            }
-        }
-        MidiEvent noteOff(endDelta,0x80,Note{t_pitch,velocity},channel);
-
-        noteOff.m_absoluteTime = absoluteTime + endDelta;
-        m_events.insert(m_events.begin()+endNoteI,noteOff);
-        printf("On Delta: %d absolute of note to insert: %d\n endDeltaOf note: %d\n\n ",onDelta,absoluteTime,endDelta);
-        //TODO: change later to add specific note instead of recaluculating
-        m_noteEvents.clear();
-        createNoteEventPairs();
-    }
-
-    void removeNote(uint8_t t_pitch, uint32_t absoluteTime) {
-        if (m_events.empty()) {
-            return;
-        }
-        for (auto i{0u};i<m_noteEvents.size();i++){
-            auto& note = m_noteEvents.at(i);
-            auto& onNote = m_events.at(note.onIndex);
-            auto& offNote = m_events.at(note.offIndex);
-            if (onNote.m_absoluteTime < absoluteTime &&
-                offNote.m_absoluteTime > absoluteTime) {
-                if (onNote.getPitch() == t_pitch) {
-                    auto onDelta = onNote.getDelta();
-                    if (note.onIndex + 1 < m_events.size()) {
-                        m_events[note.onIndex + 1].setDelta(m_events[note.onIndex + 1].getDelta() +onDelta );
-                    }
-
-                    auto offDelta = offNote.getDelta();
-                    if (note.offIndex + 1 < m_events.size()) {
-                        m_events[note.offIndex + 1].setDelta(m_events[note.offIndex + 1].getDelta() +offDelta );
-                    }
-                    //for m_events
-                    m_events.erase(m_events.begin() + note.offIndex);
-                    m_events.erase(m_events.begin() + note.onIndex);
-                    m_noteEvents.clear();
-                    createNoteEventPairs();
-                    break;
-                }
-            }
-        }
-    }
 
     void updateEventDeltas(auto startIndex, auto deltaIncrement) {
         // for (int i = startIndex+1; i < m_events.size(); i++) {
