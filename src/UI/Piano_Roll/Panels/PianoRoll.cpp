@@ -11,12 +11,9 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
         if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             int beat = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
             int absoluteTime = beat * s->getPPQ();
-            printf("relativeY: %d\n", ctx.relativeY);
             int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-            printf("pitch: %d\n", pitch);
             pitch = std::clamp(pitch, 0, 127);
             pitch = 127 - pitch;
-            printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
             int duration = s->getPPQ();
 
             PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
@@ -24,14 +21,9 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
         if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
             float beat = ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
             int absoluteTime = beat * s->getPPQ();
-            printf("relativeY: %d\n", ctx.relativeY);
             int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-            printf("pitch: %d\n", pitch);
-
             pitch = std::clamp(pitch, 0, 127);
             pitch = 127 - pitch;
-
-            printf("Absolute Time clicked: %d, pitch: %d\n", absoluteTime, pitch);
 
             noteCoordinate note_coordinate(pitch, absoluteTime);
             PatternManager::instance().removeNoteFromPattern(note_coordinate);
@@ -44,7 +36,7 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
         }
         if (isHovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
             ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
-            printf("selectionPoint2: %d\n", ctx.relativeY);
+            PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
         }
         if (isHovered && ToolManager::instance().isBoxSelecting()) {
 
@@ -81,10 +73,17 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) {
         float xEnd =  ctx.cursorPos.x + endPixel;
         float yEnd = yStart + ctx.noteHeight;
 
+        auto colour = Theme::currentThemeColours.barColourPacked;
+        for (auto id : pattern.m_selectedNoteIDs) {
+            if (noteData.at(noteIndices.onIndex).getID() == id) {
+                colour = Theme::currentThemeColours.beatColourPacked;
+                break;
+            }
+        }
         ctx.drawList->AddRectFilled(
             ImVec2(xStart, yStart),
             ImVec2(xEnd,yEnd),
-                Theme::currentThemeColours.barColourPacked, 3.0f);
+                colour, 3.0f);
     }
 }
 

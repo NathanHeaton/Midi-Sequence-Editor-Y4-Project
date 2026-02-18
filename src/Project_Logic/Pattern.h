@@ -49,7 +49,7 @@ public:
     void createNoteEventPairs();
     void convertMidiTicksToPPQ();
     void setLastBar();
-    void calculateSelection(SelectionCoords &t_selection);
+    void calculateSelection(const SelectionCoords &t_selection);
 
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
     void removeNote(uint8_t t_pitch, uint32_t absoluteTime);

@@ -56,7 +56,7 @@ public:
 
     void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
 
-    void setSelection(SelectionCoords &t_selection) {
+    void setSelection(const SelectionCoords &t_selection) {
         pattern.at(activePattern).calculateSelection(t_selection);
     }
 
@@ -66,15 +66,16 @@ public:
         updatePatternWithMidiData();
     }
 
+    //ParsedMidi* currentFile;
     void updatePatternWithMidiData() {
-        const auto& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
+        ParsedMidi& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
 
         size_t tracks = currentFile.m_tracks.size();
         if (currentFile.MIDI_FORMAT == 0) {
             std::vector<MidiEvent> combinedTracks;
             auto title =  currentFile.m_title + " ";
             for (size_t track = 0; track < tracks; track++) {
-
+                assignIdsToMidi(currentFile.m_tracks.at(track).Events);
                 combinedTracks.insert(combinedTracks.end(), currentFile.m_tracks.at(track).Events.begin() ,currentFile.m_tracks.at(track).Events.end());
             }
             addPatternFromMidi(title,combinedTracks, currentFile.ticksInQuarterNote);
@@ -97,11 +98,18 @@ public:
     uint32_t m_nextNoteId{0};
     uint32_t assignNoteId() { return m_nextNoteId++; }
 
-    void loopThroughTracks(auto currentFile) {
+    void assignIdsToMidi(std::vector<MidiEvent>& events) {
+        for (auto event : events) {
+            event.setID(assignNoteId());
+        }
+    }
+
+    void loopThroughTracks(auto& currentFile) {
         size_t tracks = currentFile.m_tracks.size();
         for (size_t track = 0; track < tracks; track++) {
             auto title =  currentFile.m_title + " " + std::to_string(track);
             assignIdsToMidi(currentFile.m_tracks.at(track).Events);
+
             if (currentFile.m_tracks.at(track).m_noteTrack) {
                 addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
             }
@@ -109,10 +117,6 @@ public:
         }
     }
 
-    void assignIdsToMidi(auto& events) {
-        for (auto& event : events) {
-            event.m_noteId = assignNoteId();
-        }
-    }
+
 
 };

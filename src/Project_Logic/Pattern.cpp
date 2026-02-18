@@ -102,7 +102,22 @@ void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
     createNoteEventPairs();
 }
 
-void Pattern::calculateSelection(SelectionCoords &t_selection) {
+void Pattern::calculateSelection(const SelectionCoords &t_selection) {
+    m_selectedNoteIDs.clear();
+
+    float pixelPerTick = SessionData::instance().getPPQ() / SessionData::instance().getPixelPerBeat(zoomFactor::pianoRoll);
+
+    ImVec2 adjustedValuesP1 = {t_selection.selectP1.x * pixelPerTick, t_selection.selectP1.y};
+    ImVec2 adjustedValuesP2 = {t_selection.selectP2.x * pixelPerTick, t_selection.selectP2.y};
+
+    for (auto& pair : m_noteEvents) {
+        auto onX = static_cast<float>(m_events.at(pair.onIndex).getAbsoluteTime());
+        auto offX = static_cast<float>(m_events.at(pair.offIndex).getAbsoluteTime());
+
+        if ((onX > adjustedValuesP1.x || offX > adjustedValuesP1.x) && onX < adjustedValuesP2.x) {
+            m_selectedNoteIDs.emplace(m_events.at(pair.onIndex).getID());
+        }
+    }
 
 }
 
@@ -113,13 +128,10 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta,
         uint32_t offAbsoluteTime = absoluteTime + endDelta;
         size_t startNoteI = 0;
         size_t endNoteI = 0;
-
-        printf("check if empty \n ");
         if (m_events.empty()) {
             onDelta = absoluteTime;
         }
         else {
-            printf("not empty \n ");
             for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
                 if (m_events[startNoteI].getAbsoluteTime() > absoluteTime) {
                     break; // first note
@@ -140,8 +152,6 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta,
         MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
         noteOn.m_absoluteTime = absoluteTime;
         noteOn.setID(t_id);
-
-        printf("point before insertion");
         m_events.insert(m_events.begin()+startNoteI,noteOn);
         for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
             if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
@@ -165,7 +175,6 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta,
 
         noteOff.m_absoluteTime = absoluteTime + endDelta;
         m_events.insert(m_events.begin()+endNoteI,noteOff);
-        printf("On Delta: %d absolute of note to insert: %d\n endDeltaOf note: %d\n\n ",onDelta,absoluteTime,endDelta);
         //TODO: change later to add specific note instead of recaluculating
         m_noteEvents.clear();
         createNoteEventPairs();

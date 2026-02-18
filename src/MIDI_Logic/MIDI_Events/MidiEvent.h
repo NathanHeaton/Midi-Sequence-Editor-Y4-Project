@@ -102,12 +102,12 @@ class MidiEvent {
     [[nodiscard]] bool isNoteOff() const {if (type == NOTE_OFF) return true; return false;}
 
     uint32_t m_absoluteTime;
+    uint32_t m_ID;
 private:
     uint8_t m_channel;
     uint32_t m_delta;
     uint8_t m_status;
 
-    uint32_t m_ID;
 };
 
 
