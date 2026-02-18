@@ -7,11 +7,14 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_set>
+
 #include "../MIDI_Logic/MIDI_Events/MidiEvent.h"
 
 class SessionData;
 
 struct noteCoordinate;
+struct SelectionCoords;
 
 class Pattern {
 public:
@@ -27,6 +30,8 @@ public:
     std::vector<NoteEventPair> m_noteEvents;
     int ticksInMidiFile{0};
     int m_bars{8};
+
+    std::unordered_set<uint32_t> m_selectedNoteIDs;
 
     Pattern(std::string t_title) {
         m_title = t_title;
@@ -44,8 +49,9 @@ public:
     void createNoteEventPairs();
     void convertMidiTicksToPPQ();
     void setLastBar();
+    void calculateSelection(SelectionCoords &t_selection);
 
-    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta);
+    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
     void removeNote(uint8_t t_pitch, uint32_t absoluteTime);
 
     void removeSelection(noteCoordinate t_event);

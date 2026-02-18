@@ -10,6 +10,11 @@ enum ToolTypes {
     SNIP
   };
 
+struct SelectionCoords {
+    ImVec2 selectP1;
+    ImVec2 selectP2;
+};
+
 class ToolManager {
     public:
 
@@ -40,11 +45,8 @@ private:
     ToolTypes activeArrangerTool{EDIT};
     ToolManager() = default;
 
-    struct selectionCoords {
-        ImVec2 selectP1;
-        ImVec2 selectP2;
-    };
+
     bool boxSelectingActive = false;
 
-    selectionCoords selectCoords;
+    SelectionCoords selectCoords;
 };

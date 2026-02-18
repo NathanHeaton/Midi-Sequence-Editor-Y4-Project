@@ -40,12 +40,6 @@ class MidiEvent {
         Poly_Cha
     > m_event_data;
 
-    uint8_t m_channel;
-    uint32_t m_delta;
-    uint8_t m_status;
-
-    uint32_t m_absoluteTime;
-
     // note data
     MidiEvent(uint32_t delta, uint8_t status, Note event, uint8_t channel);// for note events
     //meta events
@@ -83,6 +77,8 @@ class MidiEvent {
         m_delta = newDelta;
     }
 
+    void setID(uint32_t newID) {m_ID = newID;}
+
     [[nodiscard]] uint8_t getPitch() const {
         if (type == NOTE_ON||type==NOTE_OFF ) {
             return std::get<Note>(m_event_data).m_pitch;
@@ -96,6 +92,7 @@ class MidiEvent {
         }
         return 0;
     }
+    [[nodiscard]] uint32_t getID() const {return m_ID;}
     [[nodiscard]] uint32_t getDelta() const {return m_delta;}
     [[nodiscard]] uint8_t getChannel() const {return m_channel;}
     [[nodiscard]] uint8_t getStatus() const {return m_status;}
@@ -104,7 +101,13 @@ class MidiEvent {
     [[nodiscard]] bool isNoteOn() const {if (type == NOTE_ON) return true; return false;}
     [[nodiscard]] bool isNoteOff() const {if (type == NOTE_OFF) return true; return false;}
 
+    uint32_t m_absoluteTime;
+private:
+    uint8_t m_channel;
+    uint32_t m_delta;
+    uint8_t m_status;
 
+    uint32_t m_ID;
 };
 
 

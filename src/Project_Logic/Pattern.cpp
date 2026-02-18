@@ -2,7 +2,7 @@
 #include "../Singletons/SessionData.h"
 #include <iostream>
 #include <cmath>
-
+#include "../Singletons/ToolManager.h"
 #include "../Singletons/PatternManager.h"
 //
 // Created by nathan on 11/01/2026.
@@ -102,7 +102,11 @@ void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
     createNoteEventPairs();
 }
 
-void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta) {
+void Pattern::calculateSelection(SelectionCoords &t_selection) {
+
+}
+
+void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id) {
         uint8_t channel = 0;
         uint8_t velocity = 127;
         uint32_t onDelta = 0;
@@ -117,24 +121,26 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta)
         else {
             printf("not empty \n ");
             for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
-                if (m_events[startNoteI].m_absoluteTime > absoluteTime) {
+                if (m_events[startNoteI].getAbsoluteTime() > absoluteTime) {
                     break; // first note
                 }
             }
             if (startNoteI == 0) {
                 onDelta = absoluteTime;
-                m_events[startNoteI].setDelta(m_events[startNoteI].m_absoluteTime - absoluteTime);
+                m_events[startNoteI].setDelta(m_events[startNoteI].getAbsoluteTime() - absoluteTime);
             } else {
-                onDelta = absoluteTime - m_events[startNoteI - 1].m_absoluteTime;
+                onDelta = absoluteTime - m_events[startNoteI - 1].getAbsoluteTime();
                 if (startNoteI < m_events.size()) {
                     m_events[startNoteI].setDelta(
-                        m_events[startNoteI].m_absoluteTime - absoluteTime
+                        m_events[startNoteI].getAbsoluteTime() - absoluteTime
                     );
                 }
             }
         }
         MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
         noteOn.m_absoluteTime = absoluteTime;
+        noteOn.setID(t_id);
+
         printf("point before insertion");
         m_events.insert(m_events.begin()+startNoteI,noteOn);
         for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {

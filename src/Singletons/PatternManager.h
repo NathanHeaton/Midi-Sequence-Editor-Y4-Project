@@ -15,6 +15,8 @@ struct noteCoordinate {
 class PatternManager {
 public:
 
+
+
     static PatternManager& instance(){
         static PatternManager singleton;
         return singleton;
@@ -43,7 +45,7 @@ public:
 
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta);
+        pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
     }
 
     void removeNoteFromPattern(noteCoordinate noteCoordinate ) {
@@ -53,6 +55,10 @@ public:
     }
 
     void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
+
+    void setSelection(SelectionCoords &t_selection) {
+        pattern.at(activePattern).calculateSelection(t_selection);
+    }
 
     void addParsedMidi(auto& data, std::string title) {
         parsedMidiFile.emplace_back(data,title);
@@ -88,15 +94,24 @@ public:
 
     std::vector<ParsedMidi> parsedMidiFile;
 
+    uint32_t m_nextNoteId{0};
+    uint32_t assignNoteId() { return m_nextNoteId++; }
 
     void loopThroughTracks(auto currentFile) {
         size_t tracks = currentFile.m_tracks.size();
         for (size_t track = 0; track < tracks; track++) {
             auto title =  currentFile.m_title + " " + std::to_string(track);
+            assignIdsToMidi(currentFile.m_tracks.at(track).Events);
             if (currentFile.m_tracks.at(track).m_noteTrack) {
                 addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
             }
             else{std::cout << "skipping non note track" << std::endl;}
+        }
+    }
+
+    void assignIdsToMidi(auto& events) {
+        for (auto& event : events) {
+            event.m_noteId = assignNoteId();
         }
     }
 
