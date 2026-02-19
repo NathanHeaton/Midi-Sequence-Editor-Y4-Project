@@ -38,10 +38,7 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
             ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
             PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
         }
-        if (isHovered && ToolManager::instance().isBoxSelecting()) {
-
-        }
-        if (!isHovered) {
+        if (!isHovered && ToolManager::instance().isBoxSelecting()) {
             ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
         }
     }

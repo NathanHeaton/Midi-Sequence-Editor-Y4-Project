@@ -39,9 +39,8 @@ public:
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();
             barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll);
-            noteHeight = SessionData::instance().getWhiteSize().y * 7 /12;
+            noteHeight = SessionData::instance().getNoteHeight();
             intialGap = (SessionData::instance().getWhiteSize().y * 5.0f)/8.0f;
-
             auto& session = SessionData::instance();
             firstVisibleBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::pianoRoll)) : 0;

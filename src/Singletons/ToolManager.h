@@ -39,7 +39,7 @@ class ToolManager {
         boxSelectingActive = true;
     }
     void setSelectionPoint2(ImVec2 selectP2) {
-        selectCoords.selectP1 = selectP2;
+        selectCoords.selectP2 = selectP2;
         boxSelectingActive = false;
         normaliseSelectionCoords();
     }

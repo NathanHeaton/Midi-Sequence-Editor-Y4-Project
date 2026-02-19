@@ -69,6 +69,7 @@ public:
     [[nodiscard]] float getBlackGap() const { return Black_Gap; }
     [[nodiscard]] ImVec2 getWhiteSize() const { return WHITE_SIZE; }
     [[nodiscard]] ImVec2 getBlackSize() const { return BLACK_SIZE; }
+    [[nodiscard]] float getNoteHeight() const { return noteHeight; }
 
     // Setters
     void setBPM(int newBPM) {        BPM = newBPM;    }
@@ -86,7 +87,6 @@ public:
 
 
     TimeSignature timeSignature{4, 4};
-
 
 private:
     //JUCE_DECLARE_NON_COPYABLE(SessionData)
@@ -110,6 +110,7 @@ private:
     ImVec2 WHITE_SIZE{100, 32};
     ImVec2 BLACK_SIZE{WHITE_SIZE.x * 0.8f, WHITE_SIZE.y * 0.625f};
 
+    float noteHeight = WHITE_SIZE.y * 7 /12;
     float barWidth = timeSignature.getNumerator() * pixelPerBeat;
     float barWidthPianoRoll ;//= timeSignature.getNumerator() * pixelPerBeatPianoRoll;
 

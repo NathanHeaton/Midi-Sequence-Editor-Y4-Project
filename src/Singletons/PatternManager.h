@@ -15,8 +15,6 @@ struct noteCoordinate {
 class PatternManager {
 public:
 
-
-
     static PatternManager& instance(){
         static PatternManager singleton;
         return singleton;
@@ -42,6 +40,12 @@ public:
     }
 
     size_t getPatternSize() {return pattern.size();}
+
+    void pitchShiftSelection(signed short t_pitchDelta) {
+    }
+
+    void timeShiftSelection(uint32_t t_timeDelta) {
+    }
 
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {

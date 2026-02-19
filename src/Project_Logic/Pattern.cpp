@@ -106,16 +106,22 @@ void Pattern::calculateSelection(const SelectionCoords &t_selection) {
     m_selectedNoteIDs.clear();
 
     float pixelPerTick = SessionData::instance().getPPQ() / SessionData::instance().getPixelPerBeat(zoomFactor::pianoRoll);
+    float noteHeight = SessionData::instance().getNoteHeight();
 
-    ImVec2 adjustedValuesP1 = {t_selection.selectP1.x * pixelPerTick, t_selection.selectP1.y};
-    ImVec2 adjustedValuesP2 = {t_selection.selectP2.x * pixelPerTick, t_selection.selectP2.y};
+    ImVec2 adjustedValuesP1 = {t_selection.selectP1.x * pixelPerTick,
+        t_selection.selectP1.y / noteHeight};
+    ImVec2 adjustedValuesP2 = {t_selection.selectP2.x * pixelPerTick,
+        t_selection.selectP2.y / noteHeight};
 
     for (auto& pair : m_noteEvents) {
         auto onX = static_cast<float>(m_events.at(pair.onIndex).getAbsoluteTime());
         auto offX = static_cast<float>(m_events.at(pair.offIndex).getAbsoluteTime());
+        auto onY = 127 - static_cast<float>(m_events.at(pair.onIndex).getPitch());
 
         if ((onX > adjustedValuesP1.x || offX > adjustedValuesP1.x) && onX < adjustedValuesP2.x) {
-            m_selectedNoteIDs.emplace(m_events.at(pair.onIndex).getID());
+            if (onY > adjustedValuesP1.y && onY+1  < adjustedValuesP2.y) {
+                m_selectedNoteIDs.emplace(m_events.at(pair.onIndex).getID());
+            }
         }
     }
 

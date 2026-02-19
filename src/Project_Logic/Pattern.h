@@ -50,6 +50,8 @@ public:
     void convertMidiTicksToPPQ();
     void setLastBar();
     void calculateSelection(const SelectionCoords &t_selection);
+    void pitchShiftSelection(signed short t_pitchDelta);
+    void timeShiftSelection(uint32_t t_timeDelta);
 
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
     void removeNote(uint8_t t_pitch, uint32_t absoluteTime);
