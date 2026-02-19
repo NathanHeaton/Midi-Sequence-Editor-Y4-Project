@@ -73,10 +73,8 @@ class MidiEvent {
         }
     }
 
-    void setDelta(uint32_t newDelta) {
-        m_delta = newDelta;
-    }
-
+    void setDelta(uint32_t newDelta) {m_delta = newDelta;}
+    void setAbsoluteTime(uint32_t newAbsoluteTime) {m_absoluteTime = newAbsoluteTime;}
     void setID(uint32_t newID) {m_ID = newID;}
 
     [[nodiscard]] uint8_t getPitch() const {

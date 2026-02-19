@@ -203,7 +203,69 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
     }
 }
 
-void Pattern::timeShiftSelection(uint32_t t_timeDelta) {
+void Pattern::timeShiftSelection(int32_t t_timeDelta) {
+    printf("changingtim%d\n",t_timeDelta);
+    for (const auto selectionID: m_selectedNoteIDs) {
+        for (const auto& pair: m_noteEvents) {
+            auto& onEvent =m_events.at(pair.onIndex);
+            if (selectionID == onEvent.getID()) {
+                auto& offEvent =m_events.at(pair.offIndex);
+                auto newAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
+                if (newAbsoluteTime < 0) newAbsoluteTime = 0u;
+
+                // onEvent.setAbsoluteTime(newAbsoluteTime);
+                // offEvent.setAbsoluteTime(newAbsoluteTime);
+                //
+                // size_t onInsertionIndex = 0;
+                // size_t endNoteI = 0;
+                // auto onDelta = onEvent.getDelta();
+                //
+                // for (onInsertionIndex = 0; onInsertionIndex < m_events.size(); onInsertionIndex++) {
+                //     if (m_events[onInsertionIndex].getAbsoluteTime() > newAbsoluteTime) {
+                //         break; // first note
+                //     }
+                // }
+                // if (onInsertionIndex == 0) {
+                //     onDelta = newAbsoluteTime;
+                //     m_events[onInsertionIndex].setDelta(m_events[onInsertionIndex].getAbsoluteTime() - newAbsoluteTime);
+                // } else {
+                //     onDelta = newAbsoluteTime - m_events[onInsertionIndex - 1].getAbsoluteTime();
+                //     if (onInsertionIndex < m_events.size()) {
+                //         m_events[onInsertionIndex].setDelta(
+                //             m_events[onInsertionIndex].getAbsoluteTime() - newAbsoluteTime
+                //         );
+                //     }
+                // }
+                // onEvent.setDelta(onDelta);
+                // onEvent.m_absoluteTime = newAbsoluteTime;
+                // m_events.erase(m_events.begin() + pair.onIndex);
+                // if (pair.onIndex < onInsertionIndex) {
+                // }
+
+                // m_events.insert(m_events.begin()+onInsertionIndex,noteOn);
+                // for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
+                //     if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
+                //         break;
+                //     }
+                // }
+                // if (endNoteI == 0) {
+                //     endDelta = offAbsoluteTime;
+                //     m_events[0].setDelta(m_events[0].m_absoluteTime - offAbsoluteTime);
+                // }
+                // else {
+                //     endDelta = offAbsoluteTime - m_events[endNoteI - 1].m_absoluteTime;
+                //     if (endNoteI < m_events.size()) {
+                //         m_events[endNoteI].setDelta(
+                //             m_events[endNoteI].m_absoluteTime - offAbsoluteTime
+                //         );
+                //     }
+                // }
+                //auto i = findInsertionPoint(onEvent.getAbsoluteTime());
 
 
+            }
+        }
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
 }

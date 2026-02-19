@@ -107,11 +107,24 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
 void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
     if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
         if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
-            std::cout << "pressed down+shift" << std::endl;
             PatternManager::instance().pitchShiftSelection(-1);
         }
         if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
             PatternManager::instance().pitchShiftSelection(+1);
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
+            PatternManager::instance().timeShiftSelection(-100);
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
+            PatternManager::instance().timeShiftSelection(+100);
+        }
+    }
+    if (ImGui::IsKeyDown(ImGuiMod_Ctrl)) {
+        if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
+            PatternManager::instance().pitchShiftSelection(-12);
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
+            PatternManager::instance().pitchShiftSelection(+12);
         }
     }
 }

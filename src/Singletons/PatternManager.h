@@ -45,7 +45,7 @@ public:
         pattern.at(activePattern).pitchShiftSelection(t_pitchDelta);
     }
 
-    void timeShiftSelection(uint32_t t_timeDelta) {
+    void timeShiftSelection(int32_t t_timeDelta) {
         pattern.at(activePattern).timeShiftSelection(t_timeDelta);
     }
 

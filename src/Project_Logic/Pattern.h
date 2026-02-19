@@ -51,7 +51,7 @@ public:
     void setLastBar();
     void calculateSelection(const SelectionCoords &t_selection);
     void pitchShiftSelection(signed short t_pitchDelta);
-    void timeShiftSelection(uint32_t t_timeDelta);
+    void timeShiftSelection(int32_t t_timeDelta);
 
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
     void removeNote(uint8_t t_pitch, uint32_t absoluteTime);
@@ -59,7 +59,7 @@ public:
     void removeSelection(noteCoordinate t_event);
     void removeSelection(std::vector<noteCoordinate> t_events);
 
-    size_t findInsertionPoint(uint32_t absoluteTime) {
+    [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime) {
         size_t i = 0;
         for (i; i < m_events.size(); i++) {
             if (m_events.at(i).m_absoluteTime > absoluteTime ) {
