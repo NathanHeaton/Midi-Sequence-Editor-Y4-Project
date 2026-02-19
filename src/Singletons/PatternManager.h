@@ -42,9 +42,11 @@ public:
     size_t getPatternSize() {return pattern.size();}
 
     void pitchShiftSelection(signed short t_pitchDelta) {
+        pattern.at(activePattern).pitchShiftSelection(t_pitchDelta);
     }
 
     void timeShiftSelection(uint32_t t_timeDelta) {
+        pattern.at(activePattern).timeShiftSelection(t_timeDelta);
     }
 
 

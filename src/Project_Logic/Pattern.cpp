@@ -1,4 +1,7 @@
 #include "Pattern.h"
+
+#include <algorithm>
+
 #include "../Singletons/SessionData.h"
 #include <iostream>
 #include <cmath>
@@ -185,3 +188,22 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta,
         m_noteEvents.clear();
         createNoteEventPairs();
     }
+
+
+void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
+    for (const auto selectionID: m_selectedNoteIDs) {
+        for (const auto& pair: m_noteEvents) {
+            auto& onEvent =m_events.at(pair.onIndex);
+            auto newPitch = std::clamp(onEvent.getPitch() + t_pitchDelta,0,127);
+            if (selectionID == onEvent.getID()) {
+                onEvent.setPitch(newPitch);
+                m_events.at(pair.offIndex).setPitch(newPitch);
+            }
+        }
+    }
+}
+
+void Pattern::timeShiftSelection(uint32_t t_timeDelta) {
+
+
+}

@@ -15,6 +15,28 @@ public:
     SessionData* s = &SessionData::instance();
     bool bg_tone = false;
 
+    void create(float &scrollY,float &scrollX, float& lengthX) {
+        if (ImGui::BeginChild("piano grid",ImVec2(0,0),
+            ImGuiChildFlags_None,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
+            TimelineContext ctx;
+
+            renderSteps(ctx);
+            HandleMouseInput(ctx);
+            HandleKeyboardInput(ctx);
+
+            ImGui::SetScrollX(scrollX);
+            ImGui::SetScrollY(scrollY);
+            auto& pattern = PatternManager::instance().getCurrentPattern();
+            lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+            ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
+        }
+        ImGui::EndChild();
+    }
+
+
+
+private:
+    const int octaves = 10;
     struct TimelineContext {
         ImVec2 cursorPos;
         ImDrawList* drawList;
@@ -52,34 +74,20 @@ public:
         }
     };
 
+    void renderSteps(const TimelineContext& ctx) {
+        DrawNoteGuides(ctx);
+        DrawBars(ctx);
+        DrawOctaveLines(ctx);
+        renderPattern(ctx);
+        DrawToolEffects(ctx);
+    }
+
     void HandleMouseInput(const TimelineContext& ctx);
+    void renderPattern(const TimelineContext& ctx);
+    void DrawToolEffects(const TimelineContext& ctx);
+    void HandleKeyboardInput(const TimelineContext& ctx);
 
-    void create(float &scrollY,float &scrollX, float& lengthX) {
-        if (ImGui::BeginChild("piano grid",ImVec2(0,0),
-            ImGuiChildFlags_None,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
-            TimelineContext ctx;
-            DrawNoteGuides(ctx);
-            DrawBars(ctx);
-            DrawOctaveLines(ctx);
-            HandleMouseInput(ctx);
-            renderPattern(ctx);
-            DrawToolEffects(ctx);
-            ImGui::SetScrollX(scrollX);
-            ImGui::SetScrollY(scrollY);
-            auto& pattern = PatternManager::instance().getCurrentPattern();
-            lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
-            ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
-        }
-        ImGui::EndChild();
-    }
-
-private:
-
-    const int octaves = 10;
-
-    bool checkIfBarStart(int beat) {
-        return beat % s->timeSignature.getNumerator() == 0;
-    }
+    bool checkIfBarStart(int beat) {return beat % s->timeSignature.getNumerator() == 0;}
 
     void DrawBars(auto& ctx) {
         int increment = s->timeSignature.getNumerator();
@@ -114,7 +122,6 @@ private:
         );
     }
 
-
     void DrawOctaveLines(const TimelineContext& ctx) {
         float octaveHeight = s->getWhiteSize().y *7;
         for (unsigned int i = 0; i < octaves; i++) {
@@ -128,10 +135,6 @@ private:
             );
         }
     }
-
-    void renderPattern(const TimelineContext& ctx);
-
-    void DrawToolEffects(const TimelineContext& ctx);
 
     void DrawNoteGuides(const TimelineContext& ctx) {
         float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;

@@ -7,40 +7,42 @@
 void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
     bool isHovered = ImGui::IsWindowHovered();
 
-    if (ctx.activeTool == EDIT) {
-        if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            int beat = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
-            int absoluteTime = beat * s->getPPQ();
-            int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-            pitch = std::clamp(pitch, 0, 127);
-            pitch = 127 - pitch;
-            int duration = s->getPPQ();
+    switch (ctx.activeTool) {
+        case EDIT:
+            if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                int beat = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
+                int absoluteTime = beat * s->getPPQ();
+                int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
+                pitch = std::clamp(pitch, 0, 127);
+                pitch = 127 - pitch;
+                int duration = s->getPPQ();
 
-            PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
-        }
-        if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
-            float beat = ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
-            int absoluteTime = beat * s->getPPQ();
-            int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-            pitch = std::clamp(pitch, 0, 127);
-            pitch = 127 - pitch;
+                PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
+            }
+            if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
+                float beat = ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
+                int absoluteTime = beat * s->getPPQ();
+                int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
+                pitch = std::clamp(pitch, 0, 127);
+                pitch = 127 - pitch;
 
-            noteCoordinate note_coordinate(pitch, absoluteTime);
-            PatternManager::instance().removeNoteFromPattern(note_coordinate);
+                noteCoordinate note_coordinate(pitch, absoluteTime);
+                PatternManager::instance().removeNoteFromPattern(note_coordinate);
 
-        }
-    }
-    if (ctx.activeTool == SELECT) {
-        if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            ToolManager::instance().setSelectionPoint1(ImVec2{ctx.relativeX, ctx.relativeY});
-        }
-        if (isHovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-            ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
-            PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
-        }
-        if (!isHovered && ToolManager::instance().isBoxSelecting()) {
-            ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
-        }
+            }
+            break;
+        case SELECT:
+            if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                ToolManager::instance().setSelectionPoint1(ImVec2{ctx.relativeX, ctx.relativeY});
+            }
+            if (isHovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+                ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
+                PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
+            }
+            if (!isHovered && ToolManager::instance().isBoxSelecting()) {
+                ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
+            }
+            break;
     }
 }
 
@@ -98,6 +100,18 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
                 p1Screen,
                 p2Screen,
                 Theme::currentThemeColours.barColourPacked, 0.0f);
+        }
+    }
+}
+
+void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
+    if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
+        if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
+            std::cout << "pressed down+shift" << std::endl;
+            PatternManager::instance().pitchShiftSelection(-1);
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
+            PatternManager::instance().pitchShiftSelection(+1);
         }
     }
 }
