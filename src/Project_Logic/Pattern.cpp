@@ -130,64 +130,63 @@ void Pattern::calculateSelection(const SelectionCoords &t_selection) {
 
 }
 
-void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id) {
-        uint8_t channel = 0;
-        uint8_t velocity = 127;
-        uint32_t onDelta = 0;
-        uint32_t offAbsoluteTime = absoluteTime + endDelta;
-        size_t startNoteI = 0;
-        size_t endNoteI = 0;
-        if (m_events.empty()) {
-            onDelta = absoluteTime;
-        }
-        else {
-            for (startNoteI = 0; startNoteI < m_events.size(); startNoteI++) {
-                if (m_events[startNoteI].getAbsoluteTime() > absoluteTime) {
-                    break; // first note
-                }
-            }
-            if (startNoteI == 0) {
-                onDelta = absoluteTime;
-                m_events[startNoteI].setDelta(m_events[startNoteI].getAbsoluteTime() - absoluteTime);
-            } else {
-                onDelta = absoluteTime - m_events[startNoteI - 1].getAbsoluteTime();
-                if (startNoteI < m_events.size()) {
-                    m_events[startNoteI].setDelta(
-                        m_events[startNoteI].getAbsoluteTime() - absoluteTime
-                    );
-                }
-            }
-        }
-        MidiEvent noteOn(onDelta,0x90,Note{t_pitch,velocity},channel);
-        noteOn.m_absoluteTime = absoluteTime;
-        noteOn.setID(t_id);
-        m_events.insert(m_events.begin()+startNoteI,noteOn);
-        for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
-            if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
-                break;
-            }
-        }
-        if (endNoteI == 0) {
-            endDelta = offAbsoluteTime;
-            m_events[0].setDelta(m_events[0].m_absoluteTime - offAbsoluteTime);
-        }
-        else {
-            endDelta = offAbsoluteTime - m_events[endNoteI - 1].m_absoluteTime;
-            if (endNoteI < m_events.size()) {
-                m_events[endNoteI].setDelta(
-                    m_events[endNoteI].m_absoluteTime - offAbsoluteTime
-                );
-            }
-        }
+// Finds the insertion index for an event at the given absolute time,
+// and adjusts the delta of the following event to maintain correct spacing.
+// Returns the index at which the new event should be inserted.
+size_t Pattern::findInsertionPoint(uint32_t absoluteTime) {
+    size_t index = 0;
 
-        MidiEvent noteOff(endDelta,0x80,Note{t_pitch,velocity},channel);
-
-        noteOff.m_absoluteTime = absoluteTime + endDelta;
-        m_events.insert(m_events.begin()+endNoteI,noteOff);
-        //TODO: change later to add specific note instead of recaluculating
-        m_noteEvents.clear();
-        createNoteEventPairs();
+    for (index = 0; index < m_events.size(); index++) {
+        if (m_events[index].getAbsoluteTime() > absoluteTime) {
+            break;
+        }
     }
+
+    if (index < m_events.size()) {
+        uint32_t followingDelta = m_events[index].getAbsoluteTime() - absoluteTime;
+        m_events[index].setDelta(followingDelta);
+    }
+
+    return index;
+}
+
+// Calculates the delta for a new event being inserted at the given index and absolute time.
+// Delta is relative to the preceding event, or absolute if there is no preceding event.
+
+uint32_t Pattern::calculateDelta(size_t insertionIndex, uint32_t absoluteTime) const {
+    if (insertionIndex == 0 || m_events.empty()) {
+        return absoluteTime;
+    }
+
+    return absoluteTime - m_events[insertionIndex - 1].getAbsoluteTime();
+}
+// Inserts a MidiEvent at the correct position in m_events based on its absolute time,
+// adjusting surrounding deltas to keep the sequence consistent.
+void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
+    size_t index    = findInsertionPoint(absoluteTime);
+    uint32_t delta  = calculateDelta(index, absoluteTime);
+
+    event.setDelta(delta);
+    event.m_absoluteTime = absoluteTime;
+
+    m_events.insert(m_events.begin() + index, event);
+}
+
+void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration, uint32_t t_id) {
+    const uint8_t channel  = 0;
+    const uint8_t velocity = 127;
+    const uint32_t offAbsoluteTime = absoluteTime + duration;
+
+    MidiEvent noteOn(0, 0x90, Note{t_pitch, velocity}, channel);
+    noteOn.setID(t_id);
+    insertEvent(noteOn, absoluteTime);
+
+    MidiEvent noteOff(0, 0x80, Note{t_pitch, velocity}, channel);
+    insertEvent(noteOff, offAbsoluteTime);
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
+}
 
 
 void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
@@ -212,56 +211,6 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
                 auto& offEvent =m_events.at(pair.offIndex);
                 auto newAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
                 if (newAbsoluteTime < 0) newAbsoluteTime = 0u;
-
-                // onEvent.setAbsoluteTime(newAbsoluteTime);
-                // offEvent.setAbsoluteTime(newAbsoluteTime);
-                //
-                // size_t onInsertionIndex = 0;
-                // size_t endNoteI = 0;
-                // auto onDelta = onEvent.getDelta();
-                //
-                // for (onInsertionIndex = 0; onInsertionIndex < m_events.size(); onInsertionIndex++) {
-                //     if (m_events[onInsertionIndex].getAbsoluteTime() > newAbsoluteTime) {
-                //         break; // first note
-                //     }
-                // }
-                // if (onInsertionIndex == 0) {
-                //     onDelta = newAbsoluteTime;
-                //     m_events[onInsertionIndex].setDelta(m_events[onInsertionIndex].getAbsoluteTime() - newAbsoluteTime);
-                // } else {
-                //     onDelta = newAbsoluteTime - m_events[onInsertionIndex - 1].getAbsoluteTime();
-                //     if (onInsertionIndex < m_events.size()) {
-                //         m_events[onInsertionIndex].setDelta(
-                //             m_events[onInsertionIndex].getAbsoluteTime() - newAbsoluteTime
-                //         );
-                //     }
-                // }
-                // onEvent.setDelta(onDelta);
-                // onEvent.m_absoluteTime = newAbsoluteTime;
-                // m_events.erase(m_events.begin() + pair.onIndex);
-                // if (pair.onIndex < onInsertionIndex) {
-                // }
-
-                // m_events.insert(m_events.begin()+onInsertionIndex,noteOn);
-                // for (endNoteI = 0; endNoteI < m_events.size(); endNoteI++) {
-                //     if (m_events[endNoteI].m_absoluteTime > offAbsoluteTime) {
-                //         break;
-                //     }
-                // }
-                // if (endNoteI == 0) {
-                //     endDelta = offAbsoluteTime;
-                //     m_events[0].setDelta(m_events[0].m_absoluteTime - offAbsoluteTime);
-                // }
-                // else {
-                //     endDelta = offAbsoluteTime - m_events[endNoteI - 1].m_absoluteTime;
-                //     if (endNoteI < m_events.size()) {
-                //         m_events[endNoteI].setDelta(
-                //             m_events[endNoteI].m_absoluteTime - offAbsoluteTime
-                //         );
-                //     }
-                // }
-                //auto i = findInsertionPoint(onEvent.getAbsoluteTime());
-
 
             }
         }
