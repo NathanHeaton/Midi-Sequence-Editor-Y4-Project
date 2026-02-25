@@ -49,7 +49,11 @@ public:
     }
 
     void timerCallback() override {
-        if (eventIndex >= pattern->m_events.size()) {
+        if (pattern != &PatternManager::instance().getCurrentPattern() ) {
+            DBG("stoping song");
+        }
+        if (eventIndex >= pattern->m_events.size() || pattern != &PatternManager::instance().getCurrentPattern()) {
+            offMessageForPlayingEvents();
             setPlaying(false);
             stopTimer();
             currentPatternElapsed = 0;

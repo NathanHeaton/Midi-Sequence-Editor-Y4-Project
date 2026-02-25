@@ -60,7 +60,21 @@ public:
     void deleteSelection();
     NoteEventPair findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime);
 
-    [[nodiscard]] std::vector<NoteEventPair> getSelectedNoteEvents();
+    // coverts selected on note ids into note events pairs
+    [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {
+        std::vector<NoteEventPair> events;
+        for (const auto selectionID: m_selectedNoteIDs) {
+            for (const auto& pair: m_noteEvents) {
+                auto onEvent = m_events.at(pair.onIndex);
+                if (selectionID == onEvent.getID()) {
+                    events.push_back(pair);
+                }
+            }
+        }
+        return events;
+    }
+
+
 
     [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime);
 

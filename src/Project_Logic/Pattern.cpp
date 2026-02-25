@@ -66,7 +66,7 @@ void Pattern::convertMidiTicksToPPQ() {
 
 NoteEventPair Pattern::findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime) {
     if (m_events.empty()) {
-        return NoteEventPair();
+        return NoteEventPair(0,0);
     }
     for (auto i{0u};i<m_noteEvents.size();i++){
         auto& note = m_noteEvents.at(i);
@@ -79,6 +79,7 @@ NoteEventPair Pattern::findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTi
             }
         }
     }
+    return NoteEventPair(0,0);
 
 }
 
@@ -86,34 +87,35 @@ void Pattern::removeNote(NoteEventPair notePair) {
     if (m_events.empty()) {
         return;
     }
-    // auto& note = findNoteBasedOnPoint(t_pitch, absoluteTime);
-    // auto& onNote = m_events.at(note.onIndex);
-    // auto& offNote = m_events.at(note.offIndex);
-    // if (onNote.m_absoluteTime <= absoluteTime &&
-    //     offNote.m_absoluteTime >= absoluteTime) {
-    //     if (onNote.getPitch() == t_pitch) {
-    //         auto onDelta = onNote.getDelta();
-    //         if (note.onIndex + 1 < m_events.size()) {
-    //             m_events[note.onIndex + 1].setDelta(m_events[note.onIndex + 1].getDelta() +onDelta );
-    //         }
-    //
-    //         auto offDelta = offNote.getDelta();
-    //         if (note.offIndex + 1 < m_events.size()) {
-    //             m_events[note.offIndex + 1].setDelta(m_events[note.offIndex + 1].getDelta() +offDelta );
-    //         }
-    //         //for m_events
-    //         m_events.erase(m_events.begin() + static_cast<int>(note.offIndex));
-    //         m_events.erase(m_events.begin() + static_cast<int>(note.onIndex));
-    //
-    //     }
-    //
-    //}
+     auto& onNote = m_events.at(notePair.onIndex);
+     auto& offNote = m_events.at(notePair.offIndex);
+     auto onDelta = onNote.getDelta();
+
+     if (notePair.onIndex + 1 < m_events.size()) {
+         std::cout<<"room in events"<<std::endl;
+         m_events[notePair.onIndex + 1].setDelta(m_events[notePair.onIndex + 1].getDelta() +onDelta );
+     }
+
+     auto offDelta = offNote.getDelta();
+     if (notePair.offIndex + 1 < m_events.size()) {
+         m_events[notePair.offIndex + 1].setDelta(m_events[notePair.offIndex + 1].getDelta() +offDelta );
+     }
+     //for m_events
+    std::cout<<"point 4"<<std::endl;
+     m_events.erase(m_events.begin() + static_cast<int>(notePair.offIndex));
+     m_events.erase(m_events.begin() + static_cast<int>(notePair.onIndex));
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
 }
 
 //void Pattern::adjust
 
 void Pattern::removeSelection(noteCoordinate event) {
     auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+    if (notePair.offIndex == 0 && notePair.onIndex == 0) {
+        return;
+    }
     removeNote(notePair);
     m_noteEvents.clear();
     createNoteEventPairs();
@@ -122,10 +124,31 @@ void Pattern::removeSelection(noteCoordinate event) {
 void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
     for (auto& event:events) {
         auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+        if (notePair.offIndex == 0 && notePair.onIndex == 0) {
+            return;
+        }
         removeNote(notePair);
     }
     m_noteEvents.clear();
     createNoteEventPairs();
+}
+
+void Pattern::deleteSelection() {
+    if (m_selectedNoteIDs.empty()) {
+        return;
+    }
+
+    //Todo: find better solution for deleting selection, more robust way of getting selected note ids as they are being updated
+    auto selectedNoteIndices = convertNoteIdsToNotePair();
+    for (auto i{0u};i<selectedNoteIndices.size();i++) {
+        std::cout<<"point 2"<<std::endl;
+        removeNote(selectedNoteIndices.at(i));
+        selectedNoteIndices = convertNoteIdsToNotePair();
+    }
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
 }
 
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {
@@ -227,6 +250,7 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
 }
 
 void Pattern::timeShiftSelection(int32_t t_timeDelta) {
+    //todo: fix note deltas changing after time shift past unselected notes
     for (const auto selectionID: m_selectedNoteIDs) {
         for (const auto& pair: m_noteEvents) {
             auto onEvent = m_events.at(pair.onIndex);
@@ -236,7 +260,7 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
                 auto OnAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
                 auto OffAbsoluteTime = static_cast<signed>(offEvent.getAbsoluteTime()) + t_timeDelta;
                 if (OnAbsoluteTime < 0) OnAbsoluteTime = 0u;
-                if (OffAbsoluteTime < 0) OffAbsoluteTime = 0u;
+                if (OffAbsoluteTime == OnAbsoluteTime+OffAbsoluteTime) OffAbsoluteTime -= t_timeDelta;
 
                 m_events.erase(m_events.begin() + static_cast<int>(pair.offIndex));
                 m_events.erase(m_events.begin() + static_cast<int>(pair.onIndex));
@@ -247,33 +271,4 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
     }
     m_noteEvents.clear();
     createNoteEventPairs();
-}
-
-std::vector<NoteEventPair> Pattern::getSelectedNoteEvents() {
-    std::vector<NoteEventPair> events;
-    for (const auto selectionID: m_selectedNoteIDs) {
-        for (const auto& pair: m_noteEvents) {
-            auto onEvent = m_events.at(pair.onIndex);
-            if (selectionID == onEvent.getID()) {
-                events.push_back(pair);
-            }
-        }
-    }
-    return events;
-}
-
-void Pattern::deleteSelection() {
-    if (m_selectedNoteIDs.empty()) {
-        return;
-    }
-    auto selectedNoteIndices = getSelectedNoteEvents();
-
-    for (const auto &selectedNoteIndice : selectedNoteIndices) {
-        auto onEvent = m_events.at(selectedNoteIndice.onIndex);
-        auto offEvent = m_events.at(selectedNoteIndice.offIndex);
-
-    }
-    m_noteEvents.clear();
-    createNoteEventPairs();
-
 }

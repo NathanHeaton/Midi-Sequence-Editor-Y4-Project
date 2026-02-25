@@ -44,8 +44,8 @@ private:
         float scrollX;
         float scrollY;
         float width;
-        int firstVisibleBeat;
-        int lastVisibleBeat;
+        int firstVisibleSubBeat;
+        int lastVisibleSubBeat;
         float barWidth;
         float noteHeight;
         float intialGap;
@@ -64,9 +64,11 @@ private:
             noteHeight = SessionData::instance().getNoteHeight();
             intialGap = (SessionData::instance().getWhiteSize().y * 5.0f)/8.0f;
             auto& session = SessionData::instance();
-            firstVisibleBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX / session.getPixelPerBeat(zoomFactor::pianoRoll)) : 0;
-            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::pianoRoll));
+            firstVisibleSubBeat = scrollX != 0.0f ?
+                static_cast<int>(scrollX /
+                    (session.getPixelPerBeat(pianoRoll)/ session.getRenderedSubDivisions())) : 0;
+            lastVisibleSubBeat = static_cast<int>((scrollX + width)
+                / (session.getPixelPerBeat(pianoRoll)/session.getRenderedSubDivisions()));
             ImVec2 mousePos = ImGui::GetMousePos();
             relativeX = mousePos.x - cursorPos.x;
             relativeY = mousePos.y - cursorPos.y;
@@ -87,38 +89,46 @@ private:
     void DrawToolEffects(const TimelineContext& ctx);
     void HandleKeyboardInput(const TimelineContext& ctx);
 
-    bool checkIfBarStart(int beat) {return beat % s->timeSignature.getNumerator() == 0;}
+    bool checkIfBarStart(int beat) {return beat % (s->timeSignature.getNumerator() * s->getRenderedSubDivisions()) == 0;}
+
+    bool checkIfSubDivision(int beat) {
+        bool value = true;
+        if (beat % s->timeSignature.getNumerator() == 0) {
+            value = false;
+        }
+        return value;
+    }
 
     void DrawBars(auto& ctx) {
         int increment = s->timeSignature.getNumerator();
         increment = increment*2;
         getCurrentBarCount(ctx);
-        for (int i = ctx.firstVisibleBeat; i <= ctx.lastVisibleBeat; i++) {
-            bool barStart = checkIfBarStart(i);
+        for (int i = ctx.firstVisibleSubBeat; i <= ctx.lastVisibleSubBeat; i++) {
             ImVec2 beatPosStart = ImVec2(
-                ctx.cursorPos.x + i * s->getPixelPerBeat(zoomFactor::pianoRoll),
-                barStart ? ctx.cursorPos.y : ctx.cursorPos.y
+                ctx.cursorPos.x + i * s->getPixelPerBeat(zoomFactor::pianoRoll)/s->getRenderedSubDivisions(),
+                 ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
 
-            DrawBarLine(ctx, beatPosStart, beatPosEnd, barStart);
+            ImU32 colour = Theme::currentThemeColours.beatColourPacked;
+            if (checkIfBarStart(i)){colour=Theme::currentThemeColours.barColourPacked;}
+            if (checkIfSubDivision(i)){colour=Theme::currentThemeColours.subBeatColourPacked;}
+
+            DrawBarLine(ctx, beatPosStart, beatPosEnd, colour);
         }
     }
 
     void getCurrentBarCount(const TimelineContext& ctx) {
         int increment = s->timeSignature.getNumerator();
         increment = increment*2;
-        if (ctx.firstVisibleBeat % increment == 0) {
+        if (ctx.firstVisibleSubBeat*s->getRenderedSubDivisions() % increment == 0) {
             bg_tone = !bg_tone;
         }
     }
 
-    void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, bool barStart) {
+    void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, ImU32 colour) {
         ctx.drawList->AddLine(
-            start, end,
-            barStart ? Theme::currentThemeColours.barColourPacked
-                     : Theme::currentThemeColours.beatColourPacked,
-            1.0f
+            start, end, colour,1.0f
         );
     }
 
@@ -142,8 +152,6 @@ private:
         bool whiteNote = true;
         int octaveNoteIndex = 0;
         int noteOffset = 5;
-        bool firstNote = true;
-
 
         for (auto i{0u}; i < notes; i++) {
             float yPos;
@@ -160,14 +168,13 @@ private:
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.beatColourPacked,
+                Theme::currentThemeColours.subBeatColourPacked,
                 1.0f
             );
             if (((octaveNoteIndex+noteOffset)% 12 < 7 || (octaveNoteIndex+noteOffset)%12 > 7) && (octaveNoteIndex+noteOffset)% 12 != 0 ) {
                 whiteNote= !whiteNote;
             }
             octaveNoteIndex++;
-            firstNote = false;
         }
     }
 };

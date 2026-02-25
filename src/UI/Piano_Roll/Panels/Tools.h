@@ -67,13 +67,13 @@ public:
         if (ImGui::ImageButton("zoom_in",
             (void*)(intptr_t)ASSETS.zoomIn.textureID,
             ImVec2(32, 32))) {
-            zoomFactor::pianoRoll += 0.15;
+            zoomFactor::pianoRoll += pianoRoll * 0.15;
             }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("zoom_out",
             (void*)(intptr_t)ASSETS.zoomOut.textureID,
             ImVec2(32, 32))) {
-            zoomFactor::pianoRoll -= 0.15;
+            zoomFactor::pianoRoll -= pianoRoll * 0.15;
             }
         ImGui::TableNextColumn();
         ImGui::EndTable();

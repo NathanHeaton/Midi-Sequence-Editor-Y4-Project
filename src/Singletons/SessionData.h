@@ -16,7 +16,7 @@ inline namespace Division {
 
 inline namespace zoomFactor {
     inline float arranger = 1.0f;
-    inline float pianoRoll = 2.2f;
+    inline float pianoRoll = 3.2f;
 }
 
 
@@ -70,6 +70,7 @@ public:
     [[nodiscard]] ImVec2 getWhiteSize() const { return WHITE_SIZE; }
     [[nodiscard]] ImVec2 getBlackSize() const { return BLACK_SIZE; }
     [[nodiscard]] float getNoteHeight() const { return noteHeight; }
+    [[nodiscard]] int getRenderedSubDivisions() const { return renderedSubDvivsions; }
 
     // Setters
     void setBPM(int newBPM) {        BPM = newBPM;    }
@@ -85,6 +86,7 @@ public:
     void addTrack() {TrackAmount++;}
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
+    void setRenderedSubDivisions(int newDivisions) {renderedSubDvivsions = newDivisions;}
 
     TimeSignature timeSignature{4, 4};
 
@@ -104,6 +106,7 @@ private:
     float pixelPerBeat = 30.0f;
     float TrackHeight = 100.0f;
 
+
     int WHITE_KEYS{75};
     int BLACK_KEYS{53};
 
@@ -113,6 +116,8 @@ private:
     float noteHeight = WHITE_SIZE.y * 7 /12;
     float barWidth = timeSignature.getNumerator() * pixelPerBeat;
     float barWidthPianoRoll ;//= timeSignature.getNumerator() * pixelPerBeatPianoRoll;
+
+    int renderedSubDvivsions = 4;
 
     float Black_Gap{WHITE_SIZE.y - BLACK_SIZE.y / 2};
 

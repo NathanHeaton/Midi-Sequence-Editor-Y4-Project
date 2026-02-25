@@ -64,7 +64,9 @@ public:
         pattern.at(activePattern).removeSelection(coords);
     }
 
-    void setCurrentPattern(size_t newPattern) {activePattern = newPattern;}
+    void setCurrentPattern(size_t newPattern) {
+        activePattern = newPattern;
+    }
 
     void setSelection(const SelectionCoords &t_selection) {
         pattern.at(activePattern).calculateSelection(t_selection);
