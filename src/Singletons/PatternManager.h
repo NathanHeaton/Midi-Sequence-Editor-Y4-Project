@@ -49,6 +49,10 @@ public:
         pattern.at(activePattern).timeShiftSelection(t_timeDelta);
     }
 
+    void deleteSelection() {
+        pattern.at(activePattern).deleteSelection();
+    }
+
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
         pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());

@@ -43,6 +43,8 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
                 ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
             }
             break;
+
+
     }
 }
 
@@ -123,8 +125,21 @@ void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
         if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
             PatternManager::instance().pitchShiftSelection(-12);
         }
-        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
+        else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
             PatternManager::instance().pitchShiftSelection(+12);
         }
+        else if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
+            PatternManager::instance().pitchShiftSelection(-120);
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
+            PatternManager::instance().pitchShiftSelection(+120);
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_Z)) {
+
+        }
     }
+    if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+        PatternManager::instance().deleteSelection();
+    }
+
 }

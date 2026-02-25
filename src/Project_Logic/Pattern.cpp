@@ -5,6 +5,8 @@
 #include "../Singletons/SessionData.h"
 #include <iostream>
 #include <cmath>
+#include <ranges>
+
 #include "../Singletons/ToolManager.h"
 #include "../Singletons/PatternManager.h"
 //
@@ -62,44 +64,65 @@ void Pattern::convertMidiTicksToPPQ() {
     }
 }
 
-void Pattern::removeNote(uint8_t t_pitch, uint32_t absoluteTime) {
+NoteEventPair Pattern::findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime) {
     if (m_events.empty()) {
-        return;
+        return NoteEventPair();
     }
     for (auto i{0u};i<m_noteEvents.size();i++){
         auto& note = m_noteEvents.at(i);
         auto& onNote = m_events.at(note.onIndex);
         auto& offNote = m_events.at(note.offIndex);
-        if (onNote.m_absoluteTime < absoluteTime &&
-            offNote.m_absoluteTime > absoluteTime) {
+        if (onNote.m_absoluteTime <= absoluteTime &&
+            offNote.m_absoluteTime >= absoluteTime) {
             if (onNote.getPitch() == t_pitch) {
-                auto onDelta = onNote.getDelta();
-                if (note.onIndex + 1 < m_events.size()) {
-                    m_events[note.onIndex + 1].setDelta(m_events[note.onIndex + 1].getDelta() +onDelta );
-                }
-
-                auto offDelta = offNote.getDelta();
-                if (note.offIndex + 1 < m_events.size()) {
-                    m_events[note.offIndex + 1].setDelta(m_events[note.offIndex + 1].getDelta() +offDelta );
-                }
-                //for m_events
-                m_events.erase(m_events.begin() + note.offIndex);
-                m_events.erase(m_events.begin() + note.onIndex);
-                break;
+                return note;
             }
-            }
+        }
     }
+
 }
 
+void Pattern::removeNote(NoteEventPair notePair) {
+    if (m_events.empty()) {
+        return;
+    }
+    // auto& note = findNoteBasedOnPoint(t_pitch, absoluteTime);
+    // auto& onNote = m_events.at(note.onIndex);
+    // auto& offNote = m_events.at(note.offIndex);
+    // if (onNote.m_absoluteTime <= absoluteTime &&
+    //     offNote.m_absoluteTime >= absoluteTime) {
+    //     if (onNote.getPitch() == t_pitch) {
+    //         auto onDelta = onNote.getDelta();
+    //         if (note.onIndex + 1 < m_events.size()) {
+    //             m_events[note.onIndex + 1].setDelta(m_events[note.onIndex + 1].getDelta() +onDelta );
+    //         }
+    //
+    //         auto offDelta = offNote.getDelta();
+    //         if (note.offIndex + 1 < m_events.size()) {
+    //             m_events[note.offIndex + 1].setDelta(m_events[note.offIndex + 1].getDelta() +offDelta );
+    //         }
+    //         //for m_events
+    //         m_events.erase(m_events.begin() + static_cast<int>(note.offIndex));
+    //         m_events.erase(m_events.begin() + static_cast<int>(note.onIndex));
+    //
+    //     }
+    //
+    //}
+}
+
+//void Pattern::adjust
+
 void Pattern::removeSelection(noteCoordinate event) {
-    removeNote(event.pitch,event.absoluteTime);
+    auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+    removeNote(notePair);
     m_noteEvents.clear();
     createNoteEventPairs();
 }
 
 void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
-    for (auto it{events.begin()};it< events.end();it++) {
-        removeNote(it->pitch, it->absoluteTime);
+    for (auto& event:events) {
+        auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+        removeNote(notePair);
     }
     m_noteEvents.clear();
     createNoteEventPairs();
@@ -160,6 +183,7 @@ uint32_t Pattern::calculateDelta(size_t insertionIndex, uint32_t absoluteTime) c
 
     return absoluteTime - m_events[insertionIndex - 1].getAbsoluteTime();
 }
+
 // Inserts a MidiEvent at the correct position in m_events based on its absolute time,
 // adjusting surrounding deltas to keep the sequence consistent.
 void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
@@ -203,18 +227,53 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
 }
 
 void Pattern::timeShiftSelection(int32_t t_timeDelta) {
-    printf("changingtim%d\n",t_timeDelta);
     for (const auto selectionID: m_selectedNoteIDs) {
         for (const auto& pair: m_noteEvents) {
-            auto& onEvent =m_events.at(pair.onIndex);
+            auto onEvent = m_events.at(pair.onIndex);
             if (selectionID == onEvent.getID()) {
-                auto& offEvent =m_events.at(pair.offIndex);
-                auto newAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
-                if (newAbsoluteTime < 0) newAbsoluteTime = 0u;
+                auto offEvent = m_events.at(pair.offIndex);
 
+                auto OnAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
+                auto OffAbsoluteTime = static_cast<signed>(offEvent.getAbsoluteTime()) + t_timeDelta;
+                if (OnAbsoluteTime < 0) OnAbsoluteTime = 0u;
+                if (OffAbsoluteTime < 0) OffAbsoluteTime = 0u;
+
+                m_events.erase(m_events.begin() + static_cast<int>(pair.offIndex));
+                m_events.erase(m_events.begin() + static_cast<int>(pair.onIndex));
+                insertEvent(onEvent, static_cast<unsigned>(OnAbsoluteTime));
+                insertEvent(offEvent, static_cast<unsigned>(OffAbsoluteTime));
             }
         }
     }
     m_noteEvents.clear();
     createNoteEventPairs();
+}
+
+std::vector<NoteEventPair> Pattern::getSelectedNoteEvents() {
+    std::vector<NoteEventPair> events;
+    for (const auto selectionID: m_selectedNoteIDs) {
+        for (const auto& pair: m_noteEvents) {
+            auto onEvent = m_events.at(pair.onIndex);
+            if (selectionID == onEvent.getID()) {
+                events.push_back(pair);
+            }
+        }
+    }
+    return events;
+}
+
+void Pattern::deleteSelection() {
+    if (m_selectedNoteIDs.empty()) {
+        return;
+    }
+    auto selectedNoteIndices = getSelectedNoteEvents();
+
+    for (const auto &selectedNoteIndice : selectedNoteIndices) {
+        auto onEvent = m_events.at(selectedNoteIndice.onIndex);
+        auto offEvent = m_events.at(selectedNoteIndice.offIndex);
+
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
 }

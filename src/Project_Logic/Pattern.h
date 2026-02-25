@@ -15,14 +15,13 @@ class SessionData;
 
 struct noteCoordinate;
 struct SelectionCoords;
+struct NoteEventPair {
+    size_t onIndex;
+    size_t offIndex;
+};
 
 class Pattern {
 public:
-    struct NoteEventPair {
-        size_t onIndex;
-        size_t offIndex;
-    };
-
     float m_barLength;
     std::string m_title;
 
@@ -54,10 +53,14 @@ public:
     void timeShiftSelection(int32_t t_timeDelta);
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
-    void removeNote(uint8_t t_pitch, uint32_t absoluteTime);
+    void removeNote(NoteEventPair notePair );
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
     void removeSelection(noteCoordinate t_event);
     void removeSelection(std::vector<noteCoordinate> t_events);
+    void deleteSelection();
+    NoteEventPair findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime);
+
+    [[nodiscard]] std::vector<NoteEventPair> getSelectedNoteEvents();
 
     [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime);
 
