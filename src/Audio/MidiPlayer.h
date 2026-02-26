@@ -59,14 +59,14 @@ public:
             currentPatternElapsed = 0;
             return;
         }
-        double elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
-        double msPerTick = (60000.0 / static_cast<double>(SessionData::instance().getBPM())) / SessionData::instance().getPPQ();
+        m_elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
+        double msPerTick = (60000.0 / SessionData::instance().getBPM()) / SessionData::instance().getPPQ();
 
         auto& event = pattern->m_events[eventIndex];
 
         double eventInMs = msPerTick * static_cast<double>(event.getAbsoluteTime());
 
-        if (elapsed >= eventInMs) {
+        if (m_elapsed >= eventInMs) {
             juce::MidiMessage note;
             if (event.isNoteOff()) {
                 note = juce::MidiMessage::noteOff(event.getChannel(), event.getPitch());
@@ -85,9 +85,14 @@ public:
             eventIndex++;
         }
         if (!isPlaying()) {
-            currentPatternElapsed += elapsed;
+            currentPatternElapsed = m_elapsed * SessionData::instance().getBPM();
             stopTimer();
         }
+    }
+
+    double getCurrentPositionTicks() const {
+        double ticks = m_elapsed / ( 60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
+        return ticks;
     }
 
     void removePlayedEvents(auto& event) {
@@ -118,6 +123,7 @@ private:
     std::unique_ptr<juce::MidiOutput> midiOutput;
     const Pattern* pattern = nullptr;
     size_t eventIndex = 0;
+    double m_elapsed;
     double startTime = 0;
     double currentPatternElapsed = 0;
     bool* m_playingPtr{nullptr};

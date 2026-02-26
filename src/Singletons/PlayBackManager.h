@@ -17,6 +17,10 @@ class PlayBackManager {
         return m_playing;
     }
 
+    [[nodiscard]] double getPlayheadPositionTicks() const {
+        return player.getCurrentPositionTicks();
+    }
+
     void shutDown() {
         player.cleanUp();
     }

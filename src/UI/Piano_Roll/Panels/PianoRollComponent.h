@@ -7,6 +7,7 @@
 #include "../../../Singletons/SessionData.h"
 #include "../../../Singletons/PatternManager.h"
 #include "../../../Singletons/ToolManager.h"
+#include "../../../Singletons/PlayBackManager.h"
 
 class PianoRollComponent
 {
@@ -82,12 +83,23 @@ private:
         DrawOctaveLines(ctx);
         renderPattern(ctx);
         DrawToolEffects(ctx);
+        DrawPlayHead(ctx);
     }
 
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx);
     void DrawToolEffects(const TimelineContext& ctx);
     void HandleKeyboardInput(const TimelineContext& ctx);
+
+    void DrawPlayHead(const TimelineContext& ctx) {
+
+        float xPos = ctx.cursorPos.x + s->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPlayheadPositionTicks()/s->getPPQ());
+
+        ctx.drawList->AddLine(ImVec2(xPos,ctx.cursorPos.y+ 0),
+        ImVec2(xPos,ctx.cursorPos.y+ ctx.height),
+        Theme::currentThemeColours.barColourPacked, 5
+            );
+    }
 
     bool checkIfBarStart(int beat) {return beat % (s->timeSignature.getNumerator() * s->getRenderedSubDivisions()) == 0;}
 

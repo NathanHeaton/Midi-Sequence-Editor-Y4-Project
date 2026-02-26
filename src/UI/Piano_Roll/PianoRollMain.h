@@ -27,8 +27,9 @@ public:
 
     PianoRollMain() = default;
 
-    float pianoRollScrollY;
+    float pianoRollScrollY = 300.0f;
     float pianoRollScrollX;
+    bool intialLoad = true;
 
     void create() {
         if (ImGui::Begin("pianoRollComponent", nullptr, ImGuiWindowFlags_NoMove)) {
@@ -58,8 +59,10 @@ public:
                 ImGui::TableNextColumn();
                 pianoRoll.create(pianoRollScrollY,timelineXScroll, timelineLength);
                 ImGui::TableNextColumn();
+
                 if (ImGui::BeginChild("custom_scroll", ImVec2(15, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
                     ImGui::Dummy(ImVec2(15, SessionData::instance().getWhiteKeys() * SessionData::instance().getWhiteSize().y));
+                    if (intialLoad)  ImGui::SetScrollY(SessionData::instance().getNoteHeight()* 48); intialLoad = false;
                     pianoRollScrollY = ImGui::GetScrollY();
                 }ImGui::EndChild();
             }ImGui::EndTable();
