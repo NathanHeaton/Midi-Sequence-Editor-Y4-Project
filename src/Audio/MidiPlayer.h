@@ -85,14 +85,19 @@ public:
             eventIndex++;
         }
         if (!isPlaying()) {
-            currentPatternElapsed = m_elapsed * SessionData::instance().getBPM();
+            currentPatternElapsed = m_elapsed;
             stopTimer();
         }
     }
 
-    double getCurrentPositionTicks() const {
-        double ticks = m_elapsed / ( 60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
+    [[nodiscard]] double getCurrentPositionTicks() const {
+        double ticks = m_elapsed / (60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
         return ticks;
+    }
+
+    void setElapsedTime(unsigned int ticks) {
+        m_elapsed = ticks * (60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
+        currentPatternElapsed = m_elapsed;
     }
 
     void removePlayedEvents(auto& event) {

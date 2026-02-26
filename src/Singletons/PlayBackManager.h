@@ -30,9 +30,14 @@ class PlayBackManager {
         if (m_playing) {player.playCurrentPattern();}
         else{ player.pauseCurrentPattern();}
     }
+
     void setPlaying(bool playing) {
         m_playing = playing;
 
+    }
+
+    void setPlayHeadPositionTicks(unsigned int ticks) {
+        player.setElapsedTime(ticks);
     }
     private:
 
