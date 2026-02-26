@@ -70,7 +70,7 @@ public:
     [[nodiscard]] ImVec2 getWhiteSize() const { return WHITE_SIZE; }
     [[nodiscard]] ImVec2 getBlackSize() const { return BLACK_SIZE; }
     [[nodiscard]] float getNoteHeight() const { return noteHeight; }
-    [[nodiscard]] int getRenderedSubDivisions() const { return renderedSubDvivsions; }
+    [[nodiscard]] int getRenderedSubDivisions() const { return renderedSubDivisions; }
 
     // Setters
     void setBPM(int newBPM) {        BPM = newBPM;    }
@@ -86,7 +86,7 @@ public:
     void addTrack() {TrackAmount++;}
     void setTrackAmount(int newTrackAmount) {TrackAmount = newTrackAmount;}
 
-    void setRenderedSubDivisions(int newDivisions) {renderedSubDvivsions = newDivisions;}
+    void setRenderedSubDivisions(int newDivisions) {renderedSubDivisions = newDivisions;}
 
     TimeSignature timeSignature{4, 4};
 
@@ -117,7 +117,7 @@ private:
     float barWidth = timeSignature.getNumerator() * pixelPerBeat;
     float barWidthPianoRoll ;//= timeSignature.getNumerator() * pixelPerBeatPianoRoll;
 
-    int renderedSubDvivsions = 4;
+    int renderedSubDivisions = 4;
 
     float Black_Gap{WHITE_SIZE.y - BLACK_SIZE.y / 2};
 

@@ -23,7 +23,9 @@ public:
         if (ImGui::ImageButton("snapping",
             (void*)(intptr_t)ASSETS.divisionSnapIcon.textureID,
             ImVec2(32, 32))) {
+            ImGui::OpenPopup("SnapPopup");
             }
+        DivisionPopUp();
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("edit_button",
             (void*)(intptr_t)ASSETS.editIcon.textureID,
@@ -80,6 +82,21 @@ public:
         ImGui::Separator();
     }
 
+    void DivisionPopUp() {
+        if (ImGui::BeginPopup("SnapPopup"))
+        {
+            static const char* snapOptions[] = { "beat","1/2 beat", "1/3 beat", "1/16", "1/32", "1/64" };
+
+            for (int i = 0; i < IM_ARRAYSIZE(snapOptions); i++)
+            {
+                if (ImGui::Selectable(snapOptions[i]))
+                {
+                //    SessionData::instance().setRenderedSubDivisions(i);
+                }
+            }
+            ImGui::EndPopup();
+        }
+    }
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Tools)
 };

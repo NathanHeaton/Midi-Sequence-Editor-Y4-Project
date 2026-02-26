@@ -10,8 +10,8 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
     switch (ctx.activeTool) {
         case EDIT:
             if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                int beat = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll));
-                int absoluteTime = beat * s->getPPQ();
+                int noteTime = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll) *s->getRenderedSubDivisions());
+                int absoluteTime = noteTime * (static_cast<float>(s->getPPQ())/s->getRenderedSubDivisions());
                 int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
                 pitch = std::clamp(pitch, 0, 127);
                 pitch = 127 - pitch;
