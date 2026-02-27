@@ -3,13 +3,14 @@
 //
 #pragma once
 #include "imgui.h"
-#include "../../Singletons/SessionData.h"
+#include "../../Singletons/ViewState.h"
+#include "../../Singletons/ProjectData.h"
 #include "../../Theme.h"
 
 class Timeline {
 public:
     Timeline() = default;
-    SessionData* s = &SessionData::instance();
+    ViewState* s = &ViewState::instance();
 
     bool bg_tone{true};
     int barBackgroundCount{0};
@@ -30,8 +31,8 @@ public:
             height = ImGui::GetWindowHeight();
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
-            barWidth = SessionData::instance().getPixelPerBar(zoomFactor::arranger);
-            auto& session = SessionData::instance();
+            barWidth = ViewState::instance().getPixelPerBar(zoomFactor::arranger);
+            auto& session = ViewState::instance();
             firstVisibleBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX / session.getPixelPer(Division::QUARTER_NOTE, zoomFactor::arranger)) : 0;
             lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::arranger));
@@ -41,19 +42,19 @@ public:
 
     void createTimeline(float &timelineLength, float &xScroll) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * s->getTrackAmount()),
+        if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * ProjectData::instance().getTrackAmount()),
             false,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
             DrawBars();
             DrawTrackSeparator();
-            if (timelineLength < SessionData::instance().getPixelPerBar(zoomFactor::arranger)* 60) {
+            if (timelineLength < s->getPixelPerBar(zoomFactor::arranger)* 60) {
                 if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
-                    s->setTotalBars(s->getTotalBars()+ 4);
-                    timelineLength = s->getTotalBars() * s->getPixelPerBar(zoomFactor::arranger);
+                    ProjectData::instance().setTotalBars(ProjectData::instance().getTotalBars()+ 4);
+                    timelineLength = ProjectData::instance().getTotalBars() * s->getPixelPerBar(zoomFactor::arranger);
                 }
             }
             xScroll = ImGui::GetScrollX();
-            ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * s->getTrackAmount()));
+            ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * ProjectData::instance().getTrackAmount()));
 
         }
         ImGui::EndChild();
@@ -61,13 +62,13 @@ public:
     }
 
     bool checkIfBarStart(int beat) {
-        return beat % s->timeSignature.getNumerator() == 0;
+        return beat % TimeData::instance().timeSignature.getNumerator() == 0;
     }
 
     void DrawBars() {
         TimelineContext ctx;
 
-        int increment = s->timeSignature.getNumerator();
+        int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
 
         getCurrentBarCount(ctx);
@@ -85,7 +86,7 @@ public:
     }
 
     void getCurrentBarCount(const TimelineContext& ctx) {
-        int increment = s->timeSignature.getNumerator();
+        int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
         if (ctx.firstVisibleBeat % increment == 0) {
             bg_tone = !bg_tone;
@@ -94,7 +95,7 @@ public:
     }
 
     void DrawBarBackgrounds(const TimelineContext& ctx) {
-        int beatsPerBackground = s->timeSignature.getNumerator() * 2;
+        int beatsPerBackground = TimeData::instance().timeSignature.getNumerator() * 2;
         int firstBackgroundBeat = (ctx.firstVisibleBeat / beatsPerBackground) * beatsPerBackground;
         int backgroundIndex = firstBackgroundBeat / beatsPerBackground;
         bg_tone = (backgroundIndex % 2) == 0;
@@ -134,7 +135,7 @@ public:
     void DrawTrackSeparator() {
         TimelineContext ctx;
 
-        for (unsigned int i = 0; i < s->getTrackAmount(); i++) {
+        for (unsigned int i = 0; i < ProjectData::instance().getTrackAmount(); i++) {
             float yPos = ctx.cursorPos.y + i * s->getTrackHeight();
 
             ctx.drawList->AddLine(

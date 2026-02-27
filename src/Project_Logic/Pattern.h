@@ -11,7 +11,7 @@
 
 #include "../MIDI_Logic/MIDI_Events/MidiEvent.h"
 
-class SessionData;
+class TimeData;
 
 struct noteCoordinate;
 struct SelectionCoords;

@@ -6,6 +6,7 @@
 #include "../../../SetupAssets.h"
 #include "../../../Singletons/PlayBackManager.h"
 #include "../../../Singletons/ToolManager.h"
+#include "../../../Singletons/ViewState.h"
 
 class Tools: public juce::Component
 {
@@ -85,13 +86,14 @@ public:
     void DivisionPopUp() {
         if (ImGui::BeginPopup("SnapPopup"))
         {
-            static const char* snapOptions[] = { "beat","1/2 beat", "1/3 beat", "1/16", "1/32", "1/64" };
+            static const char* snapOptions[] = { "beat","1/2 beat", "1/3 beat", "1/4 beat", "1/5 beat",
+                "1/6 beat", "1/8 beat","1/12 beat","1/16 beat","1/24 beat","1/32 beat", "free place" };
 
             for (int i = 0; i < IM_ARRAYSIZE(snapOptions); i++)
             {
                 if (ImGui::Selectable(snapOptions[i]))
                 {
-                //    SessionData::instance().setRenderedSubDivisions(i);
+                    ViewState::instance().setSnapSubDivisions(i);
                 }
             }
             ImGui::EndPopup();

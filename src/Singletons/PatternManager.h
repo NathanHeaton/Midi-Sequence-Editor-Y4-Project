@@ -111,7 +111,7 @@ public:
     uint32_t assignNoteId() { return m_nextNoteId++; }
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {
-        for (auto event : events) {
+        for (auto& event : events) {
             event.setID(assignNoteId());
         }
     }

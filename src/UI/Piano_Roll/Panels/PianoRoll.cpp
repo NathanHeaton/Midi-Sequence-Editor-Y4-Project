@@ -10,18 +10,19 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
     switch (ctx.activeTool) {
         case EDIT:
             if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                int noteTime = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll) *s->getRenderedSubDivisions());
-                int absoluteTime = noteTime * (static_cast<float>(s->getPPQ())/s->getRenderedSubDivisions());
+                int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(zoomFactor::pianoRoll) *view_state->getSnappedSubDivisions());
+
+                int absoluteTime = noteTime * (static_cast<float>(TimeData::instance().PPQ)/view_state->getSnappedSubDivisions());
                 int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
                 pitch = std::clamp(pitch, 0, 127);
                 pitch = 127 - pitch;
-                int duration = s->getPPQ();
+                int duration = TimeData::instance().PPQ;
 
                 PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
             }
             if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
-                float beat = ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
-                int absoluteTime = beat * s->getPPQ();
+                float beat = ctx.relativeX / view_state->getPixelPerBeat(zoomFactor::pianoRoll);
+                int absoluteTime = beat * TimeData::instance().PPQ;
                 int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
                 pitch = std::clamp(pitch, 0, 127);
                 pitch = 127 - pitch;
@@ -43,13 +44,14 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
                 ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
             }
             break;
-
-
+        default:
+         break;
     }
 }
 
 
-void PianoRollComponent::renderPattern(const TimelineContext& ctx) {
+void PianoRollComponent::renderPattern(const TimelineContext& ctx) const
+{
     auto& pattern = PatternManager::instance().getCurrentPattern();
     auto& noteData = pattern.m_events;
 
@@ -59,14 +61,14 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) {
 
         float startDelta =0;
         if (onIndex.m_absoluteTime != 0){startDelta =
-            static_cast<float>(onIndex.m_absoluteTime) / s->getPPQ();}
+            static_cast<float>(onIndex.m_absoluteTime) / TimeData::instance().PPQ;}
 
         float endDelta=0;
         if (offIndex.m_absoluteTime != 0){endDelta =
-            static_cast<float>(offIndex.m_absoluteTime) / s->getPPQ();}
+            static_cast<float>(offIndex.m_absoluteTime) / TimeData::instance().PPQ;}
 
-        float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
-        float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
+        float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
+        float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
         auto pitch =  noteData.at(noteIndices.onIndex).getPitch();
 
         float yStart = ctx.cursorPos.y + ( ctx.height - ((noteData.at(noteIndices.onIndex).getPitch()+1)*ctx.noteHeight));
@@ -92,8 +94,8 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
     if (ctx.activeTool == SELECT) {
         if (ToolManager::instance().isBoxSelecting()) {
             ImVec2 p1 = ToolManager::instance().getSelectionPoint1();
-            ImVec2 p1Screen = ImVec2(p1.x + ctx.cursorPos.x, p1.y + ctx.cursorPos.y);
-            ImVec2 p2Screen = ImVec2(
+            const ImVec2 p1Screen = ImVec2(p1.x + ctx.cursorPos.x, p1.y + ctx.cursorPos.y);
+            const ImVec2 p2Screen = ImVec2(
                 ctx.relativeX + ctx.cursorPos.x,
                 ctx.relativeY + ctx.cursorPos.y
             );
