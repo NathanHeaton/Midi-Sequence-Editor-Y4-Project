@@ -9,26 +9,27 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
 
     switch (ctx.activeTool) {
         case EDIT:
-            if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            if (isHovered && ImGui::IsAnyMouseDown()) {
                 int noteTime = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll) *s->getRenderedSubDivisions());
                 int absoluteTime = noteTime * (static_cast<float>(s->getPPQ())/s->getRenderedSubDivisions());
                 int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
                 pitch = std::clamp(pitch, 0, 127);
                 pitch = 127 - pitch;
-                int duration = s->getPPQ();
-
-                PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
-            }
-            if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
-                float beat = ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll);
-                int absoluteTime = beat * s->getPPQ();
-                int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-                pitch = std::clamp(pitch, 0, 127);
-                pitch = 127 - pitch;
-
-                noteCoordinate note_coordinate(pitch, absoluteTime);
-                PatternManager::instance().removeNoteFromPattern(note_coordinate);
-
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                    auto noteHoverState = PatternManager::instance().getNoteHoverState();
+                    if (noteHoverState == NoteCenterHover) {
+                        moveNote(ctx);
+                    }
+                    else if (noteHoverState == NoteCenterHover) {
+                        stretchNote(ctx);
+                    }
+                    else {
+                        placeNote(ctx,pitch,absoluteTime);
+                    }
+                }
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                    removeNote(ctx,pitch,absoluteTime);
+                }
             }
             break;
         case SELECT:
@@ -46,6 +47,25 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
 
 
     }
+}
+
+void PianoRollComponent::placeNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime) {
+    int duration = s->getPPQ();
+    PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
+}
+
+void PianoRollComponent::removeNote(const TimelineContext &ctx, uint8_t pitch, uint32_t absoluteTime) {
+    noteCoordinate note_coordinate(pitch, absoluteTime);
+    PatternManager::instance().removeNoteFromPattern(note_coordinate);
+
+}
+
+void PianoRollComponent::moveNote(const TimelineContext &ctx) {
+
+}
+
+void PianoRollComponent::stretchNote(const TimelineContext &ctx) {
+
 }
 
 

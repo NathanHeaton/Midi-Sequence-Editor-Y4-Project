@@ -272,3 +272,8 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
     m_noteEvents.clear();
     createNoteEventPairs();
 }
+
+NoteHoverState Pattern::getHoveredNotePoint() {
+
+
+}

@@ -12,6 +12,12 @@ struct noteCoordinate {
     uint32_t absoluteTime;
 };
 
+enum NoteHoverState: int{
+    noNoteHover,
+    NoteEdgeHover,
+    NoteCenterHover
+};
+
 class PatternManager {
 public:
 
@@ -53,7 +59,6 @@ public:
         pattern.at(activePattern).deleteSelection();
     }
 
-
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
         pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
     }
@@ -66,6 +71,10 @@ public:
 
     void setCurrentPattern(size_t newPattern) {
         activePattern = newPattern;
+    }
+
+    NoteHoverState getNoteHoverState() {
+        return noNoteHover;
     }
 
     void setSelection(const SelectionCoords &t_selection) {
