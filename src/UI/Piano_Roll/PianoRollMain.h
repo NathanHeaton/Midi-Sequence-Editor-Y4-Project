@@ -23,7 +23,7 @@ public:
     PianoRollComponent pianoRoll;
 
     float timelineXScroll = 0.0f;
-    float timelineLength = SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
+    float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
 
     PianoRollMain() = default;
 
@@ -61,8 +61,8 @@ public:
                 ImGui::TableNextColumn();
 
                 if (ImGui::BeginChild("custom_scroll", ImVec2(15, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-                    ImGui::Dummy(ImVec2(15, SessionData::instance().getWhiteKeys() * SessionData::instance().getWhiteSize().y));
-                    if (intialLoad)  ImGui::SetScrollY(SessionData::instance().getNoteHeight()* 48); intialLoad = false;
+                    ImGui::Dummy(ImVec2(15, ViewState::instance().WHITE_KEYS * ViewState::instance().getWhiteSize().y));
+                    if (intialLoad)  ImGui::SetScrollY(ViewState::instance().getNoteHeight()* 48); intialLoad = false;
                     pianoRollScrollY = ImGui::GetScrollY();
                 }ImGui::EndChild();
             }ImGui::EndTable();

@@ -2,7 +2,8 @@
 
 #include <algorithm>
 
-#include "../Singletons/SessionData.h"
+#include "../Singletons/TimeData.h"
+#include "../Singletons/ViewState.h"
 #include <iostream>
 #include <cmath>
 #include <ranges>
@@ -14,7 +15,7 @@
 //
 
 void Pattern::setLastBar() {
-    const auto barSize = SessionData::instance().getPPQ() * SessionData::instance().timeSignature.getNumerator();
+    const auto barSize = TimeData::instance().PPQ * TimeData::instance().timeSignature.getNumerator();
     int endAbsolute = m_events.back().m_absoluteTime;
 
     float bars = static_cast<float>(endAbsolute) / static_cast<float>(barSize);
@@ -59,7 +60,7 @@ void Pattern::createNoteEventPairs(){
 void Pattern::convertMidiTicksToPPQ() {
     for (auto& event : m_events) {
         uint32_t newDelta = static_cast<uint32_t>(event.getDelta()/(static_cast<float>(ticksInMidiFile))*
-            SessionData::instance().getPPQ());
+            TimeData::instance().PPQ);
         event.setDelta(newDelta);
     }
 }
@@ -154,8 +155,8 @@ void Pattern::deleteSelection() {
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {
     m_selectedNoteIDs.clear();
 
-    float pixelPerTick = SessionData::instance().getPPQ() / SessionData::instance().getPixelPerBeat(zoomFactor::pianoRoll);
-    float noteHeight = SessionData::instance().getNoteHeight();
+    float pixelPerTick = TimeData::instance().PPQ / ViewState::instance().getPixelPerBeat(zoomFactor::pianoRoll);
+    float noteHeight = ViewState::instance().getNoteHeight();
 
     ImVec2 adjustedValuesP1 = {t_selection.selectP1.x * pixelPerTick,
         t_selection.selectP1.y / noteHeight};
@@ -271,9 +272,4 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
     }
     m_noteEvents.clear();
     createNoteEventPairs();
-}
-
-NoteHoverState Pattern::getHoveredNotePoint() {
-
-
 }

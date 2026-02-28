@@ -3,7 +3,7 @@
 #include "../../../Theme.h"
 #include <imgui.h>
 #include <iostream>
-#include "../../../Singletons/SessionData.h"
+#include "../../../Singletons/ViewState.h"
 
 class Piano
 {
@@ -24,12 +24,12 @@ public:
             scrollY = ImGui::GetScrollX();
         }
     };
-    void create(float &pianoRollScrollY) {
-        whiteKeys = SessionData::instance().getWhiteKeys();
-        blackKeys = SessionData::instance().getBlackKeys();
-        WHITE_SIZE = SessionData::instance().getWhiteSize();
-        BLACK_SIZE = SessionData::instance().getBlackSize();
-        blackGap = SessionData::instance().getBlackGap();
+    void create(const float &pianoRollScrollY) {
+        whiteKeys = ViewState::instance().WHITE_KEYS;
+        blackKeys = ViewState::instance().BLACK_KEYS;
+        WHITE_SIZE = ViewState::instance().getWhiteSize();
+        BLACK_SIZE = ViewState::instance().getBlackSize();
+        blackGap = ViewState::instance().getBlackGap();
         if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,0),ImGuiChildFlags_None,
             ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
 
@@ -44,7 +44,8 @@ public:
         ImGui::EndChild();
     }
 
-    void drawWhiteKey(pianoVars &vars) {
+    void drawWhiteKey(pianoVars &vars) const
+    {
         int octave = 9;
         for ( int i{0u}; i < whiteKeys; ++i ) {
             ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + i* WHITE_SIZE.y);
@@ -71,7 +72,8 @@ public:
             }
         }
     }
-    void drawBlackKey(pianoVars &vars) {
+    void drawBlackKey(pianoVars &vars) const
+    {
         float totalGap = 0;
         int setOf3Count = 3;
         int setOf2Count = 1;

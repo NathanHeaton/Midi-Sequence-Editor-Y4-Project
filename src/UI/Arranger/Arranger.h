@@ -5,7 +5,8 @@
 #include "TopControls.h"
 #include "Track.h"
 #include "Timeline.h"
-#include "../../Singletons/SessionData.h"
+#include "../../Singletons/ViewState.h"
+#include "../../Singletons/ProjectData.h"
 #include "../Common/timelineLabel.h"
 #include <iostream>
 
@@ -17,15 +18,15 @@ class Arranger
 public:
 
     TopControls topControls;
-    PatternViewport patternViewport;
+    //PatternViewport patternViewport;
     Timeline timeline;
     TimelineLabel timelineLabel;
 
     std::vector<std::unique_ptr<Track>> tracks;
-    std::vector<std::unique_ptr<HeadingComponent>> trackComponents;
+    //std::vector<std::unique_ptr<HeadingComponent>> trackComponents;
 
 
-    float timelineLength = SessionData::instance().getPixelPerBar(zoomFactor::arranger)* SessionData::instance().getTotalBars();
+    float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::arranger)* ProjectData::instance().getTotalBars();
     float timelineXScroll = 0.0f;
     Arranger() {
         AddTrack();
@@ -53,7 +54,7 @@ public:
             ImGui::TableNextColumn();
 
             timelineLabel.create(timelineLength,timelineXScroll,
-                SessionData::instance().getTotalBars(),
+                ProjectData::instance().getTotalBars(),
                 zoomFactor::arranger);
 
         }ImGui::EndTable();
@@ -79,15 +80,11 @@ public:
         ImGui::EndChild();
     }
 
-
-
-
     void AddTrack()  {
-        auto s = &SessionData::instance();
         DBG("adding track");
         auto newTrack =  std::make_unique<Track>(); // create a new track
         tracks.push_back(std::move(newTrack));
-        s->addTrack();
+        ProjectData::instance().addTrack();
     }
 
 

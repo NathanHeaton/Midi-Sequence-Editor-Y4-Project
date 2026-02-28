@@ -4,7 +4,8 @@
 
 #pragma once
 #include "imgui.h"
-#include "../../Singletons/SessionData.h"
+#include "../../Singletons/ViewState.h"
+#include "../../Singletons/TimeData.h"
 #include "../../Singletons/PlayBackManager.h"
 #include "../../Theme.h"
 
@@ -23,7 +24,7 @@ class TimelineLabel {
     void create(float timelineLength, float &xScroll, int bars, float t_zoomFactor) {
         totalBars = bars;
         m_zoomFactor =t_zoomFactor;
-        barWidth = SessionData::instance().getPixelPerBar(m_zoomFactor);
+        barWidth = ViewState::instance().getPixelPerBar(m_zoomFactor);
         if (ImGui::BeginChild("Timeline", ImVec2(0, height),
             false)) {
             ImGui::SetScrollX(xScroll);
@@ -57,8 +58,8 @@ class TimelineLabel {
         auto cursorPos = ImGui::GetCursorScreenPos();
         auto drawList = ImGui::GetWindowDrawList();
 
-        float xPos = cursorPos.x + SessionData::instance().getPixelPerBeat(pianoRoll)*
-            (PlayBackManager::instance().getPlayheadPositionTicks()/SessionData::instance().getPPQ());
+        float xPos = cursorPos.x + ViewState::instance().getPixelPerBeat(pianoRoll)*
+            (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
 
         drawList->AddLine(ImVec2(xPos,cursorPos.y+ 0),
         ImVec2(xPos,cursorPos.y+ height),
@@ -74,7 +75,7 @@ class TimelineLabel {
 
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
             PlayBackManager::instance().setPlaying(false);
-            unsigned int ticks = SessionData::instance().getPPQ() *((mousePos.x - cursorPos.x)/ SessionData::instance().getPixelPerBeat(pianoRoll));
+            unsigned int ticks = TimeData::instance().PPQ *((mousePos.x - cursorPos.x)/ ViewState::instance().getPixelPerBeat(pianoRoll));
             PlayBackManager::instance().setPlayHeadPositionTicks(ticks);
             mouseDown = true;
         }

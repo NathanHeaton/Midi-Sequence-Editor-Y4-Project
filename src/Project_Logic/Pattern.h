@@ -59,9 +59,11 @@ public:
     void removeSelection(noteCoordinate t_event);
     void removeSelection(std::vector<noteCoordinate> t_events);
     void deleteSelection();
-    NoteHoverState getHoveredNotePoint();
-
     NoteEventPair findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime);
+
+    NoteHoverState findNoteHoverState(uint8_t t_pitch, uint32_t absoluteTime) {
+
+    }
 
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {

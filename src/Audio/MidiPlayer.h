@@ -2,7 +2,7 @@
 #pragma once
 #include <juce_audio_devices/juce_audio_devices.h>
 #include "AudioManager.h"
-#include "../Singletons/SessionData.h"
+#include "../Singletons/TimeData.h"
 #include  "../Singletons/PatternManager.h"
 
 class MidiPlayer : public juce::Timer {
@@ -60,7 +60,7 @@ public:
             return;
         }
         m_elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
-        double msPerTick = (60000.0 / SessionData::instance().getBPM()) / SessionData::instance().getPPQ();
+        double msPerTick = (60000.0 / TimeData::instance().getBPM()) / TimeData::instance().PPQ;
 
         auto& event = pattern->m_events[eventIndex];
 
@@ -91,12 +91,12 @@ public:
     }
 
     [[nodiscard]] double getCurrentPositionTicks() const {
-        double ticks = m_elapsed / (60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
+        double ticks = m_elapsed / (60000.0/ TimeData::instance().getBPM() / TimeData::instance().PPQ);
         return ticks;
     }
 
     void setElapsedTime(unsigned int ticks) {
-        m_elapsed = ticks * (60000.0/ SessionData::instance().getBPM() / SessionData::instance().getPPQ());
+        m_elapsed = ticks * (60000.0/ TimeData::instance().getBPM() / TimeData::instance().PPQ);
         currentPatternElapsed = m_elapsed;
     }
 

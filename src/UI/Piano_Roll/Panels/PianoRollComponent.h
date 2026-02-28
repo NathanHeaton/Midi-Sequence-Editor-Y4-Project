@@ -1,10 +1,11 @@
+
 //
 // Created by nathan on 24/11/2025.
 //
 #pragma once
 
 #include "../../../Theme.h"
-#include "../../../Singletons/SessionData.h"
+#include "../../../Singletons/ViewState.h"
 #include "../../../Singletons/PatternManager.h"
 #include "../../../Singletons/ToolManager.h"
 #include "../../../Singletons/PlayBackManager.h"
@@ -13,7 +14,7 @@ class PianoRollComponent
 {
 public:
     PianoRollComponent() = default;
-    SessionData* s = &SessionData::instance();
+    ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
 
     void create(float &scrollY,float &scrollX, float& lengthX) {
@@ -28,8 +29,8 @@ public:
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
             auto& pattern = PatternManager::instance().getCurrentPattern();
-            lengthX =  SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
-            ImGui::Dummy(ImVec2(lengthX ,s->getWhiteKeys()*s->getWhiteSize().y));
+            lengthX =  view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+            ImGui::Dummy(ImVec2(lengthX ,view_state->WHITE_KEYS*view_state->getWhiteSize().y));
         }
         ImGui::EndChild();
     }
@@ -49,7 +50,7 @@ private:
         int lastVisibleSubBeat;
         float barWidth;
         float noteHeight;
-        float intialGap;
+        float initialGap;
         float relativeX;
         float relativeY;
         ToolTypes activeTool;
@@ -57,19 +58,19 @@ private:
         TimelineContext() {
             cursorPos = ImGui::GetCursorScreenPos();
             drawList = ImGui::GetWindowDrawList();
-            height =SessionData::instance().getWhiteSize().y * SessionData::instance().getWhiteKeys();
+            height =ViewState::instance().getWhiteSize().y * ViewState::instance().WHITE_KEYS;
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();
-            barWidth = 2 * SessionData::instance().timeSignature.getNumerator() * SessionData::instance().getPixelPerBar(zoomFactor::pianoRoll);
-            noteHeight = SessionData::instance().getNoteHeight();
-            intialGap = (SessionData::instance().getWhiteSize().y * 5.0f)/8.0f;
-            auto& session = SessionData::instance();
+            barWidth = 2 * TimeData::instance().timeSignature.getNumerator() * ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll);
+            noteHeight = ViewState::instance().getNoteHeight();
+            initialGap = (ViewState::instance().getWhiteSize().y * 5.0f)/8.0f;
+            auto& view = ViewState::instance();
             firstVisibleSubBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX /
-                    (session.getPixelPerBeat(pianoRoll)/ session.getRenderedSubDivisions())) : 0;
+                    (view.getPixelPerBeat(pianoRoll)/ view.getRenderedSubDivisions())) : 0;
             lastVisibleSubBeat = static_cast<int>((scrollX + width)
-                / (session.getPixelPerBeat(pianoRoll)/session.getRenderedSubDivisions()));
+                / (view.getPixelPerBeat(pianoRoll)/view.getRenderedSubDivisions()));
             ImVec2 mousePos = ImGui::GetMousePos();
             relativeX = mousePos.x - cursorPos.x;
             relativeY = mousePos.y - cursorPos.y;
@@ -87,13 +88,14 @@ private:
     }
 
     void HandleMouseInput(const TimelineContext& ctx);
-    void renderPattern(const TimelineContext& ctx);
-    void DrawToolEffects(const TimelineContext& ctx);
-    void HandleKeyboardInput(const TimelineContext& ctx);
+    void renderPattern(const TimelineContext& ctx) const;
+    static void DrawToolEffects(const TimelineContext& ctx);
+    static void HandleKeyboardInput(const TimelineContext& ctx);
 
-    void DrawPlayHead(const TimelineContext& ctx) {
+    void DrawPlayHead(const TimelineContext& ctx) const
+    {
 
-        float xPos = ctx.cursorPos.x + s->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPlayheadPositionTicks()/s->getPPQ());
+        float xPos = ctx.cursorPos.x + view_state->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
 
         ctx.drawList->AddLine(ImVec2(xPos,ctx.cursorPos.y+ 0),
         ImVec2(xPos,ctx.cursorPos.y+ ctx.height),
@@ -101,28 +103,31 @@ private:
             );
     }
 
-    bool checkIfBarStart(int beat) {return beat % (s->timeSignature.getNumerator() * s->getRenderedSubDivisions()) == 0;}
+    bool checkIfBarStart(const int beat) const {return beat % (TimeData::instance().timeSignature.getNumerator() * view_state->getRenderedSubDivisions()) == 0;}
 
-    void placeNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime);
-    void removeNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime);
-    void moveNote(const TimelineContext& ctx);
-    void stretchNote(const TimelineContext& ctx);
-
-    bool checkIfSubDivision(int beat) {
+    bool checkIfSubDivision(int beat) const
+    {
         bool value = true;
-        if (beat % s->timeSignature.getNumerator() == 0) {
+        if (beat % view_state->getRenderedSubDivisions() == 0) {
             value = false;
         }
         return value;
     }
+     void determineRenderedSubDivisions(const TimelineContext& ctx)
+    {
+        if (view_state->getSnappedSubDivisions()  < 12)
+        {
+            view_state->setRenderedSubDivisions(1);
+        }
+    }
 
     void DrawBars(auto& ctx) {
-        int increment = s->timeSignature.getNumerator();
+        int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
         getCurrentBarCount(ctx);
         for (int i = ctx.firstVisibleSubBeat; i <= ctx.lastVisibleSubBeat; i++) {
             ImVec2 beatPosStart = ImVec2(
-                ctx.cursorPos.x + i * s->getPixelPerBeat(zoomFactor::pianoRoll)/s->getRenderedSubDivisions(),
+                ctx.cursorPos.x + i * view_state->getPixelPerBeat(zoomFactor::pianoRoll)/view_state->getRenderedSubDivisions(),
                  ctx.cursorPos.y
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
@@ -136,23 +141,24 @@ private:
     }
 
     void getCurrentBarCount(const TimelineContext& ctx) {
-        int increment = s->timeSignature.getNumerator();
+        int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
-        if (ctx.firstVisibleSubBeat*s->getRenderedSubDivisions() % increment == 0) {
+        if (ctx.firstVisibleSubBeat*view_state->getRenderedSubDivisions() % increment == 0) {
             bg_tone = !bg_tone;
         }
     }
 
-    void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, ImU32 colour) {
+    static void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, ImU32 colour) {
         ctx.drawList->AddLine(
             start, end, colour,1.0f
         );
     }
 
-    void DrawOctaveLines(const TimelineContext& ctx) {
-        float octaveHeight = s->getWhiteSize().y *7;
+    void DrawOctaveLines(const TimelineContext& ctx) const
+    {
+        float octaveHeight = view_state->getWhiteSize().y *7;
         for (unsigned int i = 0; i < octaves; i++) {
-            float yPos = ctx.cursorPos.y + i * octaveHeight + ( s->getWhiteSize().y*5);
+            float yPos = ctx.cursorPos.y + i * octaveHeight + ( view_state->getWhiteSize().y*5);
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
@@ -163,8 +169,9 @@ private:
         }
     }
 
-    void DrawNoteGuides(const TimelineContext& ctx) {
-        float noteGap = (s->getWhiteSize().y *7.0f)/12.0f;
+    void DrawNoteGuides(const TimelineContext& ctx) const
+    {
+        float noteGap = (view_state->getWhiteSize().y *7.0f)/12.0f;
         int notes = 128;
         bool whiteNote = true;
         int octaveNoteIndex = 0;
@@ -173,10 +180,10 @@ private:
         for (auto i{0u}; i < notes; i++) {
             float yPos;
             if (i < 8) {
-                yPos = ctx.cursorPos.y + i * ctx.intialGap;
+                yPos = ctx.cursorPos.y + i * ctx.initialGap;
             }
             else {
-                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + ctx.intialGap *8;
+                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + ctx.initialGap *8;
             }
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + noteGap ),

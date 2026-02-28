@@ -9,27 +9,26 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
 
     switch (ctx.activeTool) {
         case EDIT:
-            if (isHovered && ImGui::IsAnyMouseDown()) {
-                int noteTime = static_cast<int>(ctx.relativeX / s->getPixelPerBeat(zoomFactor::pianoRoll) *s->getRenderedSubDivisions());
-                int absoluteTime = noteTime * (static_cast<float>(s->getPPQ())/s->getRenderedSubDivisions());
+            if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *view_state->getSnappedSubDivisions());
+                int absoluteTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
                 int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
                 pitch = std::clamp(pitch, 0, 127);
                 pitch = 127 - pitch;
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                    auto noteHoverState = PatternManager::instance().getNoteHoverState();
-                    if (noteHoverState == NoteCenterHover) {
-                        moveNote(ctx);
-                    }
-                    else if (noteHoverState == NoteCenterHover) {
-                        stretchNote(ctx);
-                    }
-                    else {
-                        placeNote(ctx,pitch,absoluteTime);
-                    }
-                }
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-                    removeNote(ctx,pitch,absoluteTime);
-                }
+                int duration = TimeData::PPQ;
+
+                PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
+            }
+            if (isHovered && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
+                float beat = ctx.relativeX / view_state->getPixelPerBeat(pianoRoll);
+                int absoluteTime = beat * TimeData::PPQ;
+                int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
+                pitch = std::clamp(pitch, 0, 127);
+                pitch = 127 - pitch;
+
+                noteCoordinate note_coordinate(pitch, absoluteTime);
+                PatternManager::instance().removeNoteFromPattern(note_coordinate);
+
             }
             break;
         case SELECT:
@@ -49,27 +48,8 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
     }
 }
 
-void PianoRollComponent::placeNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime) {
-    int duration = s->getPPQ();
-    PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
-}
 
-void PianoRollComponent::removeNote(const TimelineContext &ctx, uint8_t pitch, uint32_t absoluteTime) {
-    noteCoordinate note_coordinate(pitch, absoluteTime);
-    PatternManager::instance().removeNoteFromPattern(note_coordinate);
-
-}
-
-void PianoRollComponent::moveNote(const TimelineContext &ctx) {
-
-}
-
-void PianoRollComponent::stretchNote(const TimelineContext &ctx) {
-
-}
-
-
-void PianoRollComponent::renderPattern(const TimelineContext& ctx) {
+void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto& pattern = PatternManager::instance().getCurrentPattern();
     auto& noteData = pattern.m_events;
 
@@ -79,14 +59,14 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) {
 
         float startDelta =0;
         if (onIndex.m_absoluteTime != 0){startDelta =
-            static_cast<float>(onIndex.m_absoluteTime) / s->getPPQ();}
+            static_cast<float>(onIndex.m_absoluteTime) / TimeData::PPQ;}
 
         float endDelta=0;
         if (offIndex.m_absoluteTime != 0){endDelta =
-            static_cast<float>(offIndex.m_absoluteTime) / s->getPPQ();}
+            static_cast<float>(offIndex.m_absoluteTime) / TimeData::PPQ;}
 
-        float startPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
-        float endPixel = s->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
+        float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
+        float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
         auto pitch =  noteData.at(noteIndices.onIndex).getPitch();
 
         float yStart = ctx.cursorPos.y + ( ctx.height - ((noteData.at(noteIndices.onIndex).getPitch()+1)*ctx.noteHeight));
