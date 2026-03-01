@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <ranges>
+#include <sys/stat.h>
 
 #include "../Singletons/ToolManager.h"
 #include "../Singletons/PatternManager.h"
@@ -93,7 +94,7 @@ void Pattern::removeNote(NoteEventPair notePair) {
      auto onDelta = onNote.getDelta();
 
      if (notePair.onIndex + 1 < m_events.size()) {
-         std::cout<<"room in events"<<std::endl;
+
          m_events[notePair.onIndex + 1].setDelta(m_events[notePair.onIndex + 1].getDelta() +onDelta );
      }
 
@@ -101,8 +102,7 @@ void Pattern::removeNote(NoteEventPair notePair) {
      if (notePair.offIndex + 1 < m_events.size()) {
          m_events[notePair.offIndex + 1].setDelta(m_events[notePair.offIndex + 1].getDelta() +offDelta );
      }
-     //for m_events
-    std::cout<<"point 4"<<std::endl;
+
      m_events.erase(m_events.begin() + static_cast<int>(notePair.offIndex));
      m_events.erase(m_events.begin() + static_cast<int>(notePair.onIndex));
 
@@ -138,11 +138,9 @@ void Pattern::deleteSelection() {
     if (m_selectedNoteIDs.empty()) {
         return;
     }
-
     //Todo: find better solution for deleting selection, more robust way of getting selected note ids as they are being updated
     auto selectedNoteIndices = convertNoteIdsToNotePair();
     for (auto i{0u};i<selectedNoteIndices.size();i++) {
-        std::cout<<"point 2"<<std::endl;
         removeNote(selectedNoteIndices.at(i));
         selectedNoteIndices = convertNoteIdsToNotePair();
     }
@@ -272,4 +270,30 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
     }
     m_noteEvents.clear();
     createNoteEventPairs();
+}
+
+
+NoteHoverState Pattern::findNoteHoverState(noteCoordinate hoverCoordinate) {
+    NoteHoverState state = noNoteHover;
+    for (const auto& pair: m_noteEvents) {
+        const auto& onEvent = m_events.at(pair.onIndex);
+        const auto& offEvent = m_events.at(pair.offIndex);
+        if (onEvent.getPitch() == hoverCoordinate.pitch) {
+            if (onEvent.getAbsoluteTime() <= hoverCoordinate.absoluteTime&&
+                offEvent.getAbsoluteTime() >= hoverCoordinate.absoluteTime ) {
+
+                auto centerRegion = offEvent.getAbsoluteTime() - (onEvent.getAbsoluteTime() * 0.2);
+                auto hoverDelta = hoverCoordinate.absoluteTime;
+                if (hoverDelta <= centerRegion ) {
+                    state = NoteCenterHover;
+                }
+                else {
+                    state = NoteEdgeHover;
+                }
+                break;
+            }
+        }
+    }
+
+    return state;
 }

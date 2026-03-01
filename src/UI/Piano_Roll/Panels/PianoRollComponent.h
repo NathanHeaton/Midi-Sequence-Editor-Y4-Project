@@ -87,6 +87,11 @@ private:
         DrawPlayHead(ctx);
     }
 
+    void sendNewNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
+    void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
+    void moveNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
+    void strechNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
+
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;
     static void DrawToolEffects(const TimelineContext& ctx);

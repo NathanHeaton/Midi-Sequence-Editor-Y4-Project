@@ -27,9 +27,9 @@ public:
     }
 
     void addPattern() {
-        std::string defaultTitle = "unamed_" + std::to_string(unamedPatterns);
+        std::string defaultTitle = "unamed_" + std::to_string(unnamedPatterns);
         pattern.emplace_back(Pattern(defaultTitle));
-        unamedPatterns++;
+        unnamedPatterns++;
     }
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
         pattern.emplace_back(title, events, fileTicks);
@@ -42,43 +42,43 @@ public:
     }
 
     const Pattern& getCurrentPattern() {
-        return pattern.at(activePattern);
+        return pattern.at(activePatternIndex);
     }
 
     size_t getPatternSize() {return pattern.size();}
 
     void pitchShiftSelection(signed short t_pitchDelta) {
-        pattern.at(activePattern).pitchShiftSelection(t_pitchDelta);
+        pattern.at(activePatternIndex).pitchShiftSelection(t_pitchDelta);
     }
 
     void timeShiftSelection(int32_t t_timeDelta) {
-        pattern.at(activePattern).timeShiftSelection(t_timeDelta);
+        pattern.at(activePatternIndex).timeShiftSelection(t_timeDelta);
     }
 
     void deleteSelection() {
-        pattern.at(activePattern).deleteSelection();
+        pattern.at(activePatternIndex).deleteSelection();
     }
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        pattern.at(activePattern).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
+        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
     }
 
     void removeNoteFromPattern(noteCoordinate noteCoordinate ) {
         std::vector<struct noteCoordinate> coords;
         coords.push_back(noteCoordinate);
-        pattern.at(activePattern).removeSelection(coords);
+        pattern.at(activePatternIndex).removeSelection(coords);
     }
 
     void setCurrentPattern(size_t newPattern) {
-        activePattern = newPattern;
+        activePatternIndex = newPattern;
     }
 
-    NoteHoverState getNoteHoverState() {
-        return noNoteHover;
+    NoteHoverState getNoteHoverState(noteCoordinate hoveredCoordinate) {
+        return pattern.at(activePatternIndex).findNoteHoverState(hoveredCoordinate);
     }
 
     void setSelection(const SelectionCoords &t_selection) {
-        pattern.at(activePattern).calculateSelection(t_selection);
+        pattern.at(activePatternIndex).calculateSelection(t_selection);
     }
 
     void addParsedMidi(auto& data, std::string title) {
@@ -111,8 +111,8 @@ public:
     PatternManager() = default;
 
     std::vector<Pattern> pattern{};
-    size_t activePattern = 0;
-    u_int unamedPatterns = 0;
+    size_t activePatternIndex = 0;
+    u_int unnamedPatterns = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;
 
