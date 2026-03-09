@@ -281,7 +281,6 @@ NoteHoverState Pattern::findNoteHoverState(noteCoordinate hoverCoordinate) {
         if (onEvent.getPitch() == hoverCoordinate.pitch) {
             if (onEvent.getAbsoluteTime() <= hoverCoordinate.absoluteTime&&
                 offEvent.getAbsoluteTime() >= hoverCoordinate.absoluteTime ) {
-
                 auto centerRegion = offEvent.getAbsoluteTime() - (onEvent.getAbsoluteTime() * 0.2);
                 auto hoverDelta = hoverCoordinate.absoluteTime;
                 if (hoverDelta <= centerRegion ) {
@@ -296,4 +295,19 @@ NoteHoverState Pattern::findNoteHoverState(noteCoordinate hoverCoordinate) {
     }
 
     return state;
+}
+
+void Pattern::hideNoteEvent(noteCoordinate coordinate)
+{
+    for (const auto& pair: m_noteEvents)    {
+        const auto& onEvent = m_events.at(pair.onIndex);
+        const auto& offEvent = m_events.at(pair.offIndex);
+        if (onEvent.getPitch() == coordinate.pitch)
+        {
+            if (onEvent.getAbsoluteTime() <= coordinate.absoluteTime&&
+                offEvent.getAbsoluteTime() >= coordinate.absoluteTime ) {
+                    m_hiddenNoteIDs.insert(onEvent.getID());
+                }
+        }
+    }
 }

@@ -77,6 +77,11 @@ public:
         return pattern.at(activePatternIndex).findNoteHoverState(hoveredCoordinate);
     }
 
+    void hideNoteEvent(noteCoordinate noteCoordinate)
+    {
+        pattern.at(activePatternIndex).hideNoteEvent(noteCoordinate);
+    }
+
     void setSelection(const SelectionCoords &t_selection) {
         pattern.at(activePatternIndex).calculateSelection(t_selection);
     }

@@ -37,10 +37,8 @@ namespace Theme{
         ImU32 barColourPacked;
         ImU32 beatColourPacked;
         ImU32 subBeatColourPacked;
+        ImU32 accentPacked;
 
-        // constexpr ColourScheme() {
-        //     backgroundPacked(ImU32)
-        // }
     };
 
     inline const  ColourScheme DarkBColours = {
@@ -60,7 +58,8 @@ namespace Theme{
         IM_COL32(16,24,38,255),
         IM_COL32(132,161,215,255),
         IM_COL32(70,87,118,255),
-        IM_COL32(37,47,64,255)
+        IM_COL32(37,47,64,255),
+        IM_COL32(243,180,64,255)
 
     };
 

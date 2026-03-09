@@ -83,6 +83,8 @@ private:
         DrawBars(ctx);
         DrawOctaveLines(ctx);
         renderPattern(ctx);
+        renderMovingNotes(ctx);
+
         DrawToolEffects(ctx);
         DrawPlayHead(ctx);
     }
@@ -94,8 +96,10 @@ private:
 
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;
-    static void DrawToolEffects(const TimelineContext& ctx);
-    static void HandleKeyboardInput(const TimelineContext& ctx);
+    void DrawToolEffects(const TimelineContext& ctx);
+    void HandleKeyboardInput(const TimelineContext& ctx);
+
+    void renderMovingNotes(const TimelineContext& ctx);
 
     void DrawPlayHead(const TimelineContext& ctx) const
     {
@@ -104,7 +108,7 @@ private:
 
         ctx.drawList->AddLine(ImVec2(xPos,ctx.cursorPos.y+ 0),
         ImVec2(xPos,ctx.cursorPos.y+ ctx.height),
-        Theme::currentThemeColours.barColourPacked, 5
+        Theme::currentThemeColours.accentPacked, 5
             );
     }
 

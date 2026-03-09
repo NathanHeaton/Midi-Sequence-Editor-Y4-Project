@@ -63,7 +63,7 @@ class TimelineLabel {
 
         drawList->AddLine(ImVec2(xPos,cursorPos.y+ 0),
         ImVec2(xPos,cursorPos.y+ height),
-        Theme::currentThemeColours.barColourPacked, 15
+        Theme::currentThemeColours.accentPacked, 15
             );
     }
     bool firstMouseUp = false;

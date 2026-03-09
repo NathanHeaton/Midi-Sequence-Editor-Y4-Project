@@ -36,7 +36,9 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
             auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
             int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
             if (noteHoverState == NoteCenterHover) {
-                std::cout << "center Hover" <<std::endl;
+                std::cout << "Hover"<< std::endl;
+                PatternManager::instance().hideNoteEvent(hoverCoordinate);
+                moveNote(ctx, pitch, absoluteTime);
             }
             else if (noteHoverState == NoteEdgeHover) {
                 std::cout << "edge Hover"<< std::endl;
@@ -48,6 +50,7 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
 
                 PatternManager::instance().removeNoteFromPattern(hoverCoordinate);
             }
+
             break;
         }
     }
@@ -58,6 +61,24 @@ void PianoRollComponent::sendNewNote(const TimelineContext& ctx,uint8_t pitch, u
     PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
 }
 
+void PianoRollComponent::moveNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime)
+{
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        auto& hiddenIDs = PatternManager::instance().getCurrentPattern().m_hiddenNoteIDs;
+        ToolManager::instance().setIsMovingNotes(true);
+        std::vector<movingNoteDetails> m_movingNoteDetails;
+
+        //movingNoteDetails m_movingNoteDetail(hiddenIDs., static_cast<uint8_t>(pitch), absoluteTime,absoluteTime);
+       //m_movingNoteDetails.push_back(m_movingNoteDetail);
+        //ToolManager::instance().setMovingNotes(m_movingNoteDetails);
+    }
+    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+        ToolManager::instance().updateMovingNotesPosition(pitch,absoluteTime);
+
+    }
+}
+
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto& pattern = PatternManager::instance().getCurrentPattern();
@@ -65,6 +86,10 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
     for (auto noteIndices : pattern.m_noteEvents) {
         auto onIndex = noteData.at(noteIndices.onIndex);
+        if (pattern.m_hiddenNoteIDs.contains(onIndex.getID()))
+        {
+            continue;
+        }
         auto offIndex = noteData.at(noteIndices.offIndex);
 
         float startDelta =0;
@@ -95,6 +120,25 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
             ImVec2(xStart, yStart),
             ImVec2(xEnd,yEnd),
                 colour, 3.0f);
+    }
+
+}
+
+void PianoRollComponent::renderMovingNotes(const TimelineContext& ctx)
+{
+    auto& noteDetails = ToolManager::instance().getMovingNoteDetails();
+    PatternManager::instance().getCurrentPattern();
+
+
+    for (auto note: noteDetails)
+    {
+        note.ID;
+
+
+    //     ctx.drawList->AddRectFilled(
+    // ImVec2(xStart, yStart),
+    // ImVec2(xEnd,yEnd),
+    //     colour, 3.0f);
     }
 }
 

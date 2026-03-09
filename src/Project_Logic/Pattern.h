@@ -16,9 +16,11 @@ class SessionData;
 
 struct noteCoordinate;
 struct SelectionCoords;
+
 struct NoteEventPair {
     size_t onIndex;
     size_t offIndex;
+    bool hidden = false;
 };
 
 class Pattern {
@@ -32,6 +34,7 @@ public:
     int m_bars{8};
 
     std::unordered_set<uint32_t> m_selectedNoteIDs;
+    std::unordered_set<uint32_t> m_hiddenNoteIDs;
 
     Pattern(std::string t_title) {
         m_title = t_title;
@@ -59,6 +62,11 @@ public:
     void removeSelection(noteCoordinate t_event);
     void removeSelection(std::vector<noteCoordinate> t_events);
     void deleteSelection();
+
+    void hideNoteEvent(noteCoordinate coordinate);
+
+    void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
+
     NoteEventPair findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime);
 
     NoteHoverState findNoteHoverState(noteCoordinate hoverCoordinate);
@@ -119,10 +127,7 @@ public:
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
-
     }
-
-
 
 
 };
