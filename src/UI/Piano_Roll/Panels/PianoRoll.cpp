@@ -56,7 +56,10 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
                 auto note = moveOperation.movingNotes.at(0);
 
                 NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
-                PatternManager::instance().moveNoteEvent(note.ID,newPos,note.endAbsoluteTime+ moveOperation.newDeltaPitch);
+
+                PatternManager::instance().moveNoteEvent(note.ID,
+                    newPos,
+                    note.endAbsoluteTime+ moveOperation.newDeltaTime);
             }
             moveOperation.clearNotes();
 

@@ -67,7 +67,7 @@ public:
 
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta, uint32_t endAbsolute);
     void moveNoteEvent(std::vector<uint32_t> ID, NoteCoordinate coordinateDelta);
-
+    void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 
     NoteEventPair findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
@@ -131,12 +131,13 @@ public:
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
     }
 
-    NoteEventPair* findPairByID(uint32_t id) {
+    NoteEventPair findPairByID(uint32_t id) {
         for (auto& pair : m_noteEvents) {
             if (m_events.at(pair.onIndex).getID() == id)
-                return &pair;
+                return pair;
         }
-        return nullptr;
+        std::cout << "NoteEventPairs not found" << std::endl;
+        return NoteEventPair(0,0);
     }
 
 

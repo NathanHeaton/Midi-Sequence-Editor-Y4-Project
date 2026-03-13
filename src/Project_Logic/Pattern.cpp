@@ -182,7 +182,7 @@ size_t Pattern::findInsertionPoint(uint32_t absoluteTime) {
     size_t index = 0;
 
     for (index = 0; index < m_events.size(); index++) {
-        if (m_events[index].getAbsoluteTime() > absoluteTime) {
+        if (m_events[index].getAbsoluteTime() >= absoluteTime) {
             break;
         }
     }
@@ -262,8 +262,8 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
                 if (OffAbsoluteTime == OnAbsoluteTime+OffAbsoluteTime) OffAbsoluteTime -= t_timeDelta;
 
                 m_events.erase(m_events.begin() + static_cast<int>(pair.offIndex));
-                m_events.erase(m_events.begin() + static_cast<int>(pair.onIndex));
                 insertEvent(onEvent, static_cast<unsigned>(OnAbsoluteTime));
+                m_events.erase(m_events.begin() + static_cast<int>(pair.onIndex));
                 insertEvent(offEvent, static_cast<unsigned>(OffAbsoluteTime));
             }
         }
@@ -281,7 +281,7 @@ NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
         if (onEvent.getPitch() == hoverCoordinate.pitch) {
             if (onEvent.getAbsoluteTime() <= hoverCoordinate.absoluteTime&&
                 offEvent.getAbsoluteTime() >= hoverCoordinate.absoluteTime ) {
-                auto centerRegion = offEvent.getAbsoluteTime() - (onEvent.getAbsoluteTime() * 0.2);
+                auto centerRegion = offEvent.getAbsoluteTime() - (offEvent.getAbsoluteTime() - onEvent.getAbsoluteTime()) * 0.2;
                 auto hoverDelta = hoverCoordinate.absoluteTime;
                 if (hoverDelta <= centerRegion ) {
                     state = NoteCenterHover;
@@ -312,17 +312,42 @@ void Pattern::hideNoteEvent(NoteCoordinate coordinate)
     }
 }
 
+void Pattern::fixDeltaFromDeletedNote(NoteEventPair* pair)
+{
+    auto onIndex = pair->onIndex;
+    auto offIndex = pair->offIndex;
+
+    if (onIndex < m_events.size()) {
+        if (m_events[onIndex].getAbsoluteTime() < m_events[onIndex+1].getAbsoluteTime())
+        {
+            uint32_t followingDelta = m_events[onIndex+1].getAbsoluteTime() - m_events[onIndex].getAbsoluteTime() ;
+            m_events[onIndex+1].setDelta(followingDelta);
+        }
+    }
+    if (offIndex < m_events.size()) {
+        if (m_events[offIndex].getAbsoluteTime() < m_events[offIndex+1].getAbsoluteTime())
+        {
+            uint32_t followingDelta = m_events[offIndex+1].getAbsoluteTime() - m_events[offIndex].getAbsoluteTime() ;
+            m_events[offIndex+1].setDelta(followingDelta);
+        }
+    }
+
+
+}
+
 void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
 {
-    auto* notePair = findPairByID(ID);
-    m_events.at(notePair->onIndex).setPitch(coordinatePosition.pitch);
-    m_events.at(notePair->offIndex).setPitch(coordinatePosition.pitch);
+    auto notePair = findPairByID(ID);
+    m_events.at(notePair.onIndex).setPitch(coordinatePosition.pitch);
+    m_events.at(notePair.offIndex).setPitch(coordinatePosition.pitch);
 
-    auto movedOnEvent = m_events.at(notePair->onIndex);
-    auto movedOffEvent = m_events.at(notePair->offIndex);
+    auto movedOnEvent = m_events.at(notePair.onIndex);
+    auto movedOffEvent = m_events.at(notePair.offIndex);
 
-    m_events.erase(m_events.begin() + static_cast<int>(notePair->offIndex));
-    m_events.erase(m_events.begin() + static_cast<int>(notePair->onIndex));
+    removeNote(notePair);
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
     insertEvent(movedOnEvent, static_cast<unsigned>(coordinatePosition.absoluteTime));
     insertEvent(movedOffEvent, static_cast<unsigned>(endAbsolute));
 
