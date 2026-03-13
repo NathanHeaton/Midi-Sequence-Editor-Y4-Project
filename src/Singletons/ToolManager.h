@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imgui.h>
+#include "../NoteStucts.h"
 
 enum ToolTypes {
     SELECT,
@@ -25,14 +26,21 @@ struct MovingNoteSnapshot
 
 };
 
+//struct noteCoordinate {};
+
 struct MoveOperation
 {
     std::vector<MovingNoteSnapshot> movingNotes;
 
-    uint8_t newPitch;
+    noteCoordinate originalInputCoordinate;
+    short newDeltaPitch;
+    int newDeltaTime;
     bool isMovingNote{false};
 
-    void addNotes(MovingNoteSnapshot notes){movingNotes.push_back(notes); isMovingNote = true; }
+    void addNotes(MovingNoteSnapshot notes){
+        movingNotes.push_back(notes);
+        isMovingNote = true;
+    }
     void addNotes(std::vector<MovingNoteSnapshot> notes){
         movingNotes.insert(movingNotes.begin(), notes.begin(), notes.end());
         isMovingNote = true;
@@ -40,18 +48,26 @@ struct MoveOperation
 
     void updateMovingNotesPosition(const uint8_t pitch, const uint32_t time)
     {
+        newDeltaPitch = pitch - originalInputCoordinate.pitch ;
+        newDeltaTime = static_cast<signed>(time - originalInputCoordinate.absoluteTime);
+
+    }
+
+    void commitMovingNotesPosition()
+    {
         for (auto& notes : movingNotes)
         {
-            notes.absoluteTime = time;
-            notes.endAbsoluteTime = time + notes.duration;
-            notes.pitch = pitch;
+            notes.absoluteTime += newDeltaPitch;
+            notes.endAbsoluteTime  += newDeltaPitch;
+            notes.pitch += newDeltaPitch;
         }
+        clearNotes();
     }
     void clearNotes() { movingNotes.clear(); isMovingNote = false; }
 
 };
 
-inline MoveOperation MoveOperation;
+inline MoveOperation moveOperation;
 
 class ToolManager {
     public:

@@ -65,6 +65,9 @@ public:
 
     void hideNoteEvent(noteCoordinate coordinate);
 
+    void moveNoteEvent(uint32_t ID, noteCoordinate coordinateDelta, uint32_t endAbsolute);
+    void moveNoteEvent(std::vector<uint32_t> ID, noteCoordinate coordinateDelta);
+
     void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
 
     NoteEventPair findNoteBasedOnPoint(noteCoordinate noteCoordinate);

@@ -311,3 +311,22 @@ void Pattern::hideNoteEvent(noteCoordinate coordinate)
         }
     }
 }
+
+void Pattern::moveNoteEvent(uint32_t ID, noteCoordinate coordinatePosition, uint32_t endAbsolute)
+{
+    auto* notePair = findPairByID(ID);
+    m_events.at(notePair->onIndex).setPitch(coordinatePosition.pitch);
+    m_events.at(notePair->offIndex).setPitch(coordinatePosition.pitch);
+
+    auto movedOnEvent = m_events.at(notePair->onIndex);
+    auto movedOffEvent = m_events.at(notePair->offIndex);
+
+    m_events.erase(m_events.begin() + static_cast<int>(notePair->offIndex));
+    m_events.erase(m_events.begin() + static_cast<int>(notePair->onIndex));
+    insertEvent(movedOnEvent, static_cast<unsigned>(coordinatePosition.absoluteTime));
+    insertEvent(movedOffEvent, static_cast<unsigned>(endAbsolute));
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
+}

@@ -6,11 +6,7 @@
 #include <vector>
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
-
-struct noteCoordinate {
-    uint8_t pitch;
-    uint32_t absoluteTime;
-};
+#include "../NoteStucts.h"
 
 enum NoteHoverState: int{
     noNoteHover,
@@ -95,6 +91,11 @@ public:
         parsedMidiFile.emplace_back(data,title);
         std::cout << "moving onto pattern" << std::endl;
         updatePatternWithMidiData();
+    }
+
+    void moveNoteEvent(uint32_t ID, noteCoordinate coordinatePosition, uint32_t endAbsolute)
+    {
+        pattern.at(activePatternIndex).moveNoteEvent(ID, coordinatePosition, endAbsolute);
     }
 
     //ParsedMidi* currentFile;

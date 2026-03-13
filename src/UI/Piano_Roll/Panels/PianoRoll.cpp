@@ -42,12 +42,23 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
     auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
     int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
 
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && MoveOperation.isMovingNote)
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && moveOperation.isMovingNote)
     {
-        MoveOperation.updateMovingNotesPosition(hoverCoordinate.pitch,hoverCoordinate.absoluteTime);
+        moveOperation.updateMovingNotesPosition(hoverCoordinate.pitch,hoverCoordinate.absoluteTime);
         std::cout<<"note is being moved"<<std::endl;
     }
-    else {MoveOperation.clearNotes();}
+    else
+    {
+        if (moveOperation.movingNotes.size() == 1 )
+        {
+            auto note = moveOperation.movingNotes.at(0);
+            noteCoordinate newPos(moveOperation.newDeltaPitch, moveOperation.newDeltaTime);
+            PatternManager::instance().moveNoteEvent(note.ID,newPos,note.endAbsoluteTime);
+        }
+
+        moveOperation.clearNotes();
+
+    }
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (noteHoverState == NoteCenterHover) {
@@ -87,8 +98,8 @@ void PianoRollComponent::moveNote(const TimelineContext& ctx, noteCoordinate hov
         noteData.at(notePair.offIndex).getAbsoluteTime() - onNote.getAbsoluteTime(),
         onNote.getPitch()
         );
-
-    MoveOperation.addNotes(noteSnapshot);
+    moveOperation.originalInputCoordinate = hoverCoordinate;
+    moveOperation.addNotes(noteSnapshot);
 }
 
 
@@ -137,18 +148,21 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
 void PianoRollComponent::renderMovingNotes(const TimelineContext& ctx)
 {
-    for (auto note: MoveOperation.movingNotes)
+    for (auto note: moveOperation.movingNotes)
     {
         std::cout<<"got moving note data"<<std::endl;
+        auto onTime = note.absoluteTime + moveOperation.newDeltaTime;
+        auto offTime = note.endAbsoluteTime + moveOperation.newDeltaTime;
+        auto pitch = note.pitch + moveOperation.newDeltaPitch;
 
-        auto pitch = 127 - note.pitch;
+
         float startDelta =0;
-        if (note.absoluteTime != 0){startDelta =
-            static_cast<float>(note.absoluteTime) / TimeData::PPQ;}
+        if (onTime != 0){startDelta =
+            static_cast<float>(onTime) / TimeData::PPQ;}
 
         float endDelta=0;
-        if (note.endAbsoluteTime != 0){endDelta =
-            static_cast<float>(note.endAbsoluteTime) / TimeData::PPQ;}
+        if (offTime != 0){endDelta =
+            static_cast<float>(offTime) / TimeData::PPQ;}
 
         float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
 
@@ -156,12 +170,11 @@ void PianoRollComponent::renderMovingNotes(const TimelineContext& ctx)
 
         float xStart = startPixel + ctx.cursorPos.x;
         float xEnd = endPixel + ctx.cursorPos.x;
-        float yStart = pitch * ViewState::instance().getNoteHeight() + ctx.cursorPos.y;
-
+        float yStart = ctx.cursorPos.y+ ( ctx.height - ((pitch+1)*ctx.noteHeight));
 
         ctx.drawList->AddRectFilled(
     ImVec2(xStart, yStart),
-    ImVec2(xEnd,yStart + ViewState::instance().getNoteHeight()),
+    ImVec2(xEnd,yStart + ctx.noteHeight),
         Theme::currentThemeColours.beatColourPacked, 3.0f);
     }
 }
