@@ -14,7 +14,7 @@
 enum NoteHoverState : int;
 class SessionData;
 
-struct noteCoordinate;
+struct NoteCoordinate;
 struct SelectionCoords;
 
 struct NoteEventPair {
@@ -59,19 +59,19 @@ public:
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
     void removeNote(NoteEventPair notePair );
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
-    void removeSelection(noteCoordinate t_event);
-    void removeSelection(std::vector<noteCoordinate> t_events);
+    void removeSelection(NoteCoordinate t_event);
+    void removeSelection(std::vector<NoteCoordinate> t_events);
     void deleteSelection();
 
-    void hideNoteEvent(noteCoordinate coordinate);
+    void hideNoteEvent(NoteCoordinate coordinate);
 
-    void moveNoteEvent(uint32_t ID, noteCoordinate coordinateDelta, uint32_t endAbsolute);
-    void moveNoteEvent(std::vector<uint32_t> ID, noteCoordinate coordinateDelta);
+    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta, uint32_t endAbsolute);
+    void moveNoteEvent(std::vector<uint32_t> ID, NoteCoordinate coordinateDelta);
 
-    void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
+    void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 
-    NoteEventPair findNoteBasedOnPoint(noteCoordinate noteCoordinate);
-    NoteHoverState findNoteHoverState(noteCoordinate hoverCoordinate);
+    NoteEventPair findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
+    NoteHoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
 
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {

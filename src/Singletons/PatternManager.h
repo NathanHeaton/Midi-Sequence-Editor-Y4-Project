@@ -59,8 +59,8 @@ public:
         pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
     }
 
-    void removeNoteFromPattern(noteCoordinate noteCoordinate ) {
-        std::vector<struct noteCoordinate> coords;
+    void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
+        std::vector<struct NoteCoordinate> coords;
         coords.push_back(noteCoordinate);
         pattern.at(activePatternIndex).removeSelection(coords);
     }
@@ -69,16 +69,21 @@ public:
         activePatternIndex = newPattern;
     }
 
-    NoteHoverState getNoteHoverState(noteCoordinate hoveredCoordinate) {
+    NoteHoverState getNoteHoverState(NoteCoordinate hoveredCoordinate) {
         return pattern.at(activePatternIndex).findNoteHoverState(hoveredCoordinate);
     }
 
-    void hideNoteEvent(noteCoordinate noteCoordinate)
+    void hideNoteEvent(NoteCoordinate noteCoordinate)
     {
         pattern.at(activePatternIndex).hideNoteEvent(noteCoordinate);
     }
 
-    NoteEventPair getNoteEventPairFromCoordinate(noteCoordinate noteCoordinate)
+    void showAllEvents()
+    {
+        pattern.at(activePatternIndex).showAllNoteEvents();
+    }
+
+    NoteEventPair getNoteEventPairFromCoordinate(NoteCoordinate noteCoordinate)
     {
         return pattern.at(activePatternIndex).findNoteBasedOnPoint(noteCoordinate);
     }
@@ -93,7 +98,7 @@ public:
         updatePatternWithMidiData();
     }
 
-    void moveNoteEvent(uint32_t ID, noteCoordinate coordinatePosition, uint32_t endAbsolute)
+    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
     {
         pattern.at(activePatternIndex).moveNoteEvent(ID, coordinatePosition, endAbsolute);
     }

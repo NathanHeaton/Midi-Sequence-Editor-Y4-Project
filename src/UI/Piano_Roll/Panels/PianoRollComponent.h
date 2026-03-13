@@ -89,10 +89,11 @@ private:
         DrawPlayHead(ctx);
     }
 
-    void sendNewNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
+    void sendNewNote(NoteCoordinate snappedCoordinate);
     void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
-    void moveNote(const TimelineContext& ctx, noteCoordinate hoverCoordinate);
-    void strechNote(const TimelineContext& ctx, noteCoordinate hoverCoordinate);
+    void moveNote(const TimelineContext& ctx, NoteCoordinate snappedCoordinate);
+    void strechNote(const TimelineContext& ctx, NoteCoordinate hoverCoordinate);
+
     void edit(const TimelineContext& ctx);
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;

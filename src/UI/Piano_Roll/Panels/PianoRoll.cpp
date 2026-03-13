@@ -38,40 +38,45 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
     int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
     pitch = std::clamp(pitch, 0, 127);
     pitch = 127 - pitch;
-    noteCoordinate hoverCoordinate(pitch, absoluteTime);
+    NoteCoordinate hoverCoordinate(pitch, static_cast<uint32_t>(absoluteTime));
     auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
     int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
+    NoteCoordinate snappedCoordinate(pitch, static_cast<uint32_t>(snappedTime));
 
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && moveOperation.isMovingNote)
+    if (moveOperation.isMovingNote)
     {
-        moveOperation.updateMovingNotesPosition(hoverCoordinate.pitch,hoverCoordinate.absoluteTime);
-        std::cout<<"note is being moved"<<std::endl;
-    }
-    else
-    {
-        if (moveOperation.movingNotes.size() == 1 )
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
         {
-            auto note = moveOperation.movingNotes.at(0);
-            noteCoordinate newPos(moveOperation.newDeltaPitch, moveOperation.newDeltaTime);
-            PatternManager::instance().moveNoteEvent(note.ID,newPos,note.endAbsoluteTime);
+            moveOperation.updateMovingNotesPosition(snappedCoordinate.pitch,snappedCoordinate.absoluteTime);
         }
+        else
+        {
+            if (moveOperation.movingNotes.size() == 1 )
+            {
+                auto note = moveOperation.movingNotes.at(0);
 
-        moveOperation.clearNotes();
+                NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
+                PatternManager::instance().moveNoteEvent(note.ID,newPos,note.endAbsoluteTime+ moveOperation.newDeltaPitch);
+            }
+            moveOperation.clearNotes();
 
+            PatternManager::instance().showAllEvents();
+        }
     }
+
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (noteHoverState == NoteCenterHover) {
             std::cout << "Hover"<< std::endl;
             PatternManager::instance().hideNoteEvent(hoverCoordinate);
-            moveNote(ctx, hoverCoordinate);
+            moveNote(ctx, snappedCoordinate);
         }
         else if (noteHoverState == NoteEdgeHover) {
             std::cout << "edge Hover"<< std::endl;
         }
         else
         {
-            sendNewNote(ctx, pitch, snappedTime);
+            sendNewNote(snappedCoordinate);
         }
     }
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
@@ -80,14 +85,15 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
     }
 }
 
-void PianoRollComponent::sendNewNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime) {
+void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
     int duration = TimeData::PPQ;
-    PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
+    PatternManager::instance().addNoteToPattern(snappedCoordinate.pitch,
+        static_cast<signed>(snappedCoordinate.absoluteTime),  duration);
 }
 
-void PianoRollComponent::moveNote(const TimelineContext& ctx, noteCoordinate hoverCoordinate)
+void PianoRollComponent::moveNote(const TimelineContext& ctx, NoteCoordinate snappedCoordinate)
 {
-    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(hoverCoordinate);
+    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
 
     const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
     const auto& onNote =noteData.at(notePair.onIndex);
@@ -98,7 +104,7 @@ void PianoRollComponent::moveNote(const TimelineContext& ctx, noteCoordinate hov
         noteData.at(notePair.offIndex).getAbsoluteTime() - onNote.getAbsoluteTime(),
         onNote.getPitch()
         );
-    moveOperation.originalInputCoordinate = hoverCoordinate;
+    moveOperation.originalInputCoordinate = snappedCoordinate;
     moveOperation.addNotes(noteSnapshot);
 }
 

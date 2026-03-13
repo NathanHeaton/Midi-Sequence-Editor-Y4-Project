@@ -66,7 +66,7 @@ void Pattern::convertMidiTicksToPPQ() {
     }
 }
 
-NoteEventPair Pattern::findNoteBasedOnPoint(noteCoordinate noteCoordinate) {
+NoteEventPair Pattern::findNoteBasedOnPoint(NoteCoordinate noteCoordinate) {
     if (m_events.empty()) {
         return NoteEventPair(0,0);
     }
@@ -112,7 +112,7 @@ void Pattern::removeNote(NoteEventPair notePair) {
 
 //void Pattern::adjust
 
-void Pattern::removeSelection(noteCoordinate event) {
+void Pattern::removeSelection(NoteCoordinate event) {
     auto notePair = findNoteBasedOnPoint(event);
     if (notePair.offIndex == 0 && notePair.onIndex == 0) {
         return;
@@ -122,7 +122,7 @@ void Pattern::removeSelection(noteCoordinate event) {
     createNoteEventPairs();
 }
 
-void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
+void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
     for (auto& event:events) {
         auto notePair = findNoteBasedOnPoint(event);
         if (notePair.offIndex == 0 && notePair.onIndex == 0) {
@@ -273,7 +273,7 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
 }
 
 
-NoteHoverState Pattern::findNoteHoverState(noteCoordinate hoverCoordinate) {
+NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
     NoteHoverState state = noNoteHover;
     for (const auto& pair: m_noteEvents) {
         const auto& onEvent = m_events.at(pair.onIndex);
@@ -297,7 +297,7 @@ NoteHoverState Pattern::findNoteHoverState(noteCoordinate hoverCoordinate) {
     return state;
 }
 
-void Pattern::hideNoteEvent(noteCoordinate coordinate)
+void Pattern::hideNoteEvent(NoteCoordinate coordinate)
 {
     for (const auto& pair: m_noteEvents)    {
         const auto& onEvent = m_events.at(pair.onIndex);
@@ -312,7 +312,7 @@ void Pattern::hideNoteEvent(noteCoordinate coordinate)
     }
 }
 
-void Pattern::moveNoteEvent(uint32_t ID, noteCoordinate coordinatePosition, uint32_t endAbsolute)
+void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
 {
     auto* notePair = findPairByID(ID);
     m_events.at(notePair->onIndex).setPitch(coordinatePosition.pitch);

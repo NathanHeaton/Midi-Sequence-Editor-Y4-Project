@@ -4,7 +4,7 @@
 
 #pragma once
 
-struct noteCoordinate {
+struct NoteCoordinate {
     uint8_t pitch;
     uint32_t absoluteTime;
 };

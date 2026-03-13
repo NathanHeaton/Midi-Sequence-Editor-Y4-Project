@@ -32,7 +32,7 @@ struct MoveOperation
 {
     std::vector<MovingNoteSnapshot> movingNotes;
 
-    noteCoordinate originalInputCoordinate;
+    NoteCoordinate originalInputCoordinate;
     short newDeltaPitch;
     int newDeltaTime;
     bool isMovingNote{false};
