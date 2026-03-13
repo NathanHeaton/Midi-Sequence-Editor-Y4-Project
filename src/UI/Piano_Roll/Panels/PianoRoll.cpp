@@ -24,35 +24,48 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
                 PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
             }
             break;
-        case EDIT: {
-            int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *view_state->getSnappedSubDivisions());
-            int absoluteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *TimeData::PPQ);
-
-            int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-            pitch = std::clamp(pitch, 0, 127);
-            pitch = 127 - pitch;
-
-            noteCoordinate hoverCoordinate(pitch, absoluteTime);
-            auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
-            int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
-            if (noteHoverState == NoteCenterHover) {
-                std::cout << "Hover"<< std::endl;
-                PatternManager::instance().hideNoteEvent(hoverCoordinate);
-                moveNote(ctx, pitch, absoluteTime);
-            }
-            else if (noteHoverState == NoteEdgeHover) {
-                std::cout << "edge Hover"<< std::endl;
-            }
-            else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                sendNewNote(ctx, pitch, snappedTime);
-            }
-            if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-
-                PatternManager::instance().removeNoteFromPattern(hoverCoordinate);
-            }
-
+        case EDIT:
+            edit(ctx);
             break;
+
+    }
+}
+
+void PianoRollComponent::edit(const TimelineContext& ctx)
+{
+    int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *view_state->getSnappedSubDivisions());
+    int absoluteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *TimeData::PPQ);
+    int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
+    pitch = std::clamp(pitch, 0, 127);
+    pitch = 127 - pitch;
+    noteCoordinate hoverCoordinate(pitch, absoluteTime);
+    auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
+    int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
+
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && MoveOperation.isMovingNote)
+    {
+        MoveOperation.updateMovingNotesPosition(hoverCoordinate.pitch,hoverCoordinate.absoluteTime);
+        std::cout<<"note is being moved"<<std::endl;
+    }
+    else {MoveOperation.clearNotes();}
+
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        if (noteHoverState == NoteCenterHover) {
+            std::cout << "Hover"<< std::endl;
+            PatternManager::instance().hideNoteEvent(hoverCoordinate);
+            moveNote(ctx, hoverCoordinate);
         }
+        else if (noteHoverState == NoteEdgeHover) {
+            std::cout << "edge Hover"<< std::endl;
+        }
+        else
+        {
+            sendNewNote(ctx, pitch, snappedTime);
+        }
+    }
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+
+        PatternManager::instance().removeNoteFromPattern(hoverCoordinate);
     }
 }
 
@@ -61,22 +74,21 @@ void PianoRollComponent::sendNewNote(const TimelineContext& ctx,uint8_t pitch, u
     PatternManager::instance().addNoteToPattern(pitch,  absoluteTime,  duration);
 }
 
-void PianoRollComponent::moveNote(const TimelineContext& ctx, uint8_t pitch, uint32_t absoluteTime)
+void PianoRollComponent::moveNote(const TimelineContext& ctx, noteCoordinate hoverCoordinate)
 {
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    {
-        auto& hiddenIDs = PatternManager::instance().getCurrentPattern().m_hiddenNoteIDs;
-        ToolManager::instance().setIsMovingNotes(true);
-        std::vector<movingNoteDetails> m_movingNoteDetails;
+    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(hoverCoordinate);
 
-        //movingNoteDetails m_movingNoteDetail(hiddenIDs., static_cast<uint8_t>(pitch), absoluteTime,absoluteTime);
-       //m_movingNoteDetails.push_back(m_movingNoteDetail);
-        //ToolManager::instance().setMovingNotes(m_movingNoteDetails);
-    }
-    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-        ToolManager::instance().updateMovingNotesPosition(pitch,absoluteTime);
+    const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
+    const auto& onNote =noteData.at(notePair.onIndex);
+    MovingNoteSnapshot noteSnapshot(
+        onNote.getID(),
+        onNote.getAbsoluteTime(),
+        noteData.at(notePair.offIndex).getAbsoluteTime(),
+        noteData.at(notePair.offIndex).getAbsoluteTime() - onNote.getAbsoluteTime(),
+        onNote.getPitch()
+        );
 
-    }
+    MoveOperation.addNotes(noteSnapshot);
 }
 
 
@@ -102,7 +114,6 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
         float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
         float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
-        auto pitch =  noteData.at(noteIndices.onIndex).getPitch();
 
         float yStart = ctx.cursorPos.y + ( ctx.height - ((noteData.at(noteIndices.onIndex).getPitch()+1)*ctx.noteHeight));
         float xStart = ctx.cursorPos.x + startPixel;
@@ -126,19 +137,32 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
 void PianoRollComponent::renderMovingNotes(const TimelineContext& ctx)
 {
-    auto& noteDetails = ToolManager::instance().getMovingNoteDetails();
-    PatternManager::instance().getCurrentPattern();
-
-
-    for (auto note: noteDetails)
+    for (auto note: MoveOperation.movingNotes)
     {
-        note.ID;
+        std::cout<<"got moving note data"<<std::endl;
+
+        auto pitch = 127 - note.pitch;
+        float startDelta =0;
+        if (note.absoluteTime != 0){startDelta =
+            static_cast<float>(note.absoluteTime) / TimeData::PPQ;}
+
+        float endDelta=0;
+        if (note.endAbsoluteTime != 0){endDelta =
+            static_cast<float>(note.endAbsoluteTime) / TimeData::PPQ;}
+
+        float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
+
+        float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
+
+        float xStart = startPixel + ctx.cursorPos.x;
+        float xEnd = endPixel + ctx.cursorPos.x;
+        float yStart = pitch * ViewState::instance().getNoteHeight() + ctx.cursorPos.y;
 
 
-    //     ctx.drawList->AddRectFilled(
-    // ImVec2(xStart, yStart),
-    // ImVec2(xEnd,yEnd),
-    //     colour, 3.0f);
+        ctx.drawList->AddRectFilled(
+    ImVec2(xStart, yStart),
+    ImVec2(xEnd,yStart + ViewState::instance().getNoteHeight()),
+        Theme::currentThemeColours.beatColourPacked, 3.0f);
     }
 }
 

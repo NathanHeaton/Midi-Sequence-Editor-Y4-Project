@@ -15,25 +15,43 @@ struct SelectionCoords {
     ImVec2 selectP2;
 };
 
-struct movingNoteDetails
+struct MovingNoteSnapshot
 {
-    uint32_t& ID;
+    uint32_t ID;
     uint32_t absoluteTime;
-    uint32_t pitch;
+    uint32_t endAbsoluteTime;
     uint32_t duration;
-    uint8_t newPitch;
-    uint32_t newAbsoluteTime;
-    //ImVec2 noteSize;
-    movingNoteDetails(uint32_t& t_ID,uint8_t t_pitch,uint32_t t_duration,uint32_t t_absoluteTime) : ID(t_ID)
-    {
-        absoluteTime = t_absoluteTime;
-        duration = t_duration;
-        pitch = t_pitch;
-        newPitch = pitch;
-        newAbsoluteTime = absoluteTime;
-    }
-    ;
+    uint8_t pitch;
+
 };
+
+struct MoveOperation
+{
+    std::vector<MovingNoteSnapshot> movingNotes;
+
+    uint8_t newPitch;
+    bool isMovingNote{false};
+
+    void addNotes(MovingNoteSnapshot notes){movingNotes.push_back(notes); isMovingNote = true; }
+    void addNotes(std::vector<MovingNoteSnapshot> notes){
+        movingNotes.insert(movingNotes.begin(), notes.begin(), notes.end());
+        isMovingNote = true;
+    }
+
+    void updateMovingNotesPosition(const uint8_t pitch, const uint32_t time)
+    {
+        for (auto& notes : movingNotes)
+        {
+            notes.absoluteTime = time;
+            notes.endAbsoluteTime = time + notes.duration;
+            notes.pitch = pitch;
+        }
+    }
+    void clearNotes() { movingNotes.clear(); isMovingNote = false; }
+
+};
+
+inline MoveOperation MoveOperation;
 
 class ToolManager {
     public:
@@ -71,41 +89,17 @@ class ToolManager {
         selectCoords = temp;
     }
 
-    void setMovingNotes(std::vector<movingNoteDetails> t_movingNoteDs)
-    {
-        for (auto t_movingNoteD : t_movingNoteDs)
-        {
-            movingNotes.push_back(t_movingNoteD);
-        }
-    }
-
-    void updateMovingNotesPosition(const uint8_t pitch, const uint32_t time)
-    {
-        for (auto notes : movingNotes)
-        {
-            notes.newAbsoluteTime = time;
-            notes.newPitch = pitch;
-        }
-
-    }
-
-    void setIsMovingNotes(bool state){isMovingNote = state;};
-
     [[nodiscard]] bool IsMovingNotes() const {return isMovingNote;};
 
-    [[nodiscard]] const std::vector<movingNoteDetails>& getMovingNoteDetails() const {return movingNotes;}
 
 private:
     ToolTypes activeNoteTool{EDIT};
     ToolTypes activeArrangerTool{EDIT};
     ToolManager() = default;
 
-
     bool boxSelectingActive = false;
 
     bool isMovingNote = false;
-
-    std::vector<movingNoteDetails> movingNotes;
 
 
     SelectionCoords selectCoords;

@@ -66,7 +66,7 @@ void Pattern::convertMidiTicksToPPQ() {
     }
 }
 
-NoteEventPair Pattern::findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime) {
+NoteEventPair Pattern::findNoteBasedOnPoint(noteCoordinate noteCoordinate) {
     if (m_events.empty()) {
         return NoteEventPair(0,0);
     }
@@ -74,9 +74,9 @@ NoteEventPair Pattern::findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTi
         auto& note = m_noteEvents.at(i);
         auto& onNote = m_events.at(note.onIndex);
         auto& offNote = m_events.at(note.offIndex);
-        if (onNote.m_absoluteTime <= absoluteTime &&
-            offNote.m_absoluteTime >= absoluteTime) {
-            if (onNote.getPitch() == t_pitch) {
+        if (onNote.m_absoluteTime <= noteCoordinate.absoluteTime &&
+            offNote.m_absoluteTime >= noteCoordinate.absoluteTime) {
+            if (onNote.getPitch() == noteCoordinate.pitch) {
                 return note;
             }
         }
@@ -113,7 +113,7 @@ void Pattern::removeNote(NoteEventPair notePair) {
 //void Pattern::adjust
 
 void Pattern::removeSelection(noteCoordinate event) {
-    auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+    auto notePair = findNoteBasedOnPoint(event);
     if (notePair.offIndex == 0 && notePair.onIndex == 0) {
         return;
     }
@@ -124,7 +124,7 @@ void Pattern::removeSelection(noteCoordinate event) {
 
 void Pattern::removeSelection(std::vector<noteCoordinate> events ) {
     for (auto& event:events) {
-        auto notePair = findNoteBasedOnPoint(event.pitch,event.absoluteTime);
+        auto notePair = findNoteBasedOnPoint(event);
         if (notePair.offIndex == 0 && notePair.onIndex == 0) {
             return;
         }

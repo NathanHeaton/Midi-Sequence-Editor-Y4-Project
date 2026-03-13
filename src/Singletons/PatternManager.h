@@ -82,6 +82,11 @@ public:
         pattern.at(activePatternIndex).hideNoteEvent(noteCoordinate);
     }
 
+    NoteEventPair getNoteEventPairFromCoordinate(noteCoordinate noteCoordinate)
+    {
+        return pattern.at(activePatternIndex).findNoteBasedOnPoint(noteCoordinate);
+    }
+
     void setSelection(const SelectionCoords &t_selection) {
         pattern.at(activePatternIndex).calculateSelection(t_selection);
     }

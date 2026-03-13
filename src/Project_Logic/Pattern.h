@@ -67,8 +67,7 @@ public:
 
     void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
 
-    NoteEventPair findNoteBasedOnPoint(uint8_t t_pitch, uint32_t absoluteTime);
-
+    NoteEventPair findNoteBasedOnPoint(noteCoordinate noteCoordinate);
     NoteHoverState findNoteHoverState(noteCoordinate hoverCoordinate);
 
     // coverts selected on note ids into note events pairs
@@ -127,6 +126,14 @@ public:
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
+    }
+
+    NoteEventPair* findPairByID(uint32_t id) {
+        for (auto& pair : m_noteEvents) {
+            if (m_events.at(pair.onIndex).getID() == id)
+                return &pair;
+        }
+        return nullptr;
     }
 
 
