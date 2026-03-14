@@ -43,26 +43,35 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
     int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
     NoteCoordinate snappedCoordinate(pitch, static_cast<uint32_t>(snappedTime));
 
-    if (moveOperation.isMovingNote)
-    {
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-        {
+    if (moveOperation.isMovingNote)    {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))        {
             moveOperation.updateMovingNotesPosition(snappedCoordinate.pitch,snappedCoordinate.absoluteTime);
         }
-        else
-        {
-            if (moveOperation.movingNotes.size() == 1 )
-            {
+        else{
+            if (moveOperation.movingNotes.size() == 1 ){
                 auto note = moveOperation.movingNotes.at(0);
-
                 NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
-
                 PatternManager::instance().moveNoteEvent(note.ID,
                     newPos,
                     note.endAbsoluteTime+ moveOperation.newDeltaTime);
             }
             moveOperation.clearNotes();
-
+            PatternManager::instance().showAllEvents();
+        }
+    }
+    else if (stretchOperation.isStretchingNote) {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))        {
+            stretchOperation.updateStretchDelta(snappedCoordinate.absoluteTime);
+        }
+        else{
+            if (stretchOperation.stretchingNotes.size() == 1 ){
+                auto note = stretchOperation.stretchingNotes.at(0);
+                // NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
+                // PatternManager::instance().moveNoteEvent(note.ID,
+                //     newPos,
+                //     note.endAbsoluteTime+ moveOperation.newDeltaTime);
+            }
+            stretchOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
     }
@@ -70,15 +79,14 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (noteHoverState == NoteCenterHover) {
-            std::cout << "Hover"<< std::endl;
             PatternManager::instance().hideNoteEvent(hoverCoordinate);
-            moveNote(ctx, snappedCoordinate);
+            moveNote(snappedCoordinate);
         }
         else if (noteHoverState == NoteEdgeHover) {
-            std::cout << "edge Hover"<< std::endl;
+            PatternManager::instance().hideNoteEvent(hoverCoordinate);
+            stretchNote(snappedCoordinate);
         }
-        else
-        {
+        else{
             sendNewNote(snappedCoordinate);
         }
     }
@@ -94,13 +102,12 @@ void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
         static_cast<signed>(snappedCoordinate.absoluteTime),  duration);
 }
 
-void PianoRollComponent::moveNote(const TimelineContext& ctx, NoteCoordinate snappedCoordinate)
-{
+void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
     auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
 
     const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
     const auto& onNote =noteData.at(notePair.onIndex);
-    MovingNoteSnapshot noteSnapshot(
+    NoteSnapshot noteSnapshot(
         onNote.getID(),
         onNote.getAbsoluteTime(),
         noteData.at(notePair.offIndex).getAbsoluteTime(),
@@ -111,6 +118,23 @@ void PianoRollComponent::moveNote(const TimelineContext& ctx, NoteCoordinate sna
     moveOperation.addNotes(noteSnapshot);
 }
 
+void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
+    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
+
+    const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
+    const auto& onNote =noteData.at(notePair.onIndex);
+    const auto& offNote = noteData.at(notePair.offIndex);
+    NoteSnapshot noteSnapshot(
+        onNote.getID(),
+        onNote.getAbsoluteTime(),
+        offNote.getAbsoluteTime(),
+        offNote.getAbsoluteTime() - onNote.getAbsoluteTime(),
+        onNote.getPitch()
+        );
+    stretchOperation.initStretchingNotes(onNote.getAbsoluteTime(),offNote.getAbsoluteTime());
+    stretchOperation.addNotes(noteSnapshot);
+
+}
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto& pattern = PatternManager::instance().getCurrentPattern();
@@ -155,15 +179,31 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
 }
 
-void PianoRollComponent::renderMovingNotes(const TimelineContext& ctx)
-{
-    for (auto note: moveOperation.movingNotes)
-    {
-        std::cout<<"got moving note data"<<std::endl;
-        auto onTime = note.absoluteTime + moveOperation.newDeltaTime;
-        auto offTime = note.endAbsoluteTime + moveOperation.newDeltaTime;
-        auto pitch = note.pitch + moveOperation.newDeltaPitch;
+void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
+    std::vector<NoteSnapshot> PlaceHolderNotes;
 
+    if (moveOperation.isMovingNote) {
+        PlaceHolderNotes.insert(PlaceHolderNotes.end() ,moveOperation.movingNotes.begin(),moveOperation.movingNotes.end());
+    }
+    else if (stretchOperation.isStretchingNote) {
+        PlaceHolderNotes.insert(PlaceHolderNotes.end(),stretchOperation.stretchingNotes.begin(),stretchOperation.stretchingNotes.end());
+    }
+    else{return;}
+
+    for (auto i{0u}; i < PlaceHolderNotes.size(); ++i) {
+        auto note = PlaceHolderNotes.at(i);
+
+        auto onTime = note.absoluteTime;
+        auto offTime = note.endAbsoluteTime;
+        auto pitch = note.pitch;
+        if ( i < moveOperation.movingNotes.size() ) {
+            onTime +=  moveOperation.newDeltaTime;
+            offTime +=  moveOperation.newDeltaTime;
+            pitch +=  moveOperation.newDeltaPitch;
+        }
+        else if ( i < stretchOperation.stretchingNotes.size() ) {
+            offTime += stretchOperation.newEndDelta;
+        }
 
         float startDelta =0;
         if (onTime != 0){startDelta =

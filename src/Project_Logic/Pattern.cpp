@@ -250,26 +250,35 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
 
 void Pattern::timeShiftSelection(int32_t t_timeDelta) {
     //todo: fix note deltas changing after time shift past unselected notes
-    for (const auto selectionID: m_selectedNoteIDs) {
-        for (const auto& pair: m_noteEvents) {
-            auto onEvent = m_events.at(pair.onIndex);
-            if (selectionID == onEvent.getID()) {
-                auto offEvent = m_events.at(pair.offIndex);
 
-                auto OnAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
-                auto OffAbsoluteTime = static_cast<signed>(offEvent.getAbsoluteTime()) + t_timeDelta;
-                if (OnAbsoluteTime < 0) OnAbsoluteTime = 0u;
-                if (OffAbsoluteTime == OnAbsoluteTime+OffAbsoluteTime) OffAbsoluteTime -= t_timeDelta;
-
-                m_events.erase(m_events.begin() + static_cast<int>(pair.offIndex));
-                insertEvent(onEvent, static_cast<unsigned>(OnAbsoluteTime));
-                m_events.erase(m_events.begin() + static_cast<int>(pair.onIndex));
-                insertEvent(offEvent, static_cast<unsigned>(OffAbsoluteTime));
-            }
-        }
-    }
-    m_noteEvents.clear();
-    createNoteEventPairs();
+    // std::vector<MidiEvent> eventsToReAdd;
+    // for (const auto selectionID: m_selectedNoteIDs) {
+    //     for (const auto pair: m_noteEvents) {
+    //         auto onEvent = m_events.at(pair.onIndex);
+    //         if (selectionID == onEvent.getID()) {
+    //             auto offEvent = m_events.at(pair.offIndex);
+    //
+    //             auto OnAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
+    //             auto OffAbsoluteTime = static_cast<signed>(offEvent.getAbsoluteTime()) + t_timeDelta;
+    //
+    //             if (OnAbsoluteTime < 0) OnAbsoluteTime = 0u;
+    //             //if (OffAbsoluteTime == OnAbsoluteTime+OffAbsoluteTime) OffAbsoluteTime -= t_timeDelta;
+    //             onEvent.setAbsoluteTime(OnAbsoluteTime);
+    //             offEvent.setAbsoluteTime(OffAbsoluteTime);
+    //
+    //             removeNote(pair);
+    //             eventsToReAdd.push_back(onEvent);
+    //             eventsToReAdd.push_back(offEvent);
+    //
+    //         }
+    //     }
+    // }
+    // std::cout << eventsToReAdd.size() <<" this is size"<< std::endl;
+    // for (auto& reAdd: eventsToReAdd) {
+    //     insertEvent(reAdd,reAdd.getAbsoluteTime());
+    // }
+    // m_noteEvents.clear();
+    // createNoteEventPairs();
 }
 
 

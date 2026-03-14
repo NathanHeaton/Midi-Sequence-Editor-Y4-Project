@@ -83,7 +83,7 @@ private:
         DrawBars(ctx);
         DrawOctaveLines(ctx);
         renderPattern(ctx);
-        renderMovingNotes(ctx);
+        renderPlaceHolderNotes(ctx);
 
         DrawToolEffects(ctx);
         DrawPlayHead(ctx);
@@ -91,8 +91,8 @@ private:
 
     void sendNewNote(NoteCoordinate snappedCoordinate);
     void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
-    void moveNote(const TimelineContext& ctx, NoteCoordinate snappedCoordinate);
-    void strechNote(const TimelineContext& ctx, NoteCoordinate hoverCoordinate);
+    void moveNote(NoteCoordinate snappedCoordinate);
+    void stretchNote(NoteCoordinate hoverCoordinate);
 
     void edit(const TimelineContext& ctx);
     void HandleMouseInput(const TimelineContext& ctx);
@@ -100,7 +100,7 @@ private:
     void DrawToolEffects(const TimelineContext& ctx);
     void HandleKeyboardInput(const TimelineContext& ctx);
 
-    void renderMovingNotes(const TimelineContext& ctx);
+    void renderPlaceHolderNotes(const TimelineContext& ctx);
 
     void DrawPlayHead(const TimelineContext& ctx) const
     {
