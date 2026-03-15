@@ -57,7 +57,8 @@ public:
     }
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, assignNoteId());
+        uint32_t ids[2] ={assignNoteId(),assignNoteId()};
+        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, ids);
     }
 
     void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
@@ -86,7 +87,7 @@ public:
 
     NoteEventPair getNoteEventPairFromCoordinate(NoteCoordinate noteCoordinate)
     {
-        return pattern.at(activePatternIndex).findNoteBasedOnPoint(noteCoordinate);
+        return *pattern.at(activePatternIndex).findNoteBasedOnPoint(noteCoordinate);
     }
 
     void setSelection(const SelectionCoords &t_selection) {

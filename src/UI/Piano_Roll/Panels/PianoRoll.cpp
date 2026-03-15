@@ -97,70 +97,64 @@ void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
 }
 
 void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
-    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
-
-    const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
-    const auto& onNote =noteData.at(notePair.onIndex);
-    NoteSnapshot noteSnapshot(
-        onNote.getID(),
-        onNote.getAbsoluteTime(),
-        noteData.at(notePair.offIndex).getAbsoluteTime(),
-        noteData.at(notePair.offIndex).getAbsoluteTime() - onNote.getAbsoluteTime(),
-        onNote.getPitch()
-        );
+    auto noteSnapshot = createNoteSnapShot(snappedCoordinate);
     moveOperation.originalInputCoordinate = snappedCoordinate;
     moveOperation.addNotes(noteSnapshot);
 }
 
-void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
-    auto notePair = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
-
-    const auto& noteData = PatternManager::instance().getCurrentPattern().m_events;
-    const auto& onNote =noteData.at(notePair.onIndex);
-    const auto& offNote = noteData.at(notePair.offIndex);
-    NoteSnapshot noteSnapshot(
-        onNote.getID(),
-        onNote.getAbsoluteTime(),
-        offNote.getAbsoluteTime(),
-        offNote.getAbsoluteTime() - onNote.getAbsoluteTime(),
-        onNote.getPitch()
+NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordinate) {
+    auto noteIds = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
+    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
+    auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
+    return NoteSnapshot(
+        noteIds.onID,
+        onNote->getAbsoluteTime(),
+        offNote->getAbsoluteTime(),
+        offNote->getAbsoluteTime() - onNote->getAbsoluteTime(),
+        onNote->getPitch()
         );
-    stretchOperation.initStretchingNotes(onNote.getAbsoluteTime(),offNote.getAbsoluteTime());
+}
+void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
+    auto noteSnapshot = createNoteSnapShot(snappedCoordinate);
+    stretchOperation.initStretchingNotes(noteSnapshot.absoluteTime,noteSnapshot.endAbsoluteTime);
     stretchOperation.addNotes(noteSnapshot);
 
 }
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
-    auto& pattern = PatternManager::instance().getCurrentPattern();
-    auto& noteData = pattern.m_events;
+    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    auto& noteData = pattern->m_events;
 
-    for (auto noteIndices : pattern.m_noteEvents) {
-        auto onIndex = noteData.at(noteIndices.onIndex);
-        if (pattern.m_hiddenNoteIDs.contains(onIndex.getID()))
+    //pattern->
+    for (auto noteIDs : pattern->m_noteEvents) {
+        auto onEvent = pattern->getMidiEventByID_ptr(noteIDs.onID);
+
+        if (pattern->m_hiddenNoteIDs.contains(noteIDs.onID))
         {
             continue;
         }
-        auto offIndex = noteData.at(noteIndices.offIndex);
+        auto offEvent = pattern->getMidiEventByID_ptr(noteIDs.offID);
 
         float startDelta =0;
-        if (onIndex.m_absoluteTime != 0){startDelta =
-            static_cast<float>(onIndex.m_absoluteTime) / TimeData::PPQ;}
+        if (onEvent->m_absoluteTime != 0){startDelta =
+            static_cast<float>(onEvent->m_absoluteTime) / TimeData::PPQ;}
 
         float endDelta=0;
-        if (offIndex.m_absoluteTime != 0){endDelta =
-            static_cast<float>(offIndex.m_absoluteTime) / TimeData::PPQ;}
+        if (offEvent->m_absoluteTime != 0){endDelta =
+            static_cast<float>(offEvent->m_absoluteTime) / TimeData::PPQ;}
 
         float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
         float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
 
-        float yStart = ctx.cursorPos.y + ( ctx.height - ((noteData.at(noteIndices.onIndex).getPitch()+1)*ctx.noteHeight));
+        float yStart = ctx.cursorPos.y + (ctx.height - (onEvent->getPitch()+1)*ctx.noteHeight);
         float xStart = ctx.cursorPos.x + startPixel;
         float xEnd =  ctx.cursorPos.x + endPixel;
         float yEnd = yStart + ctx.noteHeight;
 
         auto colour = Theme::currentThemeColours.barColourPacked;
-        for (auto id : pattern.m_selectedNoteIDs) {
-            if (noteData.at(noteIndices.onIndex).getID() == id) {
+        for (auto id : pattern->m_selectedNoteIDs) {
+            if (noteIDs.onID == id) {
                 colour = Theme::currentThemeColours.beatColourPacked;
                 break;
             }

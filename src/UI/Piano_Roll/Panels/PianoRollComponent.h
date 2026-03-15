@@ -101,6 +101,7 @@ private:
     void HandleKeyboardInput(const TimelineContext& ctx);
 
     void renderPlaceHolderNotes(const TimelineContext& ctx);
+    NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
 
     void DrawPlayHead(const TimelineContext& ctx) const
     {

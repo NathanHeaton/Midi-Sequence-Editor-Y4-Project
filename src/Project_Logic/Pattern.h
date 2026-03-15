@@ -17,9 +17,12 @@ class SessionData;
 struct NoteCoordinate;
 struct SelectionCoords;
 
+/*====================================
+ * Stores of and on ID of events pairs
+ ==================================*/
 struct NoteEventPair {
-    size_t onIndex;
-    size_t offIndex;
+    uint32_t onID;
+    uint32_t offID;
     bool hidden = false;
 };
 
@@ -56,7 +59,7 @@ public:
     void pitchShiftSelection(signed short t_pitchDelta);
     void timeShiftSelection(int32_t t_timeDelta);
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
-    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id);
+    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id[]);
     void removeNote(NoteEventPair notePair );
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
 
@@ -73,7 +76,7 @@ public:
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 
-    NoteEventPair findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
+    std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
     NoteHoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
 
     // coverts selected on note ids into note events pairs
@@ -81,8 +84,7 @@ public:
         std::vector<NoteEventPair> events;
         for (const auto selectionID: m_selectedNoteIDs) {
             for (const auto& pair: m_noteEvents) {
-                auto onEvent = m_events.at(pair.onIndex);
-                if (selectionID == onEvent.getID()) {
+                if (selectionID == pair.onID) {
                     events.push_back(pair);
                 }
             }
@@ -90,7 +92,32 @@ public:
         return events;
     }
 
+    [[nodiscard]] const MidiEvent *getMidiEventByID_ptr(uint32_t ID) const{
+        for (auto& event: m_events) {
+            if (event.getID() == ID) {
+                return &event;
+            }
+        }
+        return nullptr;
+    }
 
+    [[nodiscard]] MidiEvent *getMidiEventByID_ptr(uint32_t ID) {
+        for (auto& event: m_events) {
+            if (event.getID() == ID) {
+                return &event;
+            }
+        }
+        return nullptr;
+    }
+
+    [[nodiscard]] size_t getEventIndexByID(uint32_t ID) const{
+        for (auto i{0u}; i < m_events.size(); ++i ) {
+            if (m_events.at(i).getID() == ID) {
+                return i;
+            }
+        }
+        return SIZE_MAX;
+    }
 
     [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime);
 
@@ -121,26 +148,17 @@ public:
         }
     }
 
-    void printNotePairs() {
-        printf("NotePairs\n");
-        for (auto i{0u};i<m_noteEvents.size();i++) {
-            printf("pair index %d\n",i);
-            printf("note on index %d\n ",m_noteEvents.at(i).onIndex);
-            printf("note off index %d\n ",m_noteEvents.at(i).offIndex);
-        }
-    }
-
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
     }
 
     NoteEventPair findPairByID(uint32_t id) {
         for (auto& pair : m_noteEvents) {
-            if (m_events.at(pair.onIndex).getID() == id)
+            if (pair.onID == id)
                 return pair;
         }
         std::cout << "NoteEventPairs not found" << std::endl;
-        return NoteEventPair(0,0);
+        return NoteEventPair(SIZE_MAX,SIZE_MAX);
     }
 
 
