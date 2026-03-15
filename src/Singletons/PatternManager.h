@@ -62,9 +62,13 @@ public:
     }
 
     void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
-        std::vector<struct NoteCoordinate> coords;
+        std::vector<NoteCoordinate> coords;
         coords.push_back(noteCoordinate);
         pattern.at(activePatternIndex).removeSelection(coords);
+    }
+
+    void moveSelection(NoteCoordinate coordinate) {
+        pattern.at(activePatternIndex).moveNoteEventSelection(coordinate);
     }
 
     void setCurrentPattern(size_t newPattern) {
@@ -107,9 +111,9 @@ public:
         pattern.at(activePatternIndex).stretchNoteEvent(ID,newEndDeltaOffset);
     }
 
-    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
+    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition)
     {
-        pattern.at(activePatternIndex).moveNoteEvent(ID, coordinatePosition, endAbsolute);
+        pattern.at(activePatternIndex).moveNoteEvent(ID, coordinatePosition);
     }
 
     //ParsedMidi* currentFile;

@@ -1,16 +1,15 @@
 #include "Pattern.h"
 
 #include <algorithm>
-
 #include "../Singletons/TimeData.h"
 #include "../Singletons/ViewState.h"
-#include <iostream>
 #include <cmath>
 #include <ranges>
 #include <sys/stat.h>
 
 #include "../Singletons/ToolManager.h"
 #include "../Singletons/PatternManager.h"
+
 //
 // Created by nathan on 11/01/2026.
 //
@@ -93,45 +92,16 @@ void Pattern::removeNote(NoteEventPair note) {
     createNoteEventPairs();
 }
 
-void Pattern::removeNoteOperation(NoteEventPair notepair) {
-    auto onNote = getMidiEventByID_ptr(notepair.onID);
-    auto offNote = getMidiEventByID_ptr(notepair.offID);
-    auto onDelta = onNote->getDelta();
-
-    auto noteOnIndex = getEventIndexByID(notepair.onID);
-    auto noteOffIndex = getEventIndexByID(notepair.offID);
-
-    if (noteOnIndex+1 < m_events.size()) {
-        m_events[noteOnIndex+1].setDelta(m_events[noteOnIndex+1].getDelta() +onDelta );
-    }
-    auto offDelta = offNote->getDelta();
-    if (noteOffIndex +1< m_events.size()) {
-        m_events[noteOffIndex+1].setDelta(m_events[noteOffIndex+1].getDelta() +offDelta );
-    }
-
-    m_events.erase(m_events.begin() + static_cast<int>(noteOffIndex));
-    m_events.erase(m_events.begin() + static_cast<int>(noteOnIndex));
-
-}
-
-void Pattern::removeSelection(NoteCoordinate event) {
-    auto notePair = findNoteBasedOnPoint(event);
-    if (getEventIndexByID(notePair->offID) == SIZE_MAX) {
-        return;
-    }
-    removeNote(*notePair);
-}
-
 void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
-    // for (auto& event:events) {
-    //     auto notePair = findNoteBasedOnPoint(event);
-    //     if (getEventIndexByID(notePair->offID) == SIZE_MAX) {
-    //         return;
-    //     }
-    //     removeNote(*notePair);
-    // }
-    // m_noteEvents.clear();
-    // createNoteEventPairs();
+    for (auto& event:events) {
+        auto notePair = findNoteBasedOnPoint(event);
+        if (getEventIndexByID(notePair->offID) == SIZE_MAX) {
+            return;
+        }
+        removeNote(*notePair);
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
 }
 
 void Pattern::deleteSelection() {
@@ -143,10 +113,39 @@ void Pattern::deleteSelection() {
             removeNoteOperation(noteIds);
         }
     }
-
+    m_selectedNoteIDs.clear();
     m_noteEvents.clear();
     createNoteEventPairs();
 }
+
+void Pattern::timeShiftSelection(int32_t t_timeDelta) {
+    if (m_selectedNoteIDs.empty()) {
+        return;
+    }
+    timeShiftOperation(t_timeDelta,m_selectedNoteIDs);
+
+}
+
+void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs) {
+    std::vector<MidiEvent> tempEvents;
+    for ( auto noteIds : m_noteEvents) {
+        if (m_selectedNoteIDs.contains(noteIds.onID)) {
+            auto onNote = *getMidiEventByID_ptr(noteIds.onID);
+            auto offNote = *getMidiEventByID_ptr(noteIds.offID);
+            tempEvents.push_back(onNote);
+            tempEvents.push_back(offNote);
+            removeNoteOperation(noteIds);
+        }
+    }
+
+    for ( auto event : tempEvents) {
+        insertEvent(event,event.getAbsoluteTime() + t_timeDelta);
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
+}
+
+
 
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {
     m_selectedNoteIDs.clear();
@@ -216,6 +215,27 @@ void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
     m_events.insert(m_events.begin() + index, event);
 }
 
+void Pattern::removeNoteOperation(NoteEventPair notepair) {
+    auto onNote = getMidiEventByID_ptr(notepair.onID);
+    auto offNote = getMidiEventByID_ptr(notepair.offID);
+    auto onDelta = onNote->getDelta();
+
+    auto noteOnIndex = getEventIndexByID(notepair.onID);
+    auto noteOffIndex = getEventIndexByID(notepair.offID);
+
+    if (noteOnIndex+1 < m_events.size()) {
+        m_events[noteOnIndex+1].setDelta(m_events[noteOnIndex+1].getDelta() +onDelta );
+    }
+    auto offDelta = offNote->getDelta();
+    if (noteOffIndex +1< m_events.size()) {
+        m_events[noteOffIndex+1].setDelta(m_events[noteOffIndex+1].getDelta() +offDelta );
+    }
+
+    m_events.erase(m_events.begin() + static_cast<int>(noteOffIndex));
+    m_events.erase(m_events.begin() + static_cast<int>(noteOnIndex));
+
+}
+
 void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration,uint32_t t_ids[]) {
     const uint8_t channel  = 0;
     const uint8_t velocity = 127;
@@ -245,39 +265,6 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
             }
         }
     }
-}
-
-void Pattern::timeShiftSelection(int32_t t_timeDelta) {
-    //todo: fix note deltas changing after time shift past unselected notes
-
-    // std::vector<MidiEvent> eventsToReAdd;
-    // for (const auto selectionID: m_selectedNoteIDs) {
-    //     for (const auto pair: m_noteEvents) {
-    //         auto onEvent = m_events.at(pair.onIndex);
-    //         if (selectionID == onEvent.getID()) {
-    //             auto offEvent = m_events.at(pair.offIndex);
-    //
-    //             auto OnAbsoluteTime = static_cast<signed>(onEvent.getAbsoluteTime()) + t_timeDelta;
-    //             auto OffAbsoluteTime = static_cast<signed>(offEvent.getAbsoluteTime()) + t_timeDelta;
-    //
-    //             if (OnAbsoluteTime < 0) OnAbsoluteTime = 0u;
-    //             //if (OffAbsoluteTime == OnAbsoluteTime+OffAbsoluteTime) OffAbsoluteTime -= t_timeDelta;
-    //             onEvent.setAbsoluteTime(OnAbsoluteTime);
-    //             offEvent.setAbsoluteTime(OffAbsoluteTime);
-    //
-    //             removeNote(pair);
-    //             eventsToReAdd.push_back(onEvent);
-    //             eventsToReAdd.push_back(offEvent);
-    //
-    //         }
-    //     }
-    // }
-    // std::cout << eventsToReAdd.size() <<" this is size"<< std::endl;
-    // for (auto& reAdd: eventsToReAdd) {
-    //     insertEvent(reAdd,reAdd.getAbsoluteTime());
-    // }
-    // m_noteEvents.clear();
-    // createNoteEventPairs();
 }
 
 
@@ -342,7 +329,7 @@ void Pattern::fixDeltaFromDeletedNote(NoteEventPair* pair)
     // }
 }
 
-void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition, uint32_t newEndAbsolute)
+void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition)
 {
     auto notePair = findPairByID(ID);
 
@@ -355,13 +342,22 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition, u
     m_noteEvents.clear();
     createNoteEventPairs();
 
+    auto endAbsolute = movedOffEvent.getAbsoluteTime() +
+        (newCoordinatePosition.absoluteTime - movedOnEvent.getAbsoluteTime());
     insertEvent(movedOnEvent, static_cast<unsigned>(newCoordinatePosition.absoluteTime));
-    insertEvent(movedOffEvent, static_cast<unsigned>(newEndAbsolute));
+    insertEvent(movedOffEvent, static_cast<unsigned>(endAbsolute));
 
     m_noteEvents.clear();
     createNoteEventPairs();
 
 }
+
+void Pattern::moveNoteEventSelection(NoteCoordinate coordinateDelta) {
+    timeShiftOperation(coordinateDelta.absoluteTime,m_selectedNoteIDs);
+    pitchShiftSelection(coordinateDelta.pitch);
+
+}
+
 
 void Pattern::stretchNoteEvent(uint32_t ID, uint32_t newEndDelta) {
     auto notePair = findPairByID(ID);

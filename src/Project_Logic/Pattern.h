@@ -61,19 +61,20 @@ public:
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id[]);
     void removeNote(NoteEventPair notePair );
+
     void removeNoteOperation(NoteEventPair notepair);
+    void timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs);
+
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
 
-    void removeSelection(NoteCoordinate t_event);
     void removeSelection(std::vector<NoteCoordinate> t_events);
     void deleteSelection();
 
     void stretchNoteEvent(uint32_t ID, uint32_t newEndAbsolute);
 
     void hideNoteEvent(NoteCoordinate coordinate);
-
-    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta, uint32_t newEndAbsolute);
-    void moveNoteEvent(std::vector<uint32_t> ID, NoteCoordinate coordinateDelta);
+    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta);
+    void moveNoteEventSelection(NoteCoordinate coordinateDelta);
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 

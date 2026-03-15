@@ -51,10 +51,14 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
             if (moveOperation.movingNotes.size() == 1 ){
                 auto note = moveOperation.movingNotes.at(0);
                 NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
-                PatternManager::instance().moveNoteEvent(note.ID,
-                    newPos,
-                    note.endAbsoluteTime+ moveOperation.newDeltaTime);
+                PatternManager::instance().moveNoteEvent(note.ID,newPos);
             }
+            else {
+                auto note = moveOperation.movingNotes.at(0);
+                NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
+                PatternManager::instance().moveSelection(newPos);
+            }
+
             moveOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
@@ -124,7 +128,6 @@ void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto* pattern = &PatternManager::instance().getCurrentPattern();
-    auto& noteData = pattern->m_events;
 
     //pattern->
     for (auto noteIDs : pattern->m_noteEvents) {
