@@ -88,29 +88,31 @@ void Pattern::removeNote(NoteEventPair note) {
     if (m_events.empty()) {
         return;
     }
-    auto onNote = getMidiEventByID_ptr(note.onID);
-    auto offNote = getMidiEventByID_ptr(note.offID);
-     auto onDelta = onNote->getDelta();
-
-    auto noteOnIndex = getEventIndexByID(note.onID);
-    auto noteOffIndex = getEventIndexByID(note.offID);
-
-    if (noteOnIndex+1 < m_events.size()) {
-        m_events[noteOnIndex+1].setDelta(m_events[noteOnIndex+1].getDelta() +onDelta );
-    }
-     auto offDelta = offNote->getDelta();
-     if (noteOffIndex +1< m_events.size()) {
-         m_events[noteOffIndex+1].setDelta(m_events[noteOffIndex+1].getDelta() +offDelta );
-     }
-
-     m_events.erase(m_events.begin() + static_cast<int>(noteOffIndex));
-     m_events.erase(m_events.begin() + static_cast<int>(noteOnIndex));
-
+    removeNoteOperation(note);
     m_noteEvents.clear();
     createNoteEventPairs();
 }
 
-//void Pattern::adjust
+void Pattern::removeNoteOperation(NoteEventPair notepair) {
+    auto onNote = getMidiEventByID_ptr(notepair.onID);
+    auto offNote = getMidiEventByID_ptr(notepair.offID);
+    auto onDelta = onNote->getDelta();
+
+    auto noteOnIndex = getEventIndexByID(notepair.onID);
+    auto noteOffIndex = getEventIndexByID(notepair.offID);
+
+    if (noteOnIndex+1 < m_events.size()) {
+        m_events[noteOnIndex+1].setDelta(m_events[noteOnIndex+1].getDelta() +onDelta );
+    }
+    auto offDelta = offNote->getDelta();
+    if (noteOffIndex +1< m_events.size()) {
+        m_events[noteOffIndex+1].setDelta(m_events[noteOffIndex+1].getDelta() +offDelta );
+    }
+
+    m_events.erase(m_events.begin() + static_cast<int>(noteOffIndex));
+    m_events.erase(m_events.begin() + static_cast<int>(noteOnIndex));
+
+}
 
 void Pattern::removeSelection(NoteCoordinate event) {
     auto notePair = findNoteBasedOnPoint(event);
@@ -121,28 +123,29 @@ void Pattern::removeSelection(NoteCoordinate event) {
 }
 
 void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
-    for (auto& event:events) {
-        auto notePair = findNoteBasedOnPoint(event);
-        if (getEventIndexByID(notePair->offID) == SIZE_MAX) {
-            return;
-        }
-        removeNote(*notePair);
-    }
-    m_noteEvents.clear();
-    createNoteEventPairs();
+    // for (auto& event:events) {
+    //     auto notePair = findNoteBasedOnPoint(event);
+    //     if (getEventIndexByID(notePair->offID) == SIZE_MAX) {
+    //         return;
+    //     }
+    //     removeNote(*notePair);
+    // }
+    // m_noteEvents.clear();
+    // createNoteEventPairs();
 }
 
 void Pattern::deleteSelection() {
     if (m_selectedNoteIDs.empty()) {
         return;
     }
-    //Todo: find better solution for deleting selection, more robust way of getting selected note ids as they are being updated
-    auto selectedNoteIndices = convertNoteIdsToNotePair();
-
-    for (auto i{0u};i<selectedNoteIndices.size();i++) {
-        removeNote(selectedNoteIndices.at(i));
-        selectedNoteIndices = convertNoteIdsToNotePair();
+    for ( auto noteIds : m_noteEvents) {
+        if (m_selectedNoteIDs.contains(noteIds.onID)) {
+            removeNoteOperation(noteIds);
+        }
     }
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
 }
 
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {

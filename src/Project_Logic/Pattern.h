@@ -61,6 +61,7 @@ public:
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id[]);
     void removeNote(NoteEventPair notePair );
+    void removeNoteOperation(NoteEventPair notepair);
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
 
     void removeSelection(NoteCoordinate t_event);
