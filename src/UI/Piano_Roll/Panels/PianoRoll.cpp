@@ -66,16 +66,12 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
         else{
             if (stretchOperation.stretchingNotes.size() == 1 ){
                 auto note = stretchOperation.stretchingNotes.at(0);
-                // NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
-                // PatternManager::instance().moveNoteEvent(note.ID,
-                //     newPos,
-                //     note.endAbsoluteTime+ moveOperation.newDeltaTime);
+                PatternManager::instance().stretchNoteEvent(note.ID, stretchOperation.newEndDelta);
             }
             stretchOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
     }
-
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (noteHoverState == NoteCenterHover) {
@@ -91,15 +87,13 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
         }
     }
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-
         PatternManager::instance().removeNoteFromPattern(hoverCoordinate);
     }
 }
 
 void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
-    int duration = TimeData::PPQ;
     PatternManager::instance().addNoteToPattern(snappedCoordinate.pitch,
-        static_cast<signed>(snappedCoordinate.absoluteTime),  duration);
+        static_cast<signed>(snappedCoordinate.absoluteTime),  ToolManager::instance().getLastNoteDuration());
 }
 
 void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){

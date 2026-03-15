@@ -118,8 +118,6 @@ void Pattern::removeSelection(NoteCoordinate event) {
         return;
     }
     removeNote(notePair);
-    m_noteEvents.clear();
-    createNoteEventPairs();
 }
 
 void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
@@ -140,14 +138,11 @@ void Pattern::deleteSelection() {
     }
     //Todo: find better solution for deleting selection, more robust way of getting selected note ids as they are being updated
     auto selectedNoteIndices = convertNoteIdsToNotePair();
+
     for (auto i{0u};i<selectedNoteIndices.size();i++) {
         removeNote(selectedNoteIndices.at(i));
         selectedNoteIndices = convertNoteIdsToNotePair();
     }
-
-    m_noteEvents.clear();
-    createNoteEventPairs();
-
 }
 
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {
@@ -344,11 +339,11 @@ void Pattern::fixDeltaFromDeletedNote(NoteEventPair* pair)
 
 }
 
-void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
+void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition, uint32_t newEndAbsolute)
 {
     auto notePair = findPairByID(ID);
-    m_events.at(notePair.onIndex).setPitch(coordinatePosition.pitch);
-    m_events.at(notePair.offIndex).setPitch(coordinatePosition.pitch);
+    m_events.at(notePair.onIndex).setPitch(newCoordinatePosition.pitch);
+    m_events.at(notePair.offIndex).setPitch(newCoordinatePosition.pitch);
 
     auto movedOnEvent = m_events.at(notePair.onIndex);
     auto movedOffEvent = m_events.at(notePair.offIndex);
@@ -357,10 +352,27 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint
     m_noteEvents.clear();
     createNoteEventPairs();
 
-    insertEvent(movedOnEvent, static_cast<unsigned>(coordinatePosition.absoluteTime));
-    insertEvent(movedOffEvent, static_cast<unsigned>(endAbsolute));
+    insertEvent(movedOnEvent, static_cast<unsigned>(newCoordinatePosition.absoluteTime));
+    insertEvent(movedOffEvent, static_cast<unsigned>(newEndAbsolute));
 
     m_noteEvents.clear();
     createNoteEventPairs();
 
+}
+
+void Pattern::stretchNoteEvent(uint32_t ID, uint32_t newEndDelta) {
+    auto notePair = findPairByID(ID);
+
+    auto movedOnEvent = m_events.at(notePair.onIndex);
+    auto movedOffEvent = m_events.at(notePair.offIndex);
+
+    removeNote(notePair);
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
+    insertEvent(movedOnEvent, movedOnEvent.getAbsoluteTime());
+    insertEvent(movedOffEvent, movedOffEvent.getAbsoluteTime() + newEndDelta);
+
+    m_noteEvents.clear();
+    createNoteEventPairs();
 }

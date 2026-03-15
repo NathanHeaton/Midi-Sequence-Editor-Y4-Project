@@ -58,7 +58,7 @@ private:
     uint32_t originalEndTime{0};
 public:
     std::vector<NoteSnapshot> stretchingNotes;
-    uint32_t newEndDelta{0};
+    int newEndDelta{0};
     bool isStretchingNote{false};
 
     void initStretchingNotes(uint32_t startTime,uint32_t endTime) {
@@ -74,7 +74,9 @@ public:
             newEndDelta = absolute - originalEndTime;
         }
     }
-    void clearNotes(){stretchingNotes.clear(); isStretchingNote = false;}
+    void clearNotes() {
+        stretchingNotes.clear(); isStretchingNote = false;
+    }
 };
 
 
@@ -120,6 +122,8 @@ class ToolManager {
 
     [[nodiscard]] bool IsMovingNotes() const {return isMovingNote;};
 
+    [[nodiscard]] uint32_t getLastNoteDuration() const {return lastNoteDuration;};
+    void setLastNoteDuration(uint32_t newDuration) {lastNoteDuration = newDuration;}
 
 private:
     ToolTypes activeNoteTool{EDIT};
@@ -130,6 +134,7 @@ private:
 
     bool isMovingNote = false;
 
+    uint32_t lastNoteDuration{996};
 
     SelectionCoords selectCoords;
 };

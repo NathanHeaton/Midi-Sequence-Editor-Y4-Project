@@ -6,7 +6,8 @@
 #include <vector>
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
-#include "../NoteStucts.h"
+
+#include "ToolManager.h"
 
 enum NoteHoverState: int{
     noNoteHover,
@@ -96,6 +97,13 @@ public:
         parsedMidiFile.emplace_back(data,title);
         std::cout << "moving onto pattern" << std::endl;
         updatePatternWithMidiData();
+    }
+
+    void stretchNoteEvent(uint32_t ID, uint32_t newEndDeltaOffset) {
+        ToolManager::instance().setLastNoteDuration(
+            ToolManager::instance().getLastNoteDuration()
+            +newEndDeltaOffset);
+        pattern.at(activePatternIndex).stretchNoteEvent(ID,newEndDeltaOffset);
     }
 
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition, uint32_t endAbsolute)
