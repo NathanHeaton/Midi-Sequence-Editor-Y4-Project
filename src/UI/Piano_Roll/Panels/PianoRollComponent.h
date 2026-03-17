@@ -102,6 +102,7 @@ private:
 
     void renderPlaceHolderNotes(const TimelineContext& ctx);
     NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
+    NoteSnapshot createNoteSnapShotBasedOnID(uint32_t onIds);
 
     void DrawPlayHead(const TimelineContext& ctx) const
     {

@@ -78,6 +78,8 @@ public:
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 
+    void hideNoteByID(uint32_t ID) {m_hiddenNoteIDs.insert(ID);}
+
     std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
     NoteHoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
 
@@ -123,7 +125,14 @@ public:
 
     [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime);
 
-
+    [[nodiscard]] const NoteEventPair* getEventIDPairFromOnID(uint32_t ID) const{
+        for (auto i{0u}; i < m_noteEvents.size(); ++i ) {
+            if (m_noteEvents.at(i).onID == ID) {
+                return &m_noteEvents.at(i);
+            }
+        }
+        return nullptr;
+    }
     void updateEventDeltas(auto startIndex, auto deltaIncrement) {
         // for (int i = startIndex+1; i < m_events.size(); i++) {
         //     m_events.at(i).m_delta += deltaIncrement;

@@ -84,6 +84,11 @@ public:
         pattern.at(activePatternIndex).hideNoteEvent(noteCoordinate);
     }
 
+    void hideNoteEventByID(uint32_t ID)
+    {
+        pattern.at(activePatternIndex).hideNoteByID(ID);
+    }
+
     void showAllEvents()
     {
         pattern.at(activePatternIndex).showAllNoteEvents();

@@ -55,7 +55,7 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
             }
             else {
                 auto note = moveOperation.movingNotes.at(0);
-                NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
+                NoteCoordinate newPos(moveOperation.newDeltaPitch, moveOperation.newDeltaTime);
                 PatternManager::instance().moveSelection(newPos);
             }
 
@@ -79,7 +79,6 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (noteHoverState == NoteCenterHover) {
-            PatternManager::instance().hideNoteEvent(hoverCoordinate);
             moveNote(snappedCoordinate);
         }
         else if (noteHoverState == NoteEdgeHover) {
@@ -101,16 +100,28 @@ void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
 }
 
 void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
-    auto noteSnapshot = createNoteSnapShot(snappedCoordinate);
+    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    std::vector<NoteSnapshot> noteSnapshots;
+    if (pattern->m_selectedNoteIDs.size() > 0) {
+        for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
+            noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
+        }
+    }
+    else {
+        noteSnapshots.push_back(createNoteSnapShot(snappedCoordinate));
+    }
+
     moveOperation.originalInputCoordinate = snappedCoordinate;
-    moveOperation.addNotes(noteSnapshot);
+    moveOperation.addNotes(noteSnapshots);
 }
 
-NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordinate) {
-    auto noteIds = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
+NoteSnapshot PianoRollComponent::createNoteSnapShotBasedOnID(uint32_t onID) {
     auto* pattern = &PatternManager::instance().getCurrentPattern();
+    auto noteIds = *pattern->getEventIDPairFromOnID(onID);
     auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
     auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
+
+    PatternManager::instance().hideNoteEventByID(onID);
     return NoteSnapshot(
         noteIds.onID,
         onNote->getAbsoluteTime(),
@@ -119,6 +130,23 @@ NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordi
         onNote->getPitch()
         );
 }
+
+NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordinate) {
+    auto noteIds = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
+    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
+    auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
+
+    PatternManager::instance().hideNoteEventByID(noteIds.onID);
+    return NoteSnapshot(
+        noteIds.onID,
+        onNote->getAbsoluteTime(),
+        offNote->getAbsoluteTime(),
+        offNote->getAbsoluteTime() - onNote->getAbsoluteTime(),
+        onNote->getPitch()
+        );
+}
+
 void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
     auto noteSnapshot = createNoteSnapShot(snappedCoordinate);
     stretchOperation.initStretchingNotes(noteSnapshot.absoluteTime,noteSnapshot.endAbsoluteTime);
