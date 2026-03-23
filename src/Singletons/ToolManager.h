@@ -64,7 +64,7 @@ public:
     }
     void updateStretchDelta(uint32_t absolute) {
         if (absolute > originalStartTime) {
-            newEndDelta = absolute - originalEndTime;
+            newEndDelta = static_cast<signed>(absolute - originalEndTime);
         }
     }
     void clearNotes() {
@@ -93,7 +93,7 @@ class ToolManager {
     [[nodiscard]] const SelectionCoords& getSelectionPoints() const { return selectCoords; }
 
 
-    void setNoteTool(ToolTypes t) { activeNoteTool = t; }
+    void setPianoRollTool(ToolTypes t) { activeNoteTool = t; }
     void setArrangerTool(ToolTypes t) { activeArrangerTool = t; }
 
     void setSelectionPoint1(ImVec2 selectP1) {

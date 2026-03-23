@@ -78,9 +78,15 @@ public:
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta);
 
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
-    void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
+    void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
 
     void hideNoteByID(uint32_t ID) {m_hiddenNoteIDs.insert(ID);}
+    void clearPattern(){
+        m_events.clear();
+        m_noteEvents.clear();
+        m_hiddenNoteIDs.clear();
+        m_selectedNoteIDs.clear();
+    }
 
     std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
     NoteHoverState findNoteHoverState(NoteCoordinate hoverCoordinate);

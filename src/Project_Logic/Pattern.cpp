@@ -372,13 +372,14 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
     MidiEvent movedOnEvent = *getMidiEventByID_ptr(notePair.onID);
     MidiEvent movedOffEvent = *getMidiEventByID_ptr(notePair.offID);
 
-    removeNote(notePair);
-    m_noteEvents.clear();
-    createNoteEventPairs();
+    removeNoteOperation(notePair);
 
     insertEvent(movedOnEvent, movedOnEvent.getAbsoluteTime());
-    insertEvent(movedOffEvent, movedOffEvent.getAbsoluteTime() + newEndDelta);
-
+    if (movedOnEvent.getAbsoluteTime() >= movedOffEvent.getAbsoluteTime() + newEndDelta) {
+        std::cout << "Had to fix note end time" << ID << std::endl;
+        insertEvent(movedOffEvent, movedOnEvent.getAbsoluteTime() + ViewState::instance().getStandardSnapTime());
+    }
+    else{insertEvent(movedOffEvent, movedOffEvent.getAbsoluteTime() + newEndDelta);}
     m_noteEvents.clear();
     createNoteEventPairs();
 }

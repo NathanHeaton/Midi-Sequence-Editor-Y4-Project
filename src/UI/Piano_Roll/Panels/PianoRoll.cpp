@@ -63,7 +63,7 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
         }
     }
     else if (stretchOperation.isStretchingNote) {
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))        {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
             stretchOperation.updateStretchDelta(snappedCoordinate.absoluteTime);
         }
         else{
@@ -85,7 +85,6 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
             moveNote(snappedCoordinate);
         }
         else if (noteHoverState == NoteEdgeHover) {
-            PatternManager::instance().hideNoteEvent(hoverCoordinate);
             stretchNote(snappedCoordinate);
         }
         else{
@@ -107,13 +106,13 @@ void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
     std::vector<NoteSnapshot> noteSnapshots;
     if (pattern->m_selectedNoteIDs.size() > 0) {
         for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
+            PatternManager::instance().hideNoteEventByID(m_selected_note_i_d);
             noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
         }
     }
     else {
         noteSnapshots.push_back(createNoteSnapShot(snappedCoordinate));
     }
-
     moveOperation.originalInputCoordinate = snappedCoordinate;
     moveOperation.addNotes(noteSnapshots);
 }
@@ -123,13 +122,13 @@ void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
     std::vector<NoteSnapshot> noteSnapshots;
     if (pattern->m_selectedNoteIDs.size() > 0) {
         for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
+            PatternManager::instance().hideNoteEventByID(m_selected_note_i_d);
             noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
         }
     }
     else {
         noteSnapshots.push_back(createNoteSnapShot(snappedCoordinate));
     }
-
     stretchOperation.initStretchingNotes(noteSnapshots[0].absoluteTime,noteSnapshots[0].endAbsoluteTime);
     stretchOperation.addNotes(noteSnapshots);
 }
@@ -140,7 +139,6 @@ NoteSnapshot PianoRollComponent::createNoteSnapShotBasedOnID(uint32_t onID) {
     auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
     auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
 
-    PatternManager::instance().hideNoteEventByID(onID);
     return NoteSnapshot(
         noteIds.onID,
         onNote->getAbsoluteTime(),
@@ -233,10 +231,12 @@ void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
             offTime +=  moveOperation.newDeltaTime;
             pitch +=  moveOperation.newDeltaPitch;
         }
-        else if ( i < stretchOperation.stretchingNotes.size() ) {
-            offTime += stretchOperation.newEndDelta;
+        else if ( i < stretchOperation.stretchingNotes.size() )
+        {
+            if (offTime + stretchOperation.newEndDelta < onTime)            {
+                offTime = onTime + ViewState::instance().getStandardSnapTime();
+            }else{offTime += stretchOperation.newEndDelta;}
         }
-
         float startDelta =0;
         if (onTime != 0){startDelta =
             static_cast<float>(onTime) / TimeData::PPQ;}
@@ -308,9 +308,25 @@ void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
         else if (ImGui::IsKeyPressed(ImGuiKey_Z)) {
 
         }
+        else if (ImGui::IsKeyPressed(ImGuiKey_A))
+        {
+
+        }
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
-        PatternManager::instance().deleteSelection();
+        if (PatternManager::instance().areNotesSelected()){
+            PatternManager::instance().deleteSelection();
+        }
+        else{
+            PatternManager::instance().clearPattern();
+        }
+    }
+
+    if (ImGui::IsKeyPressed(ImGuiKey_E)){
+        ToolManager::instance().setPianoRollTool(ToolTypes::EDIT);
+    }
+    else if (ImGui::IsKeyPressed(ImGuiKey_S))    {
+        ToolManager::instance().setPianoRollTool(ToolTypes::SELECT);
     }
 
 }

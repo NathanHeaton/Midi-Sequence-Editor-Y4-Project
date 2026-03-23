@@ -31,31 +31,31 @@ public:
         if (ImGui::ImageButton("edit_button",
             (void*)(intptr_t)ASSETS.editIcon.textureID,
             ImVec2(32, 32))) {
-            ToolManager::instance().setNoteTool(EDIT);
+            ToolManager::instance().setPianoRollTool(EDIT);
             }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("box_select",
         (void*)(intptr_t)ASSETS.boxSelect.textureID,
         ImVec2(32, 32))) {
-            ToolManager::instance().setNoteTool(SELECT);
+            ToolManager::instance().setPianoRollTool(SELECT);
         }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("delete_button",
             (void*)(intptr_t)ASSETS.deleteIcon.textureID,
             ImVec2(32, 32))) {
-            ToolManager::instance().setNoteTool(DELETE);
+            ToolManager::instance().setPianoRollTool(DELETE);
             }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("move_tool",
             (void*)(intptr_t)ASSETS.moveIcon.textureID,
             ImVec2(32, 32))) {
-            ToolManager::instance().setNoteTool(MOVE);
+            ToolManager::instance().setPianoRollTool(MOVE);
             }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("cut_button",
             (void*)(intptr_t)ASSETS.cutIcon.textureID,
             ImVec2(32, 32))) {
-            ToolManager::instance().setNoteTool(SNIP);
+            ToolManager::instance().setPianoRollTool(SNIP);
             }
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("play_button",

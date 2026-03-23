@@ -103,6 +103,16 @@ public:
         pattern.at(activePatternIndex).calculateSelection(t_selection);
     }
 
+    bool areNotesSelected(){
+        if (pattern.at(activePatternIndex).m_selectedNoteIDs.size() > 0)
+            {return true;}
+        return false;
+    }
+
+    void clearPattern(){
+        pattern.at(activePatternIndex).clearPattern();
+    }
+
     void addParsedMidi(auto& data, std::string title) {
         parsedMidiFile.emplace_back(data,title);
         updatePatternWithMidiData();
