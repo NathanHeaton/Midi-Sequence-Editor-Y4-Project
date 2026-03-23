@@ -1,7 +1,7 @@
 #pragma once
 
 #include <imgui.h>
-#include "../NoteStucts.h"
+#include "../NoteStructs.h"
 
 enum ToolTypes {
     SELECT,
@@ -16,22 +16,14 @@ struct SelectionCoords {
     ImVec2 selectP2;
 };
 
-struct NoteSnapshot
-{
-    uint32_t ID;
-    uint32_t absoluteTime;
-    uint32_t endAbsoluteTime;
-    uint32_t duration;
-    uint8_t pitch;
 
-};
 
 //struct noteCoordinate {};
 
 struct MoveOperation{
     std::vector<NoteSnapshot> movingNotes;
     NoteCoordinate originalInputCoordinate;
-    short newDeltaPitch;
+    int8_t newDeltaPitch;
     int newDeltaTime;
     bool isMovingNote{false};
 

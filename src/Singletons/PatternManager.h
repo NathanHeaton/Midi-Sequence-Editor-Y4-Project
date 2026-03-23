@@ -67,7 +67,7 @@ public:
         pattern.at(activePatternIndex).removeSelection(coords);
     }
 
-    void moveSelection(NoteCoordinate coordinate) {
+    void moveSelection(NoteMoveDelta coordinate) {
         pattern.at(activePatternIndex).moveNoteEventSelection(coordinate);
     }
 
@@ -105,7 +105,6 @@ public:
 
     void addParsedMidi(auto& data, std::string title) {
         parsedMidiFile.emplace_back(data,title);
-        std::cout << "moving onto pattern" << std::endl;
         updatePatternWithMidiData();
     }
 

@@ -16,7 +16,7 @@ class SessionData;
 
 struct NoteCoordinate;
 struct SelectionCoords;
-
+struct NoteMoveDelta;
 /*====================================
  * Stores of and on ID of events pairs
  ==================================*/
@@ -74,7 +74,7 @@ public:
 
     void hideNoteEvent(NoteCoordinate coordinate);
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta);
-    void moveNoteEventSelection(NoteCoordinate coordinateDelta);
+    void moveNoteEventSelection(NoteMoveDelta coordinateDelta);
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteIDs.clear(); printEvents();}
 

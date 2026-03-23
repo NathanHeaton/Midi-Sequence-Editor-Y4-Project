@@ -352,9 +352,9 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition)
 
 }
 
-void Pattern::moveNoteEventSelection(NoteCoordinate coordinateDelta) {
-    timeShiftOperation(coordinateDelta.absoluteTime,m_selectedNoteIDs);
-    pitchShiftSelection(coordinateDelta.pitch);
+void Pattern::moveNoteEventSelection(NoteMoveDelta coordinateDelta) {
+    timeShiftOperation(coordinateDelta.timeDelta,m_selectedNoteIDs);
+    pitchShiftSelection(coordinateDelta.pitchD);
     m_selectedNoteIDs.clear();
 }
 
