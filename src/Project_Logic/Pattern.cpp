@@ -293,6 +293,7 @@ NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
     return state;
 }
 
+
 void Pattern::hideNoteEvent(NoteCoordinate coordinate)
 {
     for (const auto& pair: m_noteEvents)    {
@@ -358,10 +359,16 @@ void Pattern::moveNoteEventSelection(NoteMoveDelta coordinateDelta) {
     m_selectedNoteIDs.clear();
 }
 
+void Pattern::stretchNoteEventSelection(NoteMoveDelta coordinateDelta)
+{
+    for (uint32_t id : m_selectedNoteIDs)
+    {
+        stretchNoteEvent(id,coordinateDelta.timeDelta);
+    }
+}
 
-void Pattern::stretchNoteEvent(uint32_t ID, uint32_t newEndDelta) {
+void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
     auto notePair = findPairByID(ID);
-
     MidiEvent movedOnEvent = *getMidiEventByID_ptr(notePair.onID);
     MidiEvent movedOffEvent = *getMidiEventByID_ptr(notePair.offID);
 

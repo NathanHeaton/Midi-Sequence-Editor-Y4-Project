@@ -108,11 +108,16 @@ public:
         updatePatternWithMidiData();
     }
 
-    void stretchNoteEvent(uint32_t ID, uint32_t newEndDeltaOffset) {
+    void stretchNoteEvent(uint32_t ID, int32_t newEndDeltaOffset) {
         ToolManager::instance().setLastNoteDuration(
             ToolManager::instance().getLastNoteDuration()
             +newEndDeltaOffset);
         pattern.at(activePatternIndex).stretchNoteEvent(ID,newEndDeltaOffset);
+    }
+
+    void stretchSelection(NoteMoveDelta offsetDelta)
+    {
+        pattern.at(activePatternIndex).stretchNoteEventSelection(offsetDelta);
     }
 
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition)

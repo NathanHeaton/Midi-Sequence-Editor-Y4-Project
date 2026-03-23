@@ -57,6 +57,7 @@ public:
         originalStartTime = startTime; originalEndTime = endTime;
     }
     void addNotes(NoteSnapshot notes){stretchingNotes.push_back(notes); isStretchingNote = true;}
+
     void addNotes(std::vector<NoteSnapshot> notes){
         stretchingNotes.insert(stretchingNotes.begin(), notes.begin(), notes.end());
         isStretchingNote = true;

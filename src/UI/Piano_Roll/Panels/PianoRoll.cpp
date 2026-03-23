@@ -71,6 +71,10 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
                 auto note = stretchOperation.stretchingNotes.at(0);
                 PatternManager::instance().stretchNoteEvent(note.ID, stretchOperation.newEndDelta);
             }
+            else {
+                NoteMoveDelta newPos(0, stretchOperation.newEndDelta);
+                PatternManager::instance().stretchSelection(newPos);
+            }
             stretchOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
@@ -114,6 +118,22 @@ void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
     moveOperation.addNotes(noteSnapshots);
 }
 
+void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
+    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    std::vector<NoteSnapshot> noteSnapshots;
+    if (pattern->m_selectedNoteIDs.size() > 0) {
+        for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
+            noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
+        }
+    }
+    else {
+        noteSnapshots.push_back(createNoteSnapShot(snappedCoordinate));
+    }
+
+    stretchOperation.initStretchingNotes(noteSnapshots[0].absoluteTime,noteSnapshots[0].endAbsoluteTime);
+    stretchOperation.addNotes(noteSnapshots);
+}
+
 NoteSnapshot PianoRollComponent::createNoteSnapShotBasedOnID(uint32_t onID) {
     auto* pattern = &PatternManager::instance().getCurrentPattern();
     auto noteIds = *pattern->getEventIDPairFromOnID(onID);
@@ -146,12 +166,6 @@ NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordi
         );
 }
 
-void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
-    auto noteSnapshot = createNoteSnapShot(snappedCoordinate);
-    stretchOperation.initStretchingNotes(noteSnapshot.absoluteTime,noteSnapshot.endAbsoluteTime);
-    stretchOperation.addNotes(noteSnapshot);
-
-}
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto* pattern = &PatternManager::instance().getCurrentPattern();
