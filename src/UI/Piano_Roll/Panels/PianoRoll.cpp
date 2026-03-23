@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "PianoRollComponent.h"
-
+#include "../../../NoteOperations.h"
 //
 // Created by nathan on 16/02/2026.
 //
@@ -31,68 +31,67 @@ void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
     }
 }
 
+NoteCoordinate PianoRollComponent::resolveHoverCoordinate(const TimelineContext& ctx) const {
+    int absoluteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) * TimeData::PPQ);
+    int pitch = std::clamp(127 - static_cast<int>(ctx.relativeY / ctx.noteHeight), 0, 127);
+    return NoteCoordinate(pitch, static_cast<uint32_t>(absoluteTime));
+}
+
+NoteCoordinate PianoRollComponent::resolveSnappedCoordinate(const TimelineContext& ctx) const {
+    int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll)
+                                    * view_state->getSnappedSubDivisions());
+    int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ) / view_state->getSnappedSubDivisions());
+    int pitch = std::clamp(127 - static_cast<int>(ctx.relativeY / ctx.noteHeight), 0, 127);
+    return NoteCoordinate(pitch, static_cast<uint32_t>(snappedTime));
+}
 void PianoRollComponent::edit(const TimelineContext& ctx)
 {
-    int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *view_state->getSnappedSubDivisions());
-    int absoluteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) *TimeData::PPQ);
-    int pitch = static_cast<int>(ctx.relativeY / ctx.noteHeight);
-    pitch = std::clamp(pitch, 0, 127);
-    pitch = 127 - pitch;
-    NoteCoordinate hoverCoordinate(pitch, static_cast<uint32_t>(absoluteTime));
-    auto noteHoverState = PatternManager::instance().getNoteHoverState(hoverCoordinate);
-    int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ)/view_state->getSnappedSubDivisions());
-    NoteCoordinate snappedCoordinate(pitch, static_cast<uint32_t>(snappedTime));
+    const NoteCoordinate hover = resolveHoverCoordinate(ctx);
+    const NoteCoordinate snapped = resolveSnappedCoordinate(ctx);
+    const auto hoverState = PatternManager::instance().getNoteHoverState(hover);
 
-    if (moveOperation.isMovingNote)    {
+    if (moveOperation.isActive)    {
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left))        {
-            moveOperation.updateMovingNotesPosition(snappedCoordinate.pitch,snappedCoordinate.absoluteTime);
+            moveOperation.update(snapped);
         }
         else{
-            if (moveOperation.movingNotes.size() == 1 ){
-                auto note = moveOperation.movingNotes.at(0);
-                NoteCoordinate newPos(note.pitch +moveOperation.newDeltaPitch, note.absoluteTime+moveOperation.newDeltaTime);
-                PatternManager::instance().moveNoteEvent(note.ID,newPos);
+            auto commit = moveOperation.commit();
+            if (std::holds_alternative<SingleNoteCommit>(commit))  {
+                auto& c = std::get<SingleNoteCommit>(commit);
+                PatternManager::instance().moveNoteEvent(c.ID, c.coord);
+            } else {
+                auto& c = std::get<NotesCommit>(commit);
+                PatternManager::instance().moveSelection(c.delta);
             }
-            else {
-                NoteMoveDelta newPos(moveOperation.newDeltaPitch, moveOperation.newDeltaTime);
-                PatternManager::instance().moveSelection(newPos);
-            }
-
-            moveOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
     }
-    else if (stretchOperation.isStretchingNote) {
+    else if (stretchOperation.isActive) {
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
-            stretchOperation.updateStretchDelta(snappedCoordinate.absoluteTime);
+            stretchOperation.update(snapped);
         }
         else{
-            if (stretchOperation.stretchingNotes.size() == 1 ){
-                auto note = stretchOperation.stretchingNotes.at(0);
-                PatternManager::instance().stretchNoteEvent(note.ID, stretchOperation.newEndDelta);
+            auto commit = stretchOperation.commit();
+            if (std::holds_alternative<SingleNoteCommit>(commit))  {
+                auto& c = std::get<SingleNoteCommit>(commit);
+                PatternManager::instance().stretchNoteEvent(c.ID, c.coord.absoluteTime);
+            } else {
+                auto& c = std::get<NotesCommit>(commit);
+                PatternManager::instance().stretchSelection(c.delta);
             }
-            else {
-                NoteMoveDelta newPos(0, stretchOperation.newEndDelta);
-                PatternManager::instance().stretchSelection(newPos);
-            }
-            stretchOperation.clearNotes();
             PatternManager::instance().showAllEvents();
         }
     }
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-        if (noteHoverState == NoteCenterHover) {
-            moveNote(snappedCoordinate);
-        }
-        else if (noteHoverState == NoteEdgeHover) {
-            stretchNote(snappedCoordinate);
-        }
-        else{
-            sendNewNote(snappedCoordinate);
+        switch (hoverState) {
+        case NoteCenterHover: moveNote(snapped);    break;
+        case NoteEdgeHover:   stretchNote(snapped); break;
+        default:              sendNewNote(snapped); break;
         }
     }
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        PatternManager::instance().removeNoteFromPattern(hoverCoordinate);
+        PatternManager::instance().removeNoteFromPattern(hover);
     }
 }
 
@@ -212,11 +211,11 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
     std::vector<NoteSnapshot> PlaceHolderNotes;
 
-    if (moveOperation.isMovingNote) {
-        PlaceHolderNotes.insert(PlaceHolderNotes.end() ,moveOperation.movingNotes.begin(),moveOperation.movingNotes.end());
+    if (moveOperation.isActive) {
+        PlaceHolderNotes.insert(PlaceHolderNotes.end() ,moveOperation.notes.begin(),moveOperation.notes.end());
     }
-    else if (stretchOperation.isStretchingNote) {
-        PlaceHolderNotes.insert(PlaceHolderNotes.end(),stretchOperation.stretchingNotes.begin(),stretchOperation.stretchingNotes.end());
+    else if (stretchOperation.isActive) {
+        PlaceHolderNotes.insert(PlaceHolderNotes.end(),stretchOperation.notes.begin(),stretchOperation.notes.end());
     }
     else{return;}
 
@@ -226,12 +225,12 @@ void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
         auto onTime = note.absoluteTime;
         auto offTime = note.endAbsoluteTime;
         auto pitch = note.pitch;
-        if ( i < moveOperation.movingNotes.size() ) {
+        if ( i < moveOperation.notes.size() ) {
             onTime +=  moveOperation.newDeltaTime;
             offTime +=  moveOperation.newDeltaTime;
             pitch +=  moveOperation.newDeltaPitch;
         }
-        else if ( i < stretchOperation.stretchingNotes.size() )
+        else if ( i < stretchOperation.notes.size() )
         {
             if (offTime + stretchOperation.newEndDelta < onTime)            {
                 offTime = onTime + ViewState::instance().getStandardSnapTime();

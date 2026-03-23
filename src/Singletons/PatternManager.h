@@ -6,8 +6,8 @@
 #include <vector>
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
-
 #include "ToolManager.h"
+#include "../NoteStructs.h"
 
 enum NoteHoverState: int{
     noNoteHover,

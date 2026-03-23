@@ -1,7 +1,6 @@
 #pragma once
 
 #include <imgui.h>
-#include "../NoteStructs.h"
 
 enum ToolTypes {
     SELECT,
@@ -15,67 +14,6 @@ struct SelectionCoords {
     ImVec2 selectP1;
     ImVec2 selectP2;
 };
-
-
-
-//struct noteCoordinate {};
-
-struct MoveOperation{
-    std::vector<NoteSnapshot> movingNotes;
-    NoteCoordinate originalInputCoordinate;
-    int8_t newDeltaPitch;
-    int newDeltaTime;
-    bool isMovingNote{false};
-
-    void addNotes(NoteSnapshot notes){
-        movingNotes.push_back(notes);
-        isMovingNote = true;
-    }
-    void addNotes(std::vector<NoteSnapshot> notes){
-        movingNotes.insert(movingNotes.begin(), notes.begin(), notes.end());
-        isMovingNote = true;
-    }
-
-    void updateMovingNotesPosition(const uint8_t pitch, const uint32_t time){
-        newDeltaPitch = pitch - originalInputCoordinate.pitch ;
-        newDeltaTime = static_cast<signed>(time - originalInputCoordinate.absoluteTime);
-    }
-    void clearNotes() { movingNotes.clear(); isMovingNote = false; }
-
-};
-
-struct StretchOperation {
-private:
-    uint32_t originalStartTime{0};
-    uint32_t originalEndTime{0};
-public:
-    std::vector<NoteSnapshot> stretchingNotes;
-    int newEndDelta{0};
-    bool isStretchingNote{false};
-
-    void initStretchingNotes(uint32_t startTime,uint32_t endTime) {
-        originalStartTime = startTime; originalEndTime = endTime;
-    }
-    void addNotes(NoteSnapshot notes){stretchingNotes.push_back(notes); isStretchingNote = true;}
-
-    void addNotes(std::vector<NoteSnapshot> notes){
-        stretchingNotes.insert(stretchingNotes.begin(), notes.begin(), notes.end());
-        isStretchingNote = true;
-    }
-    void updateStretchDelta(uint32_t absolute) {
-        if (absolute > originalStartTime) {
-            newEndDelta = static_cast<signed>(absolute - originalEndTime);
-        }
-    }
-    void clearNotes() {
-        stretchingNotes.clear(); isStretchingNote = false;
-    }
-};
-
-
-inline MoveOperation moveOperation;
-
-inline StretchOperation stretchOperation;
 
 class ToolManager {
     public:

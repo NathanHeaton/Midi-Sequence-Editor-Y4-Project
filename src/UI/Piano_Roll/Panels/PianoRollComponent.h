@@ -13,6 +13,7 @@
 class PianoRollComponent
 {
 public:
+
     PianoRollComponent() = default;
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
@@ -99,6 +100,8 @@ private:
     void renderPattern(const TimelineContext& ctx) const;
     void DrawToolEffects(const TimelineContext& ctx);
     void HandleKeyboardInput(const TimelineContext& ctx);
+    NoteCoordinate resolveHoverCoordinate(const TimelineContext& ctx) const;
+    NoteCoordinate resolveSnappedCoordinate(const TimelineContext& ctx) const;
 
     void renderPlaceHolderNotes(const TimelineContext& ctx);
     NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
