@@ -69,20 +69,39 @@ public:
     void initStretchingNotes(uint32_t startTime,uint32_t endTime) {
         originalStartTime = startTime; originalEndTime = endTime;
     }
-    void update(NoteCoordinate snapped) override    {
+    void update(NoteCoordinate snapped) override {
         if (snapped.absoluteTime > originalStartTime) {
             newEndDelta = static_cast<signed>(snapped.absoluteTime - originalEndTime);
         }
     }
 
-    CommitData commit() override {}
+    CommitData commit() override{
+        CommitData result;
+        if (notes.size() == 1 ){
+            auto note = notes.at(0);
+            NoteCoordinate newPos(0, newEndDelta);
+            result = SingleNoteCommit(note.ID,newPos);
+        }
+        else {
+            NoteMoveDelta newPos(0, newEndDelta);
+            result = NotesCommit(newPos);
+        }
+        clearNotes();
+        return result;
+    }
 };
 
-// struct ScaleOperation : NoteOperation {
-//     float scale;
-//     [[maybe_unused]] void update(NoteCoordinate snapped) override;
-//     [[maybe_unused]] CommitData commit() override {}
-// };
+
+struct ScaleOperation : NoteOperation {
+    float scale;
+    int firstNoteDelta;
+    void update(NoteCoordinate snapped) override
+    {
+        //
+        // scale
+    }
+    [[maybe_unused]] CommitData commit() override;
+};
 
 inline MoveOperation moveOperation;
 inline StretchOperation stretchOperation;
