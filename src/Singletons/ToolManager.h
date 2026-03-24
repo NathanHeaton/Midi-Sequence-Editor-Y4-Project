@@ -33,6 +33,7 @@ class ToolManager {
 
     void setPianoRollTool(ToolTypes t) { activeNoteTool = t; }
     void setArrangerTool(ToolTypes t) { activeArrangerTool = t; }
+    void setScaleHandlePosition(ImVec2 pos) { scaleHandlePosition = pos ; }
 
     void setSelectionPoint1(ImVec2 selectP1) {
         selectCoords.selectP1 = selectP1;
@@ -51,15 +52,22 @@ class ToolManager {
         selectCoords = temp;
     }
 
-    [[nodiscard]] bool IsMovingNotes() const {return isMovingNote;};
+    [[nodiscard]] bool IsMovingNotes() const {return isMovingNote;}
+    [[nodiscard]] bool IsScaleHandleVisible() const {return scaleHandleVisible;}
+    [[nodiscard]] ImVec2 getScaleHandlePosition() const {return scaleHandlePosition;}
+    [[nodiscard]] ImVec2 getScaleHandleSize() const {return scaleHandleSize;}
 
-    [[nodiscard]] uint32_t getLastNoteDuration() const {return lastNoteDuration;};
+    [[nodiscard]] uint32_t getLastNoteDuration() const {return lastNoteDuration;}
     void setLastNoteDuration(uint32_t newDuration) {lastNoteDuration = newDuration;}
 
 private:
     ToolTypes activeNoteTool{EDIT};
     ToolTypes activeArrangerTool{EDIT};
     ToolManager() = default;
+
+    ImVec2 scaleHandlePosition{0,0};
+    ImVec2 scaleHandleSize{30,20};
+    bool scaleHandleVisible{false};
 
     bool boxSelectingActive = false;
 

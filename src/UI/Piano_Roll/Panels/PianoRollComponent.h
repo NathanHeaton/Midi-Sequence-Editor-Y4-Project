@@ -93,7 +93,13 @@ private:
     void sendNewNote(NoteCoordinate snappedCoordinate);
     void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
     void moveNote(NoteCoordinate snappedCoordinate);
-    void stretchNote(NoteCoordinate hoverCoordinate);
+    void stretchNote(NoteCoordinate snappedCoordinate);
+    void scaleNote(NoteCoordinate snappedCoordinate);
+    void updateMoveOperation(NoteCoordinate snapped);
+    void updateScaleOperation(NoteCoordinate snapped);
+    void updateStretchOperation(NoteCoordinate snapped);
+
+    bool isScaleHandleHover(NoteCoordinate hover);
 
     void edit(const TimelineContext& ctx);
     void HandleMouseInput(const TimelineContext& ctx);
@@ -102,7 +108,7 @@ private:
     void HandleKeyboardInput(const TimelineContext& ctx);
     NoteCoordinate resolveHoverCoordinate(const TimelineContext& ctx) const;
     NoteCoordinate resolveSnappedCoordinate(const TimelineContext& ctx) const;
-
+    std::vector<NoteSnapshot> setupSnapshots(NoteCoordinate snappedCoordinate);
     void renderPlaceHolderNotes(const TimelineContext& ctx);
     NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
     NoteSnapshot createNoteSnapShotBasedOnID(uint32_t onIds);

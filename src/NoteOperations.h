@@ -94,15 +94,16 @@ public:
 
 struct ScaleOperation : NoteOperation {
     float scale;
-    int firstNoteDelta;
+    uint32_t firstNoteAbsolute;
+    uint32_t endNoteAbsolute;
     void update(NoteCoordinate snapped) override
     {
-        //
-        // scale
+        std::cout<<"scale: "<<scale<<std::endl;
+        scale = (endNoteAbsolute - firstNoteAbsolute)/(snapped.absoluteTime - firstNoteAbsolute);
     }
-    [[maybe_unused]] CommitData commit() override;
+    [[maybe_unused]] CommitData commit() override{}
 };
 
 inline MoveOperation moveOperation;
 inline StretchOperation stretchOperation;
-//inline ScaleOperation scaleOperation;
+inline ScaleOperation scaleOperation;
