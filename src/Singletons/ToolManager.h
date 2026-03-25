@@ -54,6 +54,7 @@ class ToolManager {
 
     [[nodiscard]] bool IsMovingNotes() const {return isMovingNote;}
     [[nodiscard]] bool IsScaleHandleVisible() const {return scaleHandleVisible;}
+
     [[nodiscard]] ImVec2 getScaleHandlePosition() const {return scaleHandlePosition;}
     [[nodiscard]] ImVec2 getScaleHandleSize() const {return scaleHandleSize;}
 

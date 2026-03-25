@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "PianoRollComponent.h"
 #include "../../../NoteOperations.h"
+#include "../../../utils.h"
 //
 // Created by nathan on 16/02/2026.
 //
@@ -45,7 +46,7 @@ NoteCoordinate PianoRollComponent::resolveSnappedCoordinate(const TimelineContex
     return NoteCoordinate(pitch, static_cast<uint32_t>(snappedTime));
 }
 
-void PianoRollComponent::edit(const TimelineContext& ctx)
+void PianoRollComponent::edit(const TimelineContext &ctx)
 {
     const NoteCoordinate hover = resolveHoverCoordinate(ctx);
     const NoteCoordinate snapped = resolveSnappedCoordinate(ctx);
@@ -56,32 +57,31 @@ void PianoRollComponent::edit(const TimelineContext& ctx)
     else if (stretchOperation.isActive) { updateStretchOperation(snapped);}
     else if (scaleOperation.isActive)
     {
-        updateScaleOperation(snapped);
+        //updateScaleOperation(snapped);
     }
 
-
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-        if (isScaleHandleHover(hover)){ scaleNote(hover);}
-        switch (hoverState) {
-        case NoteCenterHover: moveNote(snapped);    break;
-        case NoteEdgeHover:   stretchNote(snapped); break;
-        default:              sendNewNote(snapped); break;
-        }
+        //if (isScaleHandleHover(hover, ctx)){ scaleNote(hover);}
+        //else {
+            switch (hoverState) {
+                case NoteCenterHover: moveNote(snapped);    break;
+                case NoteEdgeHover:   stretchNote(snapped); break;
+                default:              sendNewNote(snapped); break;
+            }
+        //}
     }
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
         PatternManager::instance().removeNoteFromPattern(hover);
     }
 }
 
-bool PianoRollComponent::isScaleHandleHover(NoteCoordinate hover){
+bool PianoRollComponent::isScaleHandleHover(NoteCoordinate hover,const TimelineContext& ctx){
     auto p1 = ToolManager::instance().getScaleHandlePosition();
-    auto p2 = ToolManager::instance().getScaleHandleSize();
-    auto s1 = ImVec2((static_cast<float>(hover.absoluteTime) /TimeData::PPQ) * view_state->getPixelPerBeat(pianoRoll),(127 - hover.pitch)*view_state->getNoteHeight());
-
+    auto p2 = addImVec2(ToolManager::instance().getScaleHandleSize(),p1);
+    auto s1 = ImVec2((static_cast<float>(hover.absoluteTime) /TimeData::PPQ) * view_state->getPixelPerBeat(pianoRoll) + ctx.cursorPos.x,
+        (127 - hover.pitch)*view_state->getNoteHeight() + ctx.cursorPos.y);
     if ( s1.x > p1.x && s1.x < p2.x) {
-        if ( s1.y > p1.x && s1.y < p2.x) {
-            std::cout<<"clicked on "<<std::endl;
-            scaleOperation.addNotes(setupSnapshots(hover));
+        if ( s1.y > p1.y && s1.y < p2.y) {
             return true;
         }
     }
@@ -125,17 +125,17 @@ void PianoRollComponent::updateScaleOperation(NoteCoordinate snapped)
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
         scaleOperation.update(snapped);
     }
-    // else{
-    //     auto commit = stretchOperation.commit();
-    //     if (std::holds_alternative<SingleNoteCommit>(commit))  {
-    //         auto& c = std::get<SingleNoteCommit>(commit);
-    //         PatternManager::instance().stretchNoteEvent(c.ID, c.coord.absoluteTime);
-    //     } else {
-    //         auto& c = std::get<NotesCommit>(commit);
-    //         PatternManager::instance().stretchSelection(c.delta);
-    //     }
-    //     PatternManager::instance().showAllEvents();
-    //}
+     else{
+         auto commit = stretchOperation.commit();
+         if (std::holds_alternative<SingleNoteCommit>(commit))  {
+             auto& c = std::get<SingleNoteCommit>(commit);
+             PatternManager::instance().stretchNoteEvent(c.ID, c.coord.absoluteTime);
+         } else {
+             auto& c = std::get<NotesCommit>(commit);
+             PatternManager::instance().stretchSelection(c.delta);
+         }
+         PatternManager::instance().showAllEvents();
+    }
 }
 
 void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
@@ -155,10 +155,11 @@ void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
     stretchOperation.addNotes(noteSnapshots);
 }
 
-void PianoRollComponent::scaleNote(NoteCoordinate snappedCoordinate) {
-    auto noteSnapshots = setupSnapshots(snappedCoordinate);
-    //scaleOperation.initStretchingNotes(noteSnapshots[0].absoluteTime,noteSnapshots[0].endAbsoluteTime);
-    scaleOperation.addNotes(noteSnapshots);
+void PianoRollComponent::scaleNote(NoteCoordinate hover) {
+    scaleOperation.addNotes(setupSnapshots(hover));
+    scaleOperation.init(scaleOperation.notes.at(0).absoluteTime,
+    scaleOperation.notes.at(0).endAbsoluteTime,
+    hover.absoluteTime - scaleOperation.notes.at(0).endAbsoluteTime);
 }
 
 
@@ -326,7 +327,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
                 Theme::currentThemeColours.barColourPacked, 0.0f);
         }
     }
-    if (PatternManager::instance().areNotesSelected()){
+    if (PatternManager::instance().areNotesSelected()){ // render scale effect
         auto tool = &ToolManager::instance();
         const auto pattern = &PatternManager::instance().getCurrentPattern();
         auto middlePointY = 0;
@@ -340,15 +341,13 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
             }
         }
         middlePointY = (middlePointY*ctx.noteHeight) / pattern->m_selectedNoteIDs.size();
-        endPointX = ((endPointX+ TimeData::PPQ)/TimeData::PPQ) * view_state->getPixelPerBeat(zoomFactor::pianoRoll) ;
-        tool->setScaleHandlePosition(ImVec2(endPointX, middlePointY));
+        endPointX = ((endPointX+ TimeData::PPQ)/TimeData::PPQ) * view_state->getPixelPerBeat(zoomFactor::pianoRoll);
 
-        ImVec2 endCoords(tool->getScaleHandlePosition().x + tool->getScaleHandleSize().x + ctx.cursorPos.x,
-            tool->getScaleHandlePosition().y + tool->getScaleHandleSize().y + ctx.cursorPos.y);
+        tool->setScaleHandlePosition(ImVec2(endPointX+ ctx.cursorPos.x, middlePointY+ ctx.cursorPos.y));
+        ImVec2 endCoords = addImVec2(tool->getScaleHandlePosition(), tool->getScaleHandleSize());
 
         ctx.drawList->AddRectFilled(
-        ImVec2(tool->getScaleHandlePosition().x + ctx.cursorPos.x,
-            tool->getScaleHandlePosition().y + ctx.cursorPos.y),
+        tool->getScaleHandlePosition(),
             endCoords,
         Theme::currentThemeColours.barColourPacked, 0.0f);
     }

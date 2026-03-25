@@ -11,6 +11,8 @@
 #include <vector>
 #include <math.h>
 
+#include "imgui.h"
+
 // returns a slice of a vector
 template <typename T>
 std::vector<T> vector_slice(const std::vector<T>& a, int start_point, int end_point) {
@@ -50,6 +52,10 @@ int vector_bytes_to_int(std::vector<T> a) {
         increment++;
     }
     return value;
+}
+
+static ImVec2 addImVec2(ImVec2 a, ImVec2 b) {
+    return ImVec2(a.x + b.x, a.y + b.y);
 }
 
 

@@ -93,15 +93,42 @@ public:
 
 
 struct ScaleOperation : NoteOperation {
-    float scale;
-    uint32_t firstNoteAbsolute;
-    uint32_t endNoteAbsolute;
-    void update(NoteCoordinate snapped) override
-    {
-        std::cout<<"scale: "<<scale<<std::endl;
-        scale = (endNoteAbsolute - firstNoteAbsolute)/(snapped.absoluteTime - firstNoteAbsolute);
+private:
+    uint32_t firstNoteAbsolute{0};
+    uint32_t endNoteAbsolute{0};
+    uint32_t gapFromInitialScalePoint{0};
+public:
+
+    float scale= 1.0f;
+    void init(uint32_t start,uint32_t end,uint32_t gap) {
+        firstNoteAbsolute=start;
+        endNoteAbsolute=end;
+        gapFromInitialScalePoint=gap;
     }
-    [[maybe_unused]] CommitData commit() override{}
+    void update(NoteCoordinate snapped) override {
+        if (snapped.absoluteTime <= 0){return;}
+        scale = static_cast<float>(snapped.absoluteTime  - firstNoteAbsolute )/
+            static_cast<float>(endNoteAbsolute  - firstNoteAbsolute + gapFromInitialScalePoint);
+        std::cout<<"scale: "<<scale<<std::endl;
+        if (scale <= 0) {
+            scale = 1.0f;
+        }
+    }
+    CommitData commit() override {
+        CommitData result;
+        //Todo: make custom commit for adding notes
+        if (notes.size() == 1 ){
+            auto note = notes.at(0);
+            NoteCoordinate newPos(0, note.absoluteTime * scale);
+            result = SingleNoteCommit(note.ID,newPos);
+        }
+        else {
+            NoteMoveDelta newPos(0, scale);
+            result = NotesCommit(newPos);
+        }
+        clearNotes();
+        return result;
+    }
 };
 
 inline MoveOperation moveOperation;

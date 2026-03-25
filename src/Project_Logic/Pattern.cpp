@@ -88,8 +88,8 @@ void Pattern::removeNote(NoteEventPair note) {
         return;
     }
     removeNoteOperation(note);
-    m_noteEvents.clear();
-    createNoteEventPairs();
+    m_selectedNoteIDs.clear();
+    m_hiddenNoteIDs.clear();
 }
 
 void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
@@ -100,6 +100,8 @@ void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
         }
         removeNote(*notePair);
     }
+    m_selectedNoteIDs.clear();
+    m_hiddenNoteIDs.clear();
     m_noteEvents.clear();
     createNoteEventPairs();
 }

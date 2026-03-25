@@ -99,9 +99,9 @@ private:
     void updateScaleOperation(NoteCoordinate snapped);
     void updateStretchOperation(NoteCoordinate snapped);
 
-    bool isScaleHandleHover(NoteCoordinate hover);
+    bool isScaleHandleHover(NoteCoordinate hover,const TimelineContext& ctx);
 
-    void edit(const TimelineContext& ctx);
+    void edit(const TimelineContext &ctx);
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;
     void DrawToolEffects(const TimelineContext& ctx);
