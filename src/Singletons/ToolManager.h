@@ -74,7 +74,7 @@ private:
 
     bool isMovingNote = false;
 
-    uint32_t lastNoteDuration{996};
+    uint32_t lastNoteDuration{960};
 
     SelectionCoords selectCoords;
 };

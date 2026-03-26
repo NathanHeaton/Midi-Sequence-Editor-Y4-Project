@@ -47,14 +47,13 @@ public:
     void drawWhiteKey(pianoVars &vars) const
     {
         int octave = 9;
-        float initalWhiteNoteGap = (ViewState::instance().getNoteHeight() * 8)/5;
-        float ySize = initalWhiteNoteGap;
+        float ySize = InitialWhiteNoteGap;
         float runningSize=0;
         for ( int i{0u}; i < whiteKeys; ++i ) {
             if (i == 5) {ySize = WHITE_SIZE.y;}
             ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + runningSize);
             ImVec2 rectEnd = ImVec2(vars.cursorPos.x + WHITE_SIZE.x, vars.cursorPos.y + (runningSize + ySize) -1);
-            ImVec2 textPos = ImVec2(rectStart.x + ySize-20,rectStart.y);
+            ImVec2 textPos = ImVec2(rectStart.x + ySize-20,rectStart.y+10);
             vars.drawList->AddRectFilled(
                 rectStart, rectEnd,
                 Theme::currentThemeColours.barColourPacked,
@@ -75,17 +74,20 @@ public:
             }
         }
     }
+
     void drawBlackKey(pianoVars &vars) const
     {
         float totalGap = 0;
         int setOf3Count = 3;
         int setOf2Count = 1;
+        float ySize = InitialWhiteNoteGap;
         for ( int i{0u}; i < blackKeys; ++i ) {
+            if (i == 5) {ySize = WHITE_SIZE.y;}
             if (i == 0) {
                 totalGap = totalGap + blackGap;
             }
             else {
-                totalGap += WHITE_SIZE.y;
+                totalGap += ySize;
             }
 
             ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + totalGap);
@@ -101,7 +103,7 @@ public:
             }
             else if (setOf3Count == 3) {
                 setOf3Count++;
-                totalGap += WHITE_SIZE.y;
+                totalGap += ySize;
             }
             else if (setOf2Count < 2) {
                 setOf2Count++;
@@ -109,7 +111,7 @@ public:
             else if (setOf2Count == 2) {
                 setOf3Count = 1;
                 setOf2Count = 1;
-                totalGap += WHITE_SIZE.y;
+                totalGap += ySize;
             }
         }
     }
@@ -120,4 +122,5 @@ private:
     ImVec2 WHITE_SIZE {};
     ImVec2 BLACK_SIZE {};
     float blackGap {};
+    const float InitialWhiteNoteGap= (ViewState::instance().getNoteHeight() * 8)/5;
 };
