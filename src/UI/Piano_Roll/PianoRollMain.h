@@ -11,7 +11,7 @@
 #include <imgui.h>
 #include "Panels/piano.h"
 #include "../Common/timelineLabel.h"
-
+#include "Panels/velocity.h"
 
 
 class PianoRollMain : public juce::Component
@@ -21,6 +21,7 @@ public:
     TimelineLabel timelineLabel;
     Piano piano;
     PianoRollComponent pianoRoll;
+    Velocity velocity;
 
     float timelineXScroll = 0.0f;
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
@@ -65,6 +66,18 @@ public:
                     if (initialLoad)  ImGui::SetScrollY(ViewState::instance().getNoteHeight()* 48); initialLoad = false;
                     pianoRollScrollY = ImGui::GetScrollY();
                 }ImGui::EndChild();
+            }ImGui::EndTable();
+
+            if (ImGui::BeginTable("table", 3, ImGuiTableFlags_SizingFixedFit)) {
+                ImGui::TableSetupColumn("Piano");
+                ImGui::TableSetupColumn("sequence grid", ImGuiTableColumnFlags_WidthStretch, 0);
+                ImGui::TableSetupColumn("verticalScroll",ImGuiTableColumnFlags_WidthFixed,15);
+                ImGui::TableNextColumn();
+
+                ImGui::TableNextColumn();
+                velocity.create(pianoRollScrollY,timelineXScroll, timelineLength);
+                ImGui::TableNextColumn();
+
             }ImGui::EndTable();
         }ImGui::End();
     }
