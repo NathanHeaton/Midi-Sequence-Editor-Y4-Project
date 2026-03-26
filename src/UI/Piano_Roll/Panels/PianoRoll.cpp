@@ -46,29 +46,24 @@ NoteCoordinate PianoRollComponent::resolveSnappedCoordinate(const TimelineContex
     return NoteCoordinate(pitch, static_cast<uint32_t>(snappedTime));
 }
 
-void PianoRollComponent::edit(const TimelineContext &ctx)
-{
+void PianoRollComponent::edit(const TimelineContext &ctx){
     const NoteCoordinate hover = resolveHoverCoordinate(ctx);
     const NoteCoordinate snapped = resolveSnappedCoordinate(ctx);
     const auto hoverState = PatternManager::instance().getNoteHoverState(hover);
 
-
     if (moveOperation.isActive) { updateMoveOperation(snapped);}
     else if (stretchOperation.isActive) { updateStretchOperation(snapped);}
-    else if (scaleOperation.isActive)
-    {
-        //updateScaleOperation(snapped);
-    }
+    else if (scaleOperation.isActive) {updateScaleOperation(snapped);}
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-        //if (isScaleHandleHover(hover, ctx)){ scaleNote(hover);}
-        //else {
+        if (isScaleHandleHover(hover, ctx)){ scaleNote(hover);}
+        else {
             switch (hoverState) {
                 case NoteCenterHover: moveNote(snapped);    break;
                 case NoteEdgeHover:   stretchNote(snapped); break;
                 default:              sendNewNote(snapped); break;
             }
-        //}
+        }
     }
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
         PatternManager::instance().removeNoteFromPattern(hover);
@@ -101,6 +96,7 @@ void PianoRollComponent::updateMoveOperation(NoteCoordinate snapped){
             auto& c = std::get<NotesCommit>(commit);
             PatternManager::instance().moveSelection(c.delta);
         }
+        std::cout<<"updating move"<< std::endl;
         PatternManager::instance().showAllEvents();
     }
 }
@@ -126,13 +122,12 @@ void PianoRollComponent::updateScaleOperation(NoteCoordinate snapped)
         scaleOperation.update(snapped);
     }
      else{
-         auto commit = stretchOperation.commit();
-         if (std::holds_alternative<SingleNoteCommit>(commit))  {
-             auto& c = std::get<SingleNoteCommit>(commit);
-             PatternManager::instance().stretchNoteEvent(c.ID, c.coord.absoluteTime);
+         auto commit = scaleOperation.commit();
+         if (std::holds_alternative<ScaleCommit>(commit))  {
+             auto s = std::get<ScaleCommit>(commit).scale;
+             PatternManager::instance().scaleSelection(s);
          } else {
-             auto& c = std::get<NotesCommit>(commit);
-             PatternManager::instance().stretchSelection(c.delta);
+            std::cout<<"error with scale commit"<< std::endl;
          }
          PatternManager::instance().showAllEvents();
     }

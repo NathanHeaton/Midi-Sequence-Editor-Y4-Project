@@ -67,7 +67,7 @@ private:
     ToolManager() = default;
 
     ImVec2 scaleHandlePosition{0,0};
-    ImVec2 scaleHandleSize{30,20};
+    ImVec2 scaleHandleSize{30,80};
     bool scaleHandleVisible{false};
 
     bool boxSelectingActive = false;

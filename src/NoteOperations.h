@@ -9,8 +9,9 @@ struct SingleNoteCommit{
     NoteCoordinate coord;
 };
 struct NotesCommit{NoteMoveDelta delta;};
+struct ScaleCommit{float scale;};
 
-using CommitData = std::variant<SingleNoteCommit, NotesCommit>;
+using CommitData = std::variant<SingleNoteCommit, NotesCommit, ScaleCommit>;
 
 struct NoteOperation {
     std::vector<NoteSnapshot> notes;
@@ -116,16 +117,7 @@ public:
     }
     CommitData commit() override {
         CommitData result;
-        //Todo: make custom commit for adding notes
-        if (notes.size() == 1 ){
-            auto note = notes.at(0);
-            NoteCoordinate newPos(0, note.absoluteTime * scale);
-            result = SingleNoteCommit(note.ID,newPos);
-        }
-        else {
-            NoteMoveDelta newPos(0, scale);
-            result = NotesCommit(newPos);
-        }
+        result = ScaleCommit(scale);
         clearNotes();
         return result;
     }

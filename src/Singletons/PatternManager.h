@@ -109,6 +109,10 @@ public:
         return false;
     }
 
+    void scaleSelection(float s) {
+        pattern.at(activePatternIndex).scaleNoteEventSelection(s);
+    }
+
     void clearPattern(){
         pattern.at(activePatternIndex).clearPattern();
     }

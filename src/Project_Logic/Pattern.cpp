@@ -385,3 +385,26 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
     m_noteEvents.clear();
     createNoteEventPairs();
 }
+
+void Pattern::scaleNoteEventSelection(float scale) {
+    if (m_selectedNoteIDs.empty() || scale <= 0.0f)
+        return;
+
+    std::vector<MidiEvent> tempEvents;
+
+    for (const auto& pair : m_noteEvents) {
+        if (!m_selectedNoteIDs.contains(pair.onID))
+            continue;
+        tempEvents.push_back(*getMidiEventByID_ptr(pair.onID));
+        tempEvents.push_back(*getMidiEventByID_ptr(pair.offID));
+        removeNoteOperation(pair);
+    }
+
+    for (auto& event : tempEvents) {
+        auto newTime = static_cast<uint32_t>(event.getAbsoluteTime() * scale);
+        insertEvent(event, newTime);
+    }
+    m_selectedNoteIDs.clear();
+    m_noteEvents.clear();
+    createNoteEventPairs();
+}
