@@ -8,9 +8,9 @@
 class Piano
 {
 public:
-    
+
     Piano() = default;
-    
+
     struct pianoVars {
         ImVec2 cursorPos;
         ImDrawList* drawList;
@@ -47,17 +47,20 @@ public:
     void drawWhiteKey(pianoVars &vars) const
     {
         int octave = 9;
+        float initalWhiteNoteGap = (ViewState::instance().getNoteHeight() * 8)/5;
+        float ySize = initalWhiteNoteGap;
+        float runningSize=0;
         for ( int i{0u}; i < whiteKeys; ++i ) {
-            ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + i* WHITE_SIZE.y);
-
-            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + WHITE_SIZE.x , vars.cursorPos.y + (1 + i)* WHITE_SIZE.y -1);
-
-            ImVec2 textPos = ImVec2(rectStart.x + WHITE_SIZE.x -20,rectStart.y);
+            if (i == 5) {ySize = WHITE_SIZE.y;}
+            ImVec2 rectStart = ImVec2(vars.cursorPos.x , vars.cursorPos.y + runningSize);
+            ImVec2 rectEnd = ImVec2(vars.cursorPos.x + WHITE_SIZE.x, vars.cursorPos.y + (runningSize + ySize) -1);
+            ImVec2 textPos = ImVec2(rectStart.x + ySize-20,rectStart.y);
             vars.drawList->AddRectFilled(
                 rectStart, rectEnd,
                 Theme::currentThemeColours.barColourPacked,
                 6.0f
             );
+            runningSize += ySize;
             if ((i - 4) % 7 == 0 && i >= 4) {
                 char octaveStr[3];
                 octaveStr[0] = 'c';

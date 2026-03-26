@@ -51,7 +51,6 @@ private:
         int lastVisibleSubBeat;
         float barWidth;
         float noteHeight;
-        float initialGap;
         float relativeX;
         float relativeY;
         ToolTypes activeTool;
@@ -59,13 +58,12 @@ private:
         TimelineContext() {
             cursorPos = ImGui::GetCursorScreenPos();
             drawList = ImGui::GetWindowDrawList();
-            height =ViewState::instance().getWhiteSize().y * ViewState::instance().WHITE_KEYS;
+            height =ViewState::instance().getNoteHeight()*128 ;
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();
             barWidth = 2 * TimeData::instance().timeSignature.getNumerator() * ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll);
             noteHeight = ViewState::instance().getNoteHeight();
-            initialGap = (ViewState::instance().getWhiteSize().y * 5.0f)/8.0f;
             auto& view = ViewState::instance();
             firstVisibleSubBeat = scrollX != 0.0f ?
                 static_cast<int>(scrollX /
@@ -177,9 +175,9 @@ private:
 
     void DrawOctaveLines(const TimelineContext& ctx) const
     {
-        float octaveHeight = view_state->getWhiteSize().y *7;
+        float octaveHeight = ctx.noteHeight*12;
         for (unsigned int i = 0; i < octaves; i++) {
-            float yPos = ctx.cursorPos.y + i * octaveHeight + ( view_state->getWhiteSize().y*5);
+            float yPos = ctx.cursorPos.y + i * octaveHeight + ( ctx.noteHeight*8);
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
@@ -192,7 +190,6 @@ private:
 
     void DrawNoteGuides(const TimelineContext& ctx) const
     {
-        float noteGap = (view_state->getWhiteSize().y *7.0f)/12.0f;
         int notes = 128;
         bool whiteNote = true;
         int octaveNoteIndex = 0;
@@ -200,14 +197,9 @@ private:
 
         for (auto i{0u}; i < notes; i++) {
             float yPos;
-            if (i < 8) {
-                yPos = ctx.cursorPos.y + i * ctx.initialGap;
-            }
-            else {
-                yPos = (ctx.cursorPos.y + (i-8) * noteGap) + ctx.initialGap *8;
-            }
+            yPos = (ctx.cursorPos.y + (i) * ctx.noteHeight) ;
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
-                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + noteGap ),
+                ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + ctx.noteHeight ),
                 whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
 
             ctx.drawList->AddLine(
