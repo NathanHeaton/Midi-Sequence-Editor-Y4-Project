@@ -18,9 +18,9 @@ public:
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
 
-    void create(float &scrollY,float &scrollX, float& lengthX) {
-        if (ImGui::BeginChild("piano grid",ImVec2(0,0),
-            ImGuiChildFlags_None,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
+    void create(float &scrollY, float &scrollX, float& lengthX, float height) {
+        if (ImGui::BeginChild("piano grid", ImVec2(0, height),
+            ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
             TimelineContext ctx;
 
             renderSteps(ctx);

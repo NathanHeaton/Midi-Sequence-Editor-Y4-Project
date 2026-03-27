@@ -12,7 +12,7 @@
 #include "Panels/piano.h"
 #include "../Common/timelineLabel.h"
 #include "Panels/velocity.h"
-
+#include  "Panels/velocityLabel.h"
 
 class PianoRollMain : public juce::Component
 {
@@ -22,7 +22,7 @@ public:
     Piano piano;
     PianoRollComponent pianoRoll;
     Velocity velocity;
-
+    VelocityLabels velocityLabels;
     float timelineXScroll = 0.0f;
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
 
@@ -31,57 +31,98 @@ public:
     float pianoRollScrollY = 300.0f;
     float pianoRollScrollX;
     bool initialLoad = true;
+    float velocityHeight      = 120.0f;
+    float defaultVelocityHeight = 120.0f;
 
-    void create() {
-        if (ImGui::Begin("pianoRollComponent", nullptr, ImGuiWindowFlags_NoMove)) {
-            toolbar.create();
-            if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("gap");
-                ImGui::TableSetupColumn("timeline", ImGuiTableColumnFlags_WidthStretch);
-                ImGui::TableNextColumn();
-                ImGui::Dummy(ImVec2(0,35));
-                ImGui::TableNextColumn();
-                if (ImGui::BeginChild("horizontalScroll", ImVec2(0, 15), false, ImGuiWindowFlags_HorizontalScrollbar)) {
-                    ImGui::Dummy(ImVec2(timelineLength, 15));
-                    timelineXScroll = ImGui::GetScrollX();
-                }ImGui::EndChild();
-                timelineLabel.create(timelineLength,timelineXScroll,
+void create() {
+    if (ImGui::Begin("pianoRollComponent", nullptr,
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
+
+        toolbar.create();
+
+        if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
+            ImGui::TableSetupColumn("gap", ImGuiTableColumnFlags_WidthFixed,
+                ViewState::instance().getWhiteSize().x);
+            ImGui::TableSetupColumn("timeline", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextColumn();
+            ImGui::Dummy(ImVec2(ViewState::instance().getWhiteSize().x, 35));
+            ImGui::TableNextColumn();
+            if (ImGui::BeginChild("horizontalScroll", ImVec2(0, 15), false,
+                ImGuiWindowFlags_HorizontalScrollbar)) {
+                ImGui::Dummy(ImVec2(timelineLength, 15));
+                timelineXScroll = ImGui::GetScrollX();
+                } ImGui::EndChild();
+            timelineLabel.create(timelineLength, timelineXScroll,
                 PatternManager::instance().getCurrentPattern().m_bars,
                 zoomFactor::pianoRoll);
-            }
-            ImGui::EndTable();
+        }
+        ImGui::EndTable();
 
-            if (ImGui::BeginTable("table", 3, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("Piano");
-                ImGui::TableSetupColumn("sequence grid", ImGuiTableColumnFlags_WidthStretch, 0);
-                ImGui::TableSetupColumn("verticalScroll",ImGuiTableColumnFlags_WidthFixed,15);
-                ImGui::TableNextColumn();
-                piano.create(pianoRollScrollY);
-                ImGui::TableNextColumn();
-                pianoRoll.create(pianoRollScrollY,timelineXScroll, timelineLength);
-                ImGui::TableNextColumn();
+        float totalAvail    = ImGui::GetContentRegionAvail().y;
+        float dragBarHeight = 6.0f;
+        float minVelHeight  = 20.0f;
 
-                if (ImGui::BeginChild("custom_scroll", ImVec2(15, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-                    ImGui::Dummy(ImVec2(15, ViewState::instance().WHITE_KEYS * ViewState::instance().getWhiteSize().y));
-                    if (initialLoad)  ImGui::SetScrollY(ViewState::instance().getNoteHeight()* 48); initialLoad = false;
-                    pianoRollScrollY = ImGui::GetScrollY();
-                }ImGui::EndChild();
-            }ImGui::EndTable();
+        velocityHeight = std::clamp(velocityHeight, minVelHeight, totalAvail - 60.0f);
+        float pianoRollHeight = totalAvail - velocityHeight - dragBarHeight;
 
-            if (ImGui::BeginTable("table", 3, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("Piano");
-                ImGui::TableSetupColumn("sequence grid", ImGuiTableColumnFlags_WidthStretch, 0);
-                ImGui::TableSetupColumn("verticalScroll",ImGuiTableColumnFlags_WidthFixed,15);
-                ImGui::TableNextColumn();
+        if (ImGui::BeginTable("note_edit_elements", 3, ImGuiTableFlags_SizingFixedFit)) {
+            ImGui::TableSetupColumn("Piano");
+            ImGui::TableSetupColumn("sequence grid", ImGuiTableColumnFlags_WidthStretch, 0);
+            ImGui::TableSetupColumn("verticalScroll", ImGuiTableColumnFlags_WidthFixed, 15);
+
+            ImGui::TableNextColumn();
+            piano.create(pianoRollScrollY, pianoRollHeight);
+
+            ImGui::TableNextColumn();
+            pianoRoll.create(pianoRollScrollY, timelineXScroll, timelineLength, pianoRollHeight);
+
+            ImGui::TableNextColumn();
+            if (ImGui::BeginChild("custom_scroll", ImVec2(15, pianoRollHeight), false,
+                ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
+                ImGui::Dummy(ImVec2(15, ViewState::instance().WHITE_KEYS
+                    * ViewState::instance().getWhiteSize().y));
+                if (initialLoad) {
+                    ImGui::SetScrollY(ViewState::instance().getNoteHeight() * 48);
+                    initialLoad = false;
+                }
+                pianoRollScrollY = ImGui::GetScrollY();
+            } ImGui::EndChild();
+        } ImGui::EndTable();
+
+        bool collapsed = (velocityHeight <= minVelHeight + 1.0f);
+        // const char* arrow = "Velocity";
+        // if (ImGui::Button(arrow, ImVec2(120, dragBarHeight + 8))) {
+        //     velocityHeight = collapsed
+        //         ? defaultVelocityHeight   // expand to default
+        //         : minVelHeight;           // collapse
+        // }
+        // ImGui::SameLine();
+        // ImGui::Button("##drag_handle",
+        //     ImVec2(ImGui::GetContentRegionAvail().x, dragBarHeight + 8));
+        // if (ImGui::IsItemActive()) {
+        //     velocityHeight -= ImGui::GetIO().MouseDelta.y;  // drag up = more height
+        //     velocityHeight = std::clamp(velocityHeight, minVelHeight, totalAvail - 60.0f);
+        // }
+
+        if (!collapsed) {
+            if (ImGui::BeginTable("velocity_elements", 3, ImGuiTableFlags_SizingFixedFit)) {
+                ImGui::TableSetupColumn("Piano gap",
+                    ImGuiTableColumnFlags_WidthFixed,
+                    ViewState::instance().getWhiteSize().x);
+                ImGui::TableSetupColumn("vel grid",
+                    ImGuiTableColumnFlags_WidthStretch, 0);
+                ImGui::TableSetupColumn("scroll gap",
+                    ImGuiTableColumnFlags_WidthFixed, 15);
 
                 ImGui::TableNextColumn();
-                velocity.create(pianoRollScrollY,timelineXScroll, timelineLength);
+                velocityLabels.create(velocityHeight);
                 ImGui::TableNextColumn();
-
-            }ImGui::EndTable();
-        }ImGui::End();
+                velocity.create(timelineXScroll, timelineLength, velocityHeight);
+                ImGui::TableNextColumn();
+            } ImGui::EndTable();
+        }
     }
+    ImGui::End();
+}
 
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoRollMain)
 };

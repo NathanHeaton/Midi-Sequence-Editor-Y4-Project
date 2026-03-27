@@ -24,13 +24,13 @@ public:
             scrollY = ImGui::GetScrollX();
         }
     };
-    void create(const float &pianoRollScrollY) {
+    void create(const float &pianoRollScrollY, float height) {
         whiteKeys = ViewState::instance().WHITE_KEYS;
         blackKeys = ViewState::instance().BLACK_KEYS;
         WHITE_SIZE = ViewState::instance().getWhiteSize();
         BLACK_SIZE = ViewState::instance().getBlackSize();
         blackGap = ViewState::instance().getBlackGap();
-        if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,0),ImGuiChildFlags_None,
+        if ( ImGui::BeginChild("piano",ImVec2(WHITE_SIZE.x,height),ImGuiChildFlags_None,
             ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
 
             pianoVars vars;

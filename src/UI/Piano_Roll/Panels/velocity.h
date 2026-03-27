@@ -16,18 +16,17 @@ public:
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
 
-    void create(float &scrollY,float &scrollX, float& lengthX) {
-        if (ImGui::BeginChild("piano grid",ImVec2(0,0),
-            ImGuiChildFlags_None,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse)) {
+    void create(float &scrollX, float& lengthX, float height) {
+        if (ImGui::BeginChild("velocity window", ImVec2(0, height),
+            ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+
             TimelineContext ctx;
             renderSteps(ctx);
-            //HandleMouseInput(ctx);
 
             ImGui::SetScrollX(scrollX);
-            ImGui::SetScrollY(scrollY);
             auto& pattern = PatternManager::instance().getCurrentPattern();
-            lengthX =  view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
-            ImGui::Dummy(ImVec2(lengthX ,view_state->WHITE_KEYS*view_state->getWhiteSize().y));
+            lengthX = view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+            ImGui::Dummy(ImVec2(lengthX, height));
             }
         ImGui::EndChild();
     }
@@ -54,7 +53,7 @@ private:
         TimelineContext() {
             cursorPos = ImGui::GetCursorScreenPos();
             drawList = ImGui::GetWindowDrawList();
-            height = 20;
+            height = 120;
             width = ImGui::GetWindowWidth();
             scrollX = ImGui::GetScrollX();
             scrollY = ImGui::GetScrollY();

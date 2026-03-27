@@ -26,6 +26,7 @@ add_library(imgui STATIC
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
         src/Singletons/ToolManager.h
         src/UI/Piano_Roll/Panels/velocity.h
+        src/UI/Piano_Roll/Panels/velocityLabel.h
 
 )
 
