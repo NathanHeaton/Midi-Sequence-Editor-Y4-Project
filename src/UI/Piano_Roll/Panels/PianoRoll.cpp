@@ -53,7 +53,7 @@ void PianoRollComponent::edit(const TimelineContext &ctx){
 
     if (moveOperation.isActive) { updateMoveOperation(snapped);}
     else if (stretchOperation.isActive) { updateStretchOperation(snapped);}
-    else if (scaleOperation.isActive) {updateScaleOperation(snapped);}
+    else if (scaleOperation.isActive) {updateScaleOperation(hover);}
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
         if (isScaleHandleHover(hover, ctx)){ scaleNote(hover);}
@@ -116,10 +116,10 @@ void PianoRollComponent::updateStretchOperation(NoteCoordinate snapped){
         PatternManager::instance().showAllEvents();
     }
 }
-void PianoRollComponent::updateScaleOperation(NoteCoordinate snapped)
+void PianoRollComponent::updateScaleOperation(NoteCoordinate hover)
 {
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
-        scaleOperation.update(snapped);
+        scaleOperation.update(hover);
     }
      else{
          auto commit = scaleOperation.commit();
@@ -384,6 +384,14 @@ void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
         else if (ImGui::IsKeyPressed(ImGuiKey_A))
         {
 
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_C)){
+            std::cout <<"copied selection"<< std::endl;
+            PatternManager::instance().copyEventsSelectedEvents();
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_V)){
+            std::cout <<"pasted selection"<< std::endl;
+            PatternManager::instance().pasteEvents();
         }
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {

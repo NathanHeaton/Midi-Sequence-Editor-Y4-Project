@@ -25,7 +25,8 @@ public:
 
     void addPattern() {
         std::string defaultTitle = "unamed_" + std::to_string(unnamedPatterns);
-        pattern.emplace_back(Pattern(defaultTitle));
+        auto& p = pattern.emplace_back(Pattern(defaultTitle));
+        p.assignID = [this]() { return assignNoteId(); };
         unnamedPatterns++;
     }
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
@@ -57,8 +58,7 @@ public:
     }
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        uint32_t ids[2] ={assignNoteId(),assignNoteId()};
-        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, ids);
+        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta);
     }
 
     void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
@@ -159,9 +159,26 @@ public:
         setCurrentPattern(pattern.size()-1);
     }
 
+    void copyEventsSelectedEvents() {
+        if (!clipBoard.empty()){clipBoard.clear();}
+        auto& p = getCurrentPattern();
+        for ( auto id : p.m_selectedNoteIDs){
+            auto pair = p.getEventIDPairFromOnID(id);
+            clipBoard.push_back(*p.getMidiEventByID_ptr(pair->onID));
+            clipBoard.push_back(*p.getMidiEventByID_ptr(pair->offID));
+        }
+    }
+
+    void pasteEvents() {
+        if (clipBoard.empty()){return;}
+        pattern.at(activePatternIndex).pasteClipboard(clipBoard);
+    }
+
+    uint32_t assignNoteId() { return m_nextNoteId++; }
     private:
     PatternManager() = default;
 
+    std::vector<MidiEvent> clipBoard;
     std::vector<Pattern> pattern{};
     size_t activePatternIndex = 0;
     u_int unnamedPatterns = 0;
@@ -169,7 +186,6 @@ public:
     std::vector<ParsedMidi> parsedMidiFile;
 
     uint32_t m_nextNoteId{0};
-    uint32_t assignNoteId() { return m_nextNoteId++; }
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {
         for (auto& event : events) {

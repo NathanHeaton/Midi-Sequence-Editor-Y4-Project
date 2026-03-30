@@ -5,6 +5,7 @@
 #ifndef MYPROJECT_PATTERN_H
 #define MYPROJECT_PATTERN_H
 
+#include <functional>
 #include <iostream>
 #include <string>
 #include <unordered_set>
@@ -28,6 +29,7 @@ struct NoteEventPair {
 
 class Pattern {
 public:
+    std::function<uint32_t()> assignID;
     float m_barLength;
     std::string m_title;
 
@@ -56,7 +58,8 @@ public:
     void convertMidiTicksToPPQ();
     void setLastBar();
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
-    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta, uint32_t t_id[]);
+    void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta);
+
     void removeNote(NoteEventPair notePair );
     void scaleNoteEventSelection(float scale);
     void removeNoteOperation(NoteEventPair notepair);
@@ -71,6 +74,7 @@ public:
     void moveNoteEventSelection(NoteMoveDelta coordinateDelta);
     void stretchNoteEventSelection(NoteMoveDelta notePair);
     void deleteSelection();
+    void pasteClipboard(std::vector<MidiEvent>& copied_events);
 
     void stretchNoteEvent(uint32_t ID, int32_t newEndAbsolute);
 

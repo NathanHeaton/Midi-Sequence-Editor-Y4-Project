@@ -89,7 +89,6 @@ private:
     }
 
     void sendNewNote(NoteCoordinate snappedCoordinate);
-    void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
     void moveNote(NoteCoordinate snappedCoordinate);
     void stretchNote(NoteCoordinate snappedCoordinate);
     void scaleNote(NoteCoordinate snappedCoordinate);
@@ -104,8 +103,8 @@ private:
     void renderPattern(const TimelineContext& ctx) const;
     void DrawToolEffects(const TimelineContext& ctx);
     void HandleKeyboardInput(const TimelineContext& ctx);
-    NoteCoordinate resolveHoverCoordinate(const TimelineContext& ctx) const;
-    NoteCoordinate resolveSnappedCoordinate(const TimelineContext& ctx) const;
+    [[nodiscard]] NoteCoordinate resolveHoverCoordinate(const TimelineContext& ctx) const;
+    [[nodiscard]] NoteCoordinate resolveSnappedCoordinate(const TimelineContext& ctx) const;
     std::vector<NoteSnapshot> setupSnapshots(NoteCoordinate snappedCoordinate);
     void renderPlaceHolderNotes(const TimelineContext& ctx);
     NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);

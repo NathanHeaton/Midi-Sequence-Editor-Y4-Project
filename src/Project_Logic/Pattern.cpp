@@ -238,17 +238,17 @@ void Pattern::removeNoteOperation(NoteEventPair notepair) {
 
 }
 
-void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration,uint32_t t_ids[]) {
+void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration) {
     const uint8_t channel  = 0;
     const uint8_t velocity = 127;
     const uint32_t offAbsoluteTime = absoluteTime + duration;
 
     MidiEvent noteOn(0, 0x90, Note{t_pitch, velocity}, channel);
-    noteOn.setID(t_ids[0]);
+    noteOn.setID(assignID());
     insertEvent(noteOn, absoluteTime);
 
     MidiEvent noteOff(0, 0x80, Note{t_pitch, velocity}, channel);
-    noteOff.setID(t_ids[1]);
+    noteOff.setID(assignID());
     insertEvent(noteOff, offAbsoluteTime);
 
     m_noteEvents.clear();
@@ -295,6 +295,14 @@ NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
     return state;
 }
 
+void Pattern::pasteClipboard(std::vector<MidiEvent>& copied_events){
+    for (auto event: copied_events){
+        event.setID(assignID());
+        insertEvent(event, event.getAbsoluteTime());
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
+}
 
 void Pattern::hideNoteEvent(NoteCoordinate coordinate)
 {
