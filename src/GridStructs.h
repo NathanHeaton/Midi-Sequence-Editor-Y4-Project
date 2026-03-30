@@ -22,3 +22,8 @@ struct NoteMoveDelta {
     int8_t pitchD;
     int32_t timeDelta;
 };
+
+struct ArrangerCoordinate{
+    uint32_t time;
+    uint32_t track;
+};

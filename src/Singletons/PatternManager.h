@@ -7,7 +7,7 @@
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
 #include "ToolManager.h"
-#include "../NoteStructs.h"
+#include "../GridStructs.h"
 
 enum NoteHoverState: int{
     noNoteHover,
@@ -178,7 +178,7 @@ public:
         if (clipBoard.empty()){return;}
         NoteCoordinate topLeftEvent(clipBoard.at(0).getPitch(),clipBoard.at(0).getAbsoluteTime());
         for (const auto& event : clipBoard) {
-            if (topLeftEvent.pitch < event.getPitch() && topLeftEvent.absoluteTime <= event.getAbsoluteTime()) {
+            if (event.getAbsoluteTime() < topLeftEvent.absoluteTime) {
                 topLeftEvent.absoluteTime = event.getAbsoluteTime();
                 topLeftEvent.pitch = event.getPitch();
             }

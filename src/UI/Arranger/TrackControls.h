@@ -2,23 +2,24 @@
 // Created by nathan on 09/12/2025.
 //
 #include "imgui.h"
-
+#include "../../Singletons/ArrangerManager.h"
 #ifndef MYPROJECT_TRACK_H
 #define MYPROJECT_TRACK_H
 
-class Track {
+class TrackControls {
 public:
-    Track() = default;
+    TrackControls() = default;
 
-    void newTrack() {
+    void newTrack(size_t trackIndex) {
 
+        auto trackDetails = ArrangerManager::instance().getTrack(trackIndex);
         if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit
             |ImGuiTableFlags_BordersOuter
             , ImVec2(0, 100))) {
             ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
             ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
             if (ImGui::TableNextColumn()) {
-                ImGui::Text("Track Title");
+                ImGui::Text(trackDetails->title.c_str());
                 ImGui::BeginTable("Controls",2);
                 ImGui::TableNextColumn();
                 ImGui::Button("Instrument");

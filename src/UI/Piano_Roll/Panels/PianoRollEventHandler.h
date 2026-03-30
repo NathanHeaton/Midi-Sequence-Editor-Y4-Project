@@ -21,8 +21,8 @@ private:
     // ---------------------------------------------------------------
     // Top-level input routing
     // ---------------------------------------------------------------
-    NoteCoordinate hover;
-    NoteCoordinate snapped;
+    NoteCoordinate hover{0,0};
+    NoteCoordinate snapped{0,0};
     void handleMouseInput(const TimelineContext& ctx) {
         if (!ImGui::IsWindowHovered()) {
             return;
