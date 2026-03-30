@@ -104,7 +104,7 @@ public:
     }
 
     bool areNotesSelected(){
-        if (pattern.at(activePatternIndex).m_selectedNoteIDs.size() > 0)
+        if (pattern.at(activePatternIndex).m_selectedNoteOnIDs.size() > 0)
             {return true;}
         return false;
     }
@@ -162,7 +162,7 @@ public:
     void copyEventsSelectedEvents() {
         if (!clipBoard.empty()){clipBoard.clear();}
         auto& p = getCurrentPattern();
-        for ( auto id : p.m_selectedNoteIDs){
+        for ( auto id : p.m_selectedNoteOnIDs){
             auto pair = p.getEventIDPairFromOnID(id);
             clipBoard.push_back(*p.getMidiEventByID_ptr(pair->onID));
             clipBoard.push_back(*p.getMidiEventByID_ptr(pair->offID));
@@ -171,8 +171,23 @@ public:
 
     void pasteEvents() {
         if (clipBoard.empty()){return;}
-        pattern.at(activePatternIndex).pasteClipboard(clipBoard);
+        pattern.at(activePatternIndex).pasteClipboard(clipBoard, NoteMoveDelta(0,0));
     }
+
+    void pasteEventsOnMouse(NoteCoordinate snappedCoordinate){
+        if (clipBoard.empty()){return;}
+        NoteCoordinate topLeftEvent(clipBoard.at(0).getPitch(),clipBoard.at(0).getAbsoluteTime());
+        for (const auto& event : clipBoard) {
+            if (topLeftEvent.pitch < event.getPitch() && topLeftEvent.absoluteTime <= event.getAbsoluteTime()) {
+                topLeftEvent.absoluteTime = event.getAbsoluteTime();
+                topLeftEvent.pitch = event.getPitch();
+            }
+        }
+        NoteMoveDelta offset(snappedCoordinate.pitch - topLeftEvent.pitch,
+             static_cast<signed>(snappedCoordinate.absoluteTime - topLeftEvent.absoluteTime));
+        pattern.at(activePatternIndex).pasteClipboard(clipBoard, offset);
+    }
+
 
     uint32_t assignNoteId() { return m_nextNoteId++; }
     private:

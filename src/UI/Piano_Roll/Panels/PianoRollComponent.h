@@ -24,8 +24,8 @@ public:
             TimelineContext ctx;
 
             renderSteps(ctx);
-            HandleMouseInput(ctx);
             HandleKeyboardInput(ctx);
+            HandleMouseInput(ctx);
 
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
@@ -109,6 +109,9 @@ private:
     void renderPlaceHolderNotes(const TimelineContext& ctx);
     NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
     NoteSnapshot createNoteSnapShotBasedOnID(uint32_t onIds);
+
+    void pasteOnMouse(NoteCoordinate snappedCoordinate);
+    bool gotPasteInput = false;
 
     void DrawPlayHead(const TimelineContext& ctx) const
     {

@@ -38,8 +38,8 @@ public:
     int ticksInMidiFile{0};
     int m_bars{8};
 
-    std::unordered_set<uint32_t> m_selectedNoteIDs;
-    std::unordered_set<uint32_t> m_hiddenNoteIDs;
+    std::unordered_set<uint32_t> m_selectedNoteOnIDs;
+    std::unordered_set<uint32_t> m_hiddenNoteOnIDs;
 
     Pattern(std::string t_title) {
         m_title = t_title;
@@ -74,7 +74,7 @@ public:
     void moveNoteEventSelection(NoteMoveDelta coordinateDelta);
     void stretchNoteEventSelection(NoteMoveDelta notePair);
     void deleteSelection();
-    void pasteClipboard(std::vector<MidiEvent>& copied_events);
+    void pasteClipboard(std::vector<MidiEvent>& copied_events, NoteMoveDelta offSet);
 
     void stretchNoteEvent(uint32_t ID, int32_t newEndAbsolute);
 
@@ -82,14 +82,14 @@ public:
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta);
 
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
-    void showAllNoteEvents() {m_hiddenNoteIDs.clear();}
+    void showAllNoteEvents() {m_hiddenNoteOnIDs.clear();}
 
-    void hideNoteByID(uint32_t ID) {m_hiddenNoteIDs.insert(ID);}
+    void hideNoteByID(uint32_t ID) {m_hiddenNoteOnIDs.insert(ID);}
     void clearPattern(){
         m_events.clear();
         m_noteEvents.clear();
-        m_hiddenNoteIDs.clear();
-        m_selectedNoteIDs.clear();
+        m_hiddenNoteOnIDs.clear();
+        m_selectedNoteOnIDs.clear();
     }
 
     std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
@@ -98,7 +98,7 @@ public:
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {
         std::vector<NoteEventPair> events;
-        for (const auto selectionID: m_selectedNoteIDs) {
+        for (const auto selectionID: m_selectedNoteOnIDs) {
             for (const auto& pair: m_noteEvents) {
                 if (selectionID == pair.onID) {
                     events.push_back(pair);

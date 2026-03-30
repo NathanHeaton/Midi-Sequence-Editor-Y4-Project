@@ -49,6 +49,7 @@ NoteCoordinate PianoRollComponent::resolveSnappedCoordinate(const TimelineContex
 void PianoRollComponent::edit(const TimelineContext &ctx){
     const NoteCoordinate hover = resolveHoverCoordinate(ctx);
     const NoteCoordinate snapped = resolveSnappedCoordinate(ctx);
+    if (gotPasteInput){PatternManager::instance().pasteEventsOnMouse(snapped); gotPasteInput = false;}
     const auto hoverState = PatternManager::instance().getNoteHoverState(hover);
 
     if (moveOperation.isActive) { updateMoveOperation(snapped);}
@@ -162,8 +163,8 @@ std::vector<NoteSnapshot> PianoRollComponent::setupSnapshots(NoteCoordinate snap
 {
     auto* pattern = &PatternManager::instance().getCurrentPattern();
     std::vector<NoteSnapshot> noteSnapshots;
-    if (pattern->m_selectedNoteIDs.size() > 0) {
-        for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
+    if (pattern->m_selectedNoteOnIDs.size() > 0) {
+        for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteOnIDs) {
             PatternManager::instance().hideNoteEventByID(m_selected_note_i_d);
             noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
         }
@@ -212,7 +213,7 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     for (auto noteIDs : pattern->m_noteEvents) {
         auto onEvent = pattern->getMidiEventByID_ptr(noteIDs.onID);
 
-        if (pattern->m_hiddenNoteIDs.contains(noteIDs.onID))
+        if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID))
         {
             continue;
         }
@@ -235,7 +236,7 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         float yEnd = yStart + ctx.noteHeight;
 
         auto colour = Theme::currentThemeColours.barColourPacked;
-        for (auto id : pattern->m_selectedNoteIDs) {
+        for (auto id : pattern->m_selectedNoteOnIDs) {
             if (noteIDs.onID == id) {
                 colour = Theme::currentThemeColours.beatColourPacked;
                 break;
@@ -327,7 +328,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
         const auto pattern = &PatternManager::instance().getCurrentPattern();
         auto middlePointY = 0;
         uint32_t endPointX = 0;
-        for (auto onID :pattern->m_selectedNoteIDs)
+        for (auto onID :pattern->m_selectedNoteOnIDs)
         {
             middlePointY += 127 - pattern->getMidiEventByID_ptr(onID)->getPitch();
             auto note = pattern->getMidiEventByID_ptr(pattern->getEventIDPairFromOnID(onID)->offID);
@@ -335,7 +336,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
                 endPointX = note->getAbsoluteTime();
             }
         }
-        middlePointY = (middlePointY*ctx.noteHeight) / pattern->m_selectedNoteIDs.size();
+        middlePointY = (middlePointY*ctx.noteHeight) / pattern->m_selectedNoteOnIDs.size();
         endPointX = ((endPointX+ TimeData::PPQ)/TimeData::PPQ) * view_state->getPixelPerBeat(zoomFactor::pianoRoll);
 
         tool->setScaleHandlePosition(ImVec2(endPointX+ ctx.cursorPos.x, middlePointY+ ctx.cursorPos.y));
@@ -390,8 +391,11 @@ void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
             PatternManager::instance().copyEventsSelectedEvents();
         }
         else if (ImGui::IsKeyPressed(ImGuiKey_V)){
-            std::cout <<"pasted selection"<< std::endl;
-            PatternManager::instance().pasteEvents();
+            if (!ImGui::IsWindowHovered()) { // pastes in place
+                std::cout <<"pasted selection"<< std::endl;
+                PatternManager::instance().pasteEvents();
+            } // waits for mouse pos to paste
+            else gotPasteInput = true;
         }
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
