@@ -70,7 +70,7 @@ private:
     }
     void handleEditTool(const ArrangerContext& ctx) {
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            std::cout << "adding pattern" << std::endl;
+            ArrangerManager::instance().addClip(hover);
         }
         else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             std::cout << "delteting pattern" << std::endl;
@@ -81,9 +81,10 @@ private:
     [[nodiscard]] ArrangerCoordinate resolveHoverCoordinate(const ArrangerContext& ctx) const {
         auto* vs = &ViewState::instance();
         int absoluteTime = static_cast<int>(
-            ctx.relativeX / vs->getPixelPerBeat(pianoRoll) * TimeData::PPQ);
+            ctx.relativeX / vs->getPixelPerBeat(zoomFactor::arranger) * TimeData::PPQ);
+        auto trackAmount = ArrangerManager::instance().getTrackAmount();
 
-        int track = std::clamp(static_cast<int>(ctx.relativeY / ViewState::instance().getTrackHeight()), 0, ArrangerManager::instance().getTrackAmount());
+        int track =std::clamp(static_cast<int>(ctx.relativeY / (ViewState::instance().getTrackHeight())),0,trackAmount);
         return ArrangerCoordinate(absoluteTime, static_cast<uint32_t>(track));
     }
 };

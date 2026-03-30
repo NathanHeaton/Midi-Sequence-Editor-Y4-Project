@@ -190,12 +190,12 @@ public:
 
 
     uint32_t assignNoteId() { return m_nextNoteId++; }
+    size_t activePatternIndex = 0;
     private:
     PatternManager() = default;
 
     std::vector<MidiEvent> clipBoard;
     std::vector<Pattern> pattern{};
-    size_t activePatternIndex = 0;
     u_int unnamedPatterns = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;

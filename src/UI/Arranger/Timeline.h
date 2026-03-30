@@ -22,13 +22,10 @@ public:
         if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()),
             false,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
-
             ArrangerContext ctx;
 
-            DrawBars(ctx);
-            DrawTrackSeparator(ctx);
+            renderSteps(ctx);
             timelineHandleInput.process(ctx);
-
             if (timelineLength < s->getPixelPerBar(zoomFactor::arranger)* 60) {
                 if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
                     ProjectData::instance().setTotalBars(ProjectData::instance().getTotalBars()+ 4);
@@ -41,6 +38,12 @@ public:
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();
+    }
+
+    void renderSteps(const ArrangerContext& ctx)    {
+        DrawBars(ctx);
+        DrawTrackSeparator(ctx);
+        renderPatternClips(ctx);
     }
 
     bool checkIfBarStart(int beat) {
@@ -72,6 +75,18 @@ public:
             bg_tone = !bg_tone;
         }
 
+    }
+
+    void renderPatternClips(const ArrangerContext& ctx){
+        auto clips = ArrangerManager::instance().getPatternClips();
+        for (auto clip : *clips){
+            ImVec2 p1((clip.startTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,
+                clip.track* ViewState::instance().getTrackHeight()+ctx.cursorPos.y);
+            ImVec2 p2((clip.endTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,clip.track * ViewState::instance().getTrackHeight()
+                +ctx.cursorPos.y+ViewState::instance().getTrackHeight());
+
+            ctx.drawList->AddRectFilled(p1,p2,Theme::currentThemeColours.barColourPacked,8);
+        }
     }
 
     void DrawBarBackgrounds(const ArrangerContext& ctx) {

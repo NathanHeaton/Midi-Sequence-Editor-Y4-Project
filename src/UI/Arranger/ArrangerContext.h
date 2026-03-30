@@ -1,7 +1,7 @@
 #pragma once
 #include <imgui.h>
 #include "../../Singletons/ViewState.h"
-
+#include "../../Singletons/ToolManager.h"
 struct ArrangerContext {
     ImVec2 cursorPos;
     ImDrawList* drawList;
