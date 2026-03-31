@@ -16,8 +16,8 @@ public:
         if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit
             |ImGuiTableFlags_BordersOuter
             , ImVec2(0, 100))) {
-            ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 300);
-            ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 100);
+            ImGui::TableSetupColumn("Title",ImGuiTableColumnFlags_WidthFixed, 200);
+            ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 50);
             if (ImGui::TableNextColumn()) {
                 ImGui::Text(trackDetails->title.c_str());
                 ImGui::BeginTable("Controls",2);

@@ -51,10 +51,15 @@ public:
         else return nullptr;
     }
     [[nodiscard]] PatternClip* getClipAtTime(size_t trackIndex, uint32_t time);
-
     [[nodiscard]] bool hasOverlap(size_t trackIndex, uint32_t start, uint32_t end, uint32_t excludeID = UINT32_MAX) const;
 
-
+    void removeClip(ArrangerCoordinate pos) {
+        for (auto clips : patternClips) {
+            if (clips.startTime < pos.time && clips.endTime > pos.time && clips.track == pos.track) {
+                patternClips.erase(patternClips.begin() + clips.startTime);
+            }
+        }
+    }
 
     void addClip(ArrangerCoordinate pos) {
         PatternClip clip(PatternManager::instance().activePatternIndex,
@@ -63,7 +68,7 @@ public:
             assignID());
         patternClips.push_back(clip);
     }
-    void removeClip(uint32_t id);
+
     void removeAllClipsOnTrack(size_t trackIndex);
 
     void moveClip(uint32_t id, size_t newTrackIndex, uint32_t newStartTime);
@@ -71,7 +76,6 @@ public:
 
     void duplicateClip(uint32_t id, uint32_t newStartTime);
     void splitClip(uint32_t id, uint32_t splitTime);
-
 
     private:
     uint32_t nextID{0};

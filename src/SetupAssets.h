@@ -1,7 +1,6 @@
 #pragma once
 
-#include <filesystem>
-#include <GL/gl.h>
+#include <juce_opengl/juce_opengl.h>
 
 // Ai code //
 struct IconTexture {

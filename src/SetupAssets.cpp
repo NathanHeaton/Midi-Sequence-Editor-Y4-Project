@@ -5,12 +5,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <cstdio>
-#include <filesystem>
-#include <iostream>
-#include <unistd.h>
-#include <vector>
+#include <GL/gl.h>
 
 AssetManager ASSETS;
+using namespace juce::gl;
 
 IconTexture loadTextureFromFile(const char* filename) {
     IconTexture result = {0, 0, 0};

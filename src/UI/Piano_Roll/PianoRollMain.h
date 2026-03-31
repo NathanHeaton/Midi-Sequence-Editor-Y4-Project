@@ -5,7 +5,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../../Theme.h"
-#include "Panels/Tools.h"
+#include "../Common/Tools.h"
 #include "Panels/PianoRollComponent.h"
 #include <iostream>
 #include <imgui.h>

@@ -73,7 +73,7 @@ private:
             ArrangerManager::instance().addClip(hover);
         }
         else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            std::cout << "delteting pattern" << std::endl;
+            ArrangerManager::instance().removeClip(hover);
         }
 
     }

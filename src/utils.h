@@ -65,7 +65,7 @@ static ImVec2 minusImVec2(ImVec2 a, ImVec2 b) {
 }
 
 // ImGui gradient that also changes alpha ================================================
-void ShadeVertsLinearGradient(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx,
+inline void ShadeVertsLinearGradient(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx,
     ImVec2 gradient_p0, ImVec2 gradient_p1, ImU32 col0, ImU32 col1)
 {
     ImVec2 gradient_extent = minusImVec2(gradient_p1, gradient_p0);

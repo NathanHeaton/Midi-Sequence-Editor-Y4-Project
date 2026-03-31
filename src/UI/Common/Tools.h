@@ -1,14 +1,11 @@
 #pragma once
+#include "../../Theme.h"
+#include "../../SetupAssets.h"
+#include "../../Singletons/PlayBackManager.h"
+#include "../../Singletons/ToolManager.h"
+#include "../../Singletons/ViewState.h"
 
-#include <juce_gui_extra/juce_gui_extra.h>
-#include "../../../Theme.h"
-#include <iostream>
-#include "../../../SetupAssets.h"
-#include "../../../Singletons/PlayBackManager.h"
-#include "../../../Singletons/ToolManager.h"
-#include "../../../Singletons/ViewState.h"
-
-class Tools: public juce::Component
+class Tools
 {
 public:
 
@@ -100,5 +97,4 @@ public:
         }
     }
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Tools)
 };
