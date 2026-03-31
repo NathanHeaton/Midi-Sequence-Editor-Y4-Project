@@ -8,8 +8,8 @@
 #define MYPROJECT_THEME_H
 
 
-namespace Theme{
-
+namespace Theme
+{
     enum class ThemeType{
         Dark_Blue,
         Dark_Orange,
@@ -39,6 +39,14 @@ namespace Theme{
         ImU32 subBeatColourPacked;
         ImU32 accentPacked;
 
+    };
+
+    struct gradient
+    {
+        ImVec2 p0;
+        ImVec2 p1;
+        ImU32 col0;
+        ImU32 col1;
     };
 
     inline const  ColourScheme DarkBColours = {

@@ -88,8 +88,8 @@ void Pattern::removeNote(NoteEventPair note) {
         return;
     }
     removeNoteOperation(note);
-    m_selectedNoteIDs.clear();
-    m_hiddenNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
+    m_hiddenNoteOnIDs.clear();
 }
 
 void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
@@ -100,38 +100,38 @@ void Pattern::removeSelection(std::vector<NoteCoordinate> events ) {
         }
         removeNote(*notePair);
     }
-    m_selectedNoteIDs.clear();
-    m_hiddenNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
+    m_hiddenNoteOnIDs.clear();
     m_noteEvents.clear();
     createNoteEventPairs();
 }
 
 void Pattern::deleteSelection() {
-    if (m_selectedNoteIDs.empty()) {
+    if (m_selectedNoteOnIDs.empty()) {
         return;
     }
     for ( auto noteIds : m_noteEvents) {
-        if (m_selectedNoteIDs.contains(noteIds.onID)) {
+        if (m_selectedNoteOnIDs.contains(noteIds.onID)) {
             removeNoteOperation(noteIds);
         }
     }
-    m_selectedNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
     m_noteEvents.clear();
     createNoteEventPairs();
 }
 
 void Pattern::timeShiftSelection(int32_t t_timeDelta) {
-    if (m_selectedNoteIDs.empty()) {
+    if (m_selectedNoteOnIDs.empty()) {
         return;
     }
-    timeShiftOperation(t_timeDelta,m_selectedNoteIDs);
+    timeShiftOperation(t_timeDelta,m_selectedNoteOnIDs);
 
 }
 
 void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs) {
     std::vector<MidiEvent> tempEvents;
     for ( auto noteIds : m_noteEvents) {
-        if (m_selectedNoteIDs.contains(noteIds.onID)) {
+        if (m_selectedNoteOnIDs.contains(noteIds.onID)) {
             auto onNote = *getMidiEventByID_ptr(noteIds.onID);
             auto offNote = *getMidiEventByID_ptr(noteIds.offID);
             tempEvents.push_back(onNote);
@@ -150,7 +150,7 @@ void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32
 
 
 void Pattern::calculateSelection(const SelectionCoords &t_selection) {
-    m_selectedNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
 
     float pixelPerTick = TimeData::instance().PPQ / ViewState::instance().getPixelPerBeat(zoomFactor::pianoRoll);
     float noteHeight = ViewState::instance().getNoteHeight();
@@ -167,7 +167,7 @@ void Pattern::calculateSelection(const SelectionCoords &t_selection) {
 
         if ((onX > adjustedValuesP1.x || offX > adjustedValuesP1.x) && onX < adjustedValuesP2.x) {
             if (onY > adjustedValuesP1.y && onY+1  < adjustedValuesP2.y) {
-                m_selectedNoteIDs.emplace(note.onID);
+                m_selectedNoteOnIDs.emplace(note.onID);
             }
         }
     }
@@ -238,17 +238,17 @@ void Pattern::removeNoteOperation(NoteEventPair notepair) {
 
 }
 
-void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration,uint32_t t_ids[]) {
+void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration) {
     const uint8_t channel  = 0;
     const uint8_t velocity = 127;
     const uint32_t offAbsoluteTime = absoluteTime + duration;
 
     MidiEvent noteOn(0, 0x90, Note{t_pitch, velocity}, channel);
-    noteOn.setID(t_ids[0]);
+    noteOn.setID(assignID());
     insertEvent(noteOn, absoluteTime);
 
     MidiEvent noteOff(0, 0x80, Note{t_pitch, velocity}, channel);
-    noteOff.setID(t_ids[1]);
+    noteOff.setID(assignID());
     insertEvent(noteOff, offAbsoluteTime);
 
     m_noteEvents.clear();
@@ -257,7 +257,7 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration,
 
 
 void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
-    for (const auto selectionID: m_selectedNoteIDs) {
+    for (const auto selectionID: m_selectedNoteOnIDs) {
         for (const auto& pair: m_noteEvents) {
             auto onEvent = getMidiEventByID_ptr(pair.onID);
             auto newPitch = std::clamp(onEvent->getPitch() + t_pitchDelta,0,127);
@@ -295,6 +295,18 @@ NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
     return state;
 }
 
+void Pattern::pasteClipboard(std::vector<MidiEvent>& copied_events, NoteMoveDelta offSet){
+    m_selectedNoteOnIDs.clear();
+    for (auto event: copied_events){
+        event.setID(assignID());
+        if (event.isNoteOn()){m_selectedNoteOnIDs.emplace(event.getID());}
+        event.setPitch(event.getPitch() + offSet.pitchD);
+        event.setAbsoluteTime(event.getAbsoluteTime() + offSet.timeDelta);
+        insertEvent(event, event.getAbsoluteTime());
+    }
+    m_noteEvents.clear();
+    createNoteEventPairs();
+}
 
 void Pattern::hideNoteEvent(NoteCoordinate coordinate)
 {
@@ -305,7 +317,7 @@ void Pattern::hideNoteEvent(NoteCoordinate coordinate)
         {
             if (onEvent->getAbsoluteTime() <= coordinate.absoluteTime&&
                 offEvent->getAbsoluteTime() >= coordinate.absoluteTime ) {
-                    m_hiddenNoteIDs.insert(pair.onID);
+                    m_hiddenNoteOnIDs.insert(pair.onID);
                 }
         }
     }
@@ -356,14 +368,14 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition)
 }
 
 void Pattern::moveNoteEventSelection(NoteMoveDelta coordinateDelta) {
-    timeShiftOperation(coordinateDelta.timeDelta,m_selectedNoteIDs);
+    timeShiftOperation(coordinateDelta.timeDelta,m_selectedNoteOnIDs);
     pitchShiftSelection(coordinateDelta.pitchD);
-    m_selectedNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
 }
 
 void Pattern::stretchNoteEventSelection(NoteMoveDelta coordinateDelta)
 {
-    for (uint32_t id : m_selectedNoteIDs)
+    for (uint32_t id : m_selectedNoteOnIDs)
     {
         stretchNoteEvent(id,coordinateDelta.timeDelta);
     }
@@ -387,13 +399,13 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
 }
 
 void Pattern::scaleNoteEventSelection(float scale) {
-    if (m_selectedNoteIDs.empty() || scale <= 0.0f)
+    if (m_selectedNoteOnIDs.empty() || scale <= 0.0f)
         return;
 
     std::vector<MidiEvent> tempEvents;
 
     for (const auto& pair : m_noteEvents) {
-        if (!m_selectedNoteIDs.contains(pair.onID))
+        if (!m_selectedNoteOnIDs.contains(pair.onID))
             continue;
         tempEvents.push_back(*getMidiEventByID_ptr(pair.onID));
         tempEvents.push_back(*getMidiEventByID_ptr(pair.offID));
@@ -404,7 +416,7 @@ void Pattern::scaleNoteEventSelection(float scale) {
         auto newTime = static_cast<uint32_t>(event.getAbsoluteTime() * scale);
         insertEvent(event, newTime);
     }
-    m_selectedNoteIDs.clear();
+    m_selectedNoteOnIDs.clear();
     m_noteEvents.clear();
     createNoteEventPairs();
 }

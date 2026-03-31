@@ -9,6 +9,8 @@
 #include "../../../Singletons/PatternManager.h"
 #include "../../../Singletons/ToolManager.h"
 #include "../../../Singletons/PlayBackManager.h"
+#include "PianoRollEventHandler.h"
+#include "TimelineContext.h"
 
 class PianoRollComponent
 {
@@ -17,6 +19,7 @@ public:
     PianoRollComponent() = default;
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
+    PianoRollInputHandler inputHandler;
 
     void create(float &scrollY, float &scrollX, float& lengthX, float height) {
         if (ImGui::BeginChild("piano grid", ImVec2(0, height),
@@ -24,8 +27,7 @@ public:
             TimelineContext ctx;
 
             renderSteps(ctx);
-            HandleMouseInput(ctx);
-            HandleKeyboardInput(ctx);
+            inputHandler.process(ctx);
 
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
@@ -36,46 +38,8 @@ public:
         ImGui::EndChild();
     }
 
-
-
 private:
     const int octaves = 10;
-    struct TimelineContext {
-        ImVec2 cursorPos;
-        ImDrawList* drawList;
-        float height;
-        float scrollX;
-        float scrollY;
-        float width;
-        int firstVisibleSubBeat;
-        int lastVisibleSubBeat;
-        float barWidth;
-        float noteHeight;
-        float relativeX;
-        float relativeY;
-        ToolTypes activeTool;
-
-        TimelineContext() {
-            cursorPos = ImGui::GetCursorScreenPos();
-            drawList = ImGui::GetWindowDrawList();
-            height =ViewState::instance().getNoteHeight()*128 ;
-            width = ImGui::GetWindowWidth();
-            scrollX = ImGui::GetScrollX();
-            scrollY = ImGui::GetScrollY();
-            barWidth = 2 * TimeData::instance().timeSignature.getNumerator() * ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll);
-            noteHeight = ViewState::instance().getNoteHeight();
-            auto& view = ViewState::instance();
-            firstVisibleSubBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX /
-                    (view.getPixelPerBeat(pianoRoll)/ view.getRenderedSubDivisions())) : 0;
-            lastVisibleSubBeat = static_cast<int>((scrollX + width)
-                / (view.getPixelPerBeat(pianoRoll)/view.getRenderedSubDivisions()));
-            ImVec2 mousePos = ImGui::GetMousePos();
-            relativeX = mousePos.x - cursorPos.x;
-            relativeY = mousePos.y - cursorPos.y;
-            activeTool = ToolManager::instance().getActiveNoteTool();
-        }
-    };
 
     void renderSteps(const TimelineContext& ctx) {
         DrawNoteGuides(ctx);
@@ -88,31 +52,11 @@ private:
         DrawPlayHead(ctx);
     }
 
-    void sendNewNote(NoteCoordinate snappedCoordinate);
-    void removeNote(const TimelineContext& ctx,uint8_t pitch, uint32_t absoluteTime);
-    void moveNote(NoteCoordinate snappedCoordinate);
-    void stretchNote(NoteCoordinate snappedCoordinate);
-    void scaleNote(NoteCoordinate snappedCoordinate);
-    void updateMoveOperation(NoteCoordinate snapped);
-    void updateScaleOperation(NoteCoordinate snapped);
-    void updateStretchOperation(NoteCoordinate snapped);
-
-    bool isScaleHandleHover(NoteCoordinate hover,const TimelineContext& ctx);
-
-    void edit(const TimelineContext &ctx);
-    void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;
     void DrawToolEffects(const TimelineContext& ctx);
-    void HandleKeyboardInput(const TimelineContext& ctx);
-    NoteCoordinate resolveHoverCoordinate(const TimelineContext& ctx) const;
-    NoteCoordinate resolveSnappedCoordinate(const TimelineContext& ctx) const;
-    std::vector<NoteSnapshot> setupSnapshots(NoteCoordinate snappedCoordinate);
     void renderPlaceHolderNotes(const TimelineContext& ctx);
-    NoteSnapshot createNoteSnapShot(NoteCoordinate snappedCoordinate);
-    NoteSnapshot createNoteSnapShotBasedOnID(uint32_t onIds);
 
-    void DrawPlayHead(const TimelineContext& ctx) const
-    {
+    void DrawPlayHead(const TimelineContext& ctx) const {
 
         float xPos = ctx.cursorPos.x + view_state->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
 

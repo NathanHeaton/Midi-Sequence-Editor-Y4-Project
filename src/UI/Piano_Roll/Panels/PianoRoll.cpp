@@ -5,205 +5,6 @@
 //
 // Created by nathan on 16/02/2026.
 //
-void PianoRollComponent::HandleMouseInput(const TimelineContext& ctx) {
-    if (!ImGui::IsWindowHovered()) {
-        return;
-    }
-    switch (ctx.activeTool) {
-        case MOVE:
-            break;
-        case DELETE:
-            break;
-        case SNIP:
-            break;
-        case SELECT:
-            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                ToolManager::instance().setSelectionPoint1(ImVec2{ctx.relativeX, ctx.relativeY});
-            }
-            if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-                ToolManager::instance().setSelectionPoint2(ImVec2{ctx.relativeX, ctx.relativeY});
-                PatternManager::instance().setSelection(ToolManager::instance().getSelectionPoints());
-            }
-            break;
-        case EDIT:
-            edit(ctx);
-            break;
-
-    }
-}
-
-NoteCoordinate PianoRollComponent::resolveHoverCoordinate(const TimelineContext& ctx) const {
-    int absoluteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll) * TimeData::PPQ);
-    int pitch = std::clamp(127 - static_cast<int>(ctx.relativeY / ctx.noteHeight), 0, 127);
-    return NoteCoordinate(pitch, static_cast<uint32_t>(absoluteTime));
-}
-
-NoteCoordinate PianoRollComponent::resolveSnappedCoordinate(const TimelineContext& ctx) const {
-    int noteTime = static_cast<int>(ctx.relativeX / view_state->getPixelPerBeat(pianoRoll)
-                                    * view_state->getSnappedSubDivisions());
-    int snappedTime = noteTime * (static_cast<float>(TimeData::PPQ) / view_state->getSnappedSubDivisions());
-    int pitch = std::clamp(127 - static_cast<int>(ctx.relativeY / ctx.noteHeight), 0, 127);
-    return NoteCoordinate(pitch, static_cast<uint32_t>(snappedTime));
-}
-
-void PianoRollComponent::edit(const TimelineContext &ctx){
-    const NoteCoordinate hover = resolveHoverCoordinate(ctx);
-    const NoteCoordinate snapped = resolveSnappedCoordinate(ctx);
-    const auto hoverState = PatternManager::instance().getNoteHoverState(hover);
-
-    if (moveOperation.isActive) { updateMoveOperation(snapped);}
-    else if (stretchOperation.isActive) { updateStretchOperation(snapped);}
-    else if (scaleOperation.isActive) {updateScaleOperation(snapped);}
-
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-        if (isScaleHandleHover(hover, ctx)){ scaleNote(hover);}
-        else {
-            switch (hoverState) {
-                case NoteCenterHover: moveNote(snapped);    break;
-                case NoteEdgeHover:   stretchNote(snapped); break;
-                default:              sendNewNote(snapped); break;
-            }
-        }
-    }
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        PatternManager::instance().removeNoteFromPattern(hover);
-    }
-}
-
-bool PianoRollComponent::isScaleHandleHover(NoteCoordinate hover,const TimelineContext& ctx){
-    auto p1 = ToolManager::instance().getScaleHandlePosition();
-    auto p2 = addImVec2(ToolManager::instance().getScaleHandleSize(),p1);
-    auto s1 = ImVec2((static_cast<float>(hover.absoluteTime) /TimeData::PPQ) * view_state->getPixelPerBeat(pianoRoll) + ctx.cursorPos.x,
-        (127 - hover.pitch)*view_state->getNoteHeight() + ctx.cursorPos.y);
-    if ( s1.x > p1.x && s1.x < p2.x) {
-        if ( s1.y > p1.y && s1.y < p2.y) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void PianoRollComponent::updateMoveOperation(NoteCoordinate snapped){
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left))        {
-        moveOperation.update(snapped);
-    }
-    else{
-        auto commit = moveOperation.commit();
-        if (std::holds_alternative<SingleNoteCommit>(commit))  {
-            auto& c = std::get<SingleNoteCommit>(commit);
-            PatternManager::instance().moveNoteEvent(c.ID, c.coord);
-        } else {
-            auto& c = std::get<NotesCommit>(commit);
-            PatternManager::instance().moveSelection(c.delta);
-        }
-        std::cout<<"updating move"<< std::endl;
-        PatternManager::instance().showAllEvents();
-    }
-}
-void PianoRollComponent::updateStretchOperation(NoteCoordinate snapped){
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
-        stretchOperation.update(snapped);
-    }
-    else{
-        auto commit = stretchOperation.commit();
-        if (std::holds_alternative<SingleNoteCommit>(commit))  {
-            auto& c = std::get<SingleNoteCommit>(commit);
-            PatternManager::instance().stretchNoteEvent(c.ID, c.coord.absoluteTime);
-        } else {
-            auto& c = std::get<NotesCommit>(commit);
-            PatternManager::instance().stretchSelection(c.delta);
-        }
-        PatternManager::instance().showAllEvents();
-    }
-}
-void PianoRollComponent::updateScaleOperation(NoteCoordinate snapped)
-{
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left)){
-        scaleOperation.update(snapped);
-    }
-     else{
-         auto commit = scaleOperation.commit();
-         if (std::holds_alternative<ScaleCommit>(commit))  {
-             auto s = std::get<ScaleCommit>(commit).scale;
-             PatternManager::instance().scaleSelection(s);
-         } else {
-            std::cout<<"error with scale commit"<< std::endl;
-         }
-         PatternManager::instance().showAllEvents();
-    }
-}
-
-void PianoRollComponent::sendNewNote(NoteCoordinate snappedCoordinate) {
-    PatternManager::instance().addNoteToPattern(snappedCoordinate.pitch,
-        static_cast<signed>(snappedCoordinate.absoluteTime),  ToolManager::instance().getLastNoteDuration());
-}
-
-void PianoRollComponent::moveNote(NoteCoordinate snappedCoordinate){
-    auto noteSnapshots = setupSnapshots(snappedCoordinate);
-    moveOperation.originalInputCoordinate = snappedCoordinate;
-    moveOperation.addNotes(noteSnapshots);
-}
-
-void PianoRollComponent::stretchNote(NoteCoordinate snappedCoordinate) {
-    auto noteSnapshots = setupSnapshots(snappedCoordinate);
-    stretchOperation.initStretchingNotes(noteSnapshots[0].absoluteTime,noteSnapshots[0].endAbsoluteTime);
-    stretchOperation.addNotes(noteSnapshots);
-}
-
-void PianoRollComponent::scaleNote(NoteCoordinate hover) {
-    scaleOperation.addNotes(setupSnapshots(hover));
-    scaleOperation.init(scaleOperation.notes.at(0).absoluteTime,
-    scaleOperation.notes.at(0).endAbsoluteTime,
-    hover.absoluteTime - scaleOperation.notes.at(0).endAbsoluteTime);
-}
-
-
-std::vector<NoteSnapshot> PianoRollComponent::setupSnapshots(NoteCoordinate snappedCoordinate)
-{
-    auto* pattern = &PatternManager::instance().getCurrentPattern();
-    std::vector<NoteSnapshot> noteSnapshots;
-    if (pattern->m_selectedNoteIDs.size() > 0) {
-        for (uint32_t m_selected_note_i_d : pattern->m_selectedNoteIDs) {
-            PatternManager::instance().hideNoteEventByID(m_selected_note_i_d);
-            noteSnapshots.push_back(createNoteSnapShotBasedOnID(m_selected_note_i_d));
-        }
-    }
-    else {
-        noteSnapshots.push_back(createNoteSnapShot(snappedCoordinate));
-    }
-    return noteSnapshots;
-}
-
-NoteSnapshot PianoRollComponent::createNoteSnapShotBasedOnID(uint32_t onID) {
-    auto* pattern = &PatternManager::instance().getCurrentPattern();
-    auto noteIds = *pattern->getEventIDPairFromOnID(onID);
-    auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
-    auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
-
-    return NoteSnapshot(
-        noteIds.onID,
-        onNote->getAbsoluteTime(),
-        offNote->getAbsoluteTime(),
-        offNote->getAbsoluteTime() - onNote->getAbsoluteTime(),
-        onNote->getPitch()
-        );
-}
-
-NoteSnapshot PianoRollComponent::createNoteSnapShot(NoteCoordinate snappedCoordinate) {
-    auto noteIds = PatternManager::instance().getNoteEventPairFromCoordinate(snappedCoordinate);
-    auto* pattern = &PatternManager::instance().getCurrentPattern();
-    auto onNote = pattern->getMidiEventByID_ptr(noteIds.onID);
-    auto offNote = pattern->getMidiEventByID_ptr(noteIds.offID);
-
-    PatternManager::instance().hideNoteEventByID(noteIds.onID);
-    return NoteSnapshot(
-        noteIds.onID,
-        onNote->getAbsoluteTime(),
-        offNote->getAbsoluteTime(),
-        offNote->getAbsoluteTime() - onNote->getAbsoluteTime(),
-        onNote->getPitch()
-        );
-}
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     auto* pattern = &PatternManager::instance().getCurrentPattern();
@@ -212,7 +13,7 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     for (auto noteIDs : pattern->m_noteEvents) {
         auto onEvent = pattern->getMidiEventByID_ptr(noteIDs.onID);
 
-        if (pattern->m_hiddenNoteIDs.contains(noteIDs.onID))
+        if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID))
         {
             continue;
         }
@@ -235,7 +36,7 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         float yEnd = yStart + ctx.noteHeight;
 
         auto colour = Theme::currentThemeColours.barColourPacked;
-        for (auto id : pattern->m_selectedNoteIDs) {
+        for (auto id : pattern->m_selectedNoteOnIDs) {
             if (noteIDs.onID == id) {
                 colour = Theme::currentThemeColours.beatColourPacked;
                 break;
@@ -327,7 +128,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
         const auto pattern = &PatternManager::instance().getCurrentPattern();
         auto middlePointY = 0;
         uint32_t endPointX = 0;
-        for (auto onID :pattern->m_selectedNoteIDs)
+        for (auto onID :pattern->m_selectedNoteOnIDs)
         {
             middlePointY += 127 - pattern->getMidiEventByID_ptr(onID)->getPitch();
             auto note = pattern->getMidiEventByID_ptr(pattern->getEventIDPairFromOnID(onID)->offID);
@@ -335,7 +136,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
                 endPointX = note->getAbsoluteTime();
             }
         }
-        middlePointY = (middlePointY*ctx.noteHeight) / pattern->m_selectedNoteIDs.size();
+        middlePointY = (middlePointY*ctx.noteHeight) / pattern->m_selectedNoteOnIDs.size();
         endPointX = ((endPointX+ TimeData::PPQ)/TimeData::PPQ) * view_state->getPixelPerBeat(zoomFactor::pianoRoll);
 
         tool->setScaleHandlePosition(ImVec2(endPointX+ ctx.cursorPos.x, middlePointY+ ctx.cursorPos.y));
@@ -346,60 +147,4 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
             endCoords,
         Theme::currentThemeColours.barColourPacked, 0.0f);
     }
-}
-
-
-
-void PianoRollComponent::HandleKeyboardInput(const TimelineContext& ctx) {
-    if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
-        if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
-            PatternManager::instance().pitchShiftSelection(-1);
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
-            PatternManager::instance().pitchShiftSelection(+1);
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
-            PatternManager::instance().timeShiftSelection(-100);
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
-            PatternManager::instance().timeShiftSelection(+100);
-        }
-    }
-    if (ImGui::IsKeyDown(ImGuiMod_Ctrl)) {
-        if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
-            PatternManager::instance().pitchShiftSelection(-12);
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
-            PatternManager::instance().pitchShiftSelection(+12);
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
-            PatternManager::instance().pitchShiftSelection(-120);
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
-            PatternManager::instance().pitchShiftSelection(+120);
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_Z)) {
-
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_A))
-        {
-
-        }
-    }
-    if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
-        if (PatternManager::instance().areNotesSelected()){
-            PatternManager::instance().deleteSelection();
-        }
-        else{
-            PatternManager::instance().clearPattern();
-        }
-    }
-
-    if (ImGui::IsKeyPressed(ImGuiKey_E)){
-        ToolManager::instance().setPianoRollTool(ToolTypes::EDIT);
-    }
-    else if (ImGui::IsKeyPressed(ImGuiKey_S))    {
-        ToolManager::instance().setPianoRollTool(ToolTypes::SELECT);
-    }
-
 }

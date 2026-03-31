@@ -6,47 +6,26 @@
 #include "../../Singletons/ViewState.h"
 #include "../../Singletons/ProjectData.h"
 #include "../../Theme.h"
+#include "TimelineHandleInput.h"
+#include "ArrangerContext.h"
 
 class Timeline {
 public:
     Timeline() = default;
     ViewState* s = &ViewState::instance();
-
+    TimelineHandleInput timelineHandleInput;
     bool bg_tone{true};
     int barBackgroundCount{0};
 
-    struct TimelineContext {
-        ImVec2 cursorPos;
-        ImDrawList* drawList;
-        float height;
-        float scrollX;
-        float width;
-        int firstVisibleBeat;
-        int lastVisibleBeat;
-        float barWidth;
-
-        TimelineContext() {
-            cursorPos = ImGui::GetCursorScreenPos();
-            drawList = ImGui::GetWindowDrawList();
-            height = ImGui::GetWindowHeight();
-            width = ImGui::GetWindowWidth();
-            scrollX = ImGui::GetScrollX();
-            barWidth = ViewState::instance().getPixelPerBar(zoomFactor::arranger);
-            auto& session = ViewState::instance();
-            firstVisibleBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX / session.getPixelPer(Division::QUARTER_NOTE, zoomFactor::arranger)) : 0;
-            lastVisibleBeat = static_cast<int>((scrollX + width) / session.getPixelPerBeat(zoomFactor::arranger));
-        }
-    };
-
-
     void createTimeline(float &timelineLength, float &xScroll) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * ProjectData::instance().getTrackAmount()),
+        if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()),
             false,
             ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
-            DrawBars();
-            DrawTrackSeparator();
+            ArrangerContext ctx;
+
+            renderSteps(ctx);
+            timelineHandleInput.process(ctx);
             if (timelineLength < s->getPixelPerBar(zoomFactor::arranger)* 60) {
                 if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
                     ProjectData::instance().setTotalBars(ProjectData::instance().getTotalBars()+ 4);
@@ -54,20 +33,24 @@ public:
                 }
             }
             xScroll = ImGui::GetScrollX();
-            ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * ProjectData::instance().getTrackAmount()));
+            ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()));
 
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();
     }
 
+    void renderSteps(const ArrangerContext& ctx)    {
+        DrawBars(ctx);
+        DrawTrackSeparator(ctx);
+        renderPatternClips(ctx);
+    }
+
     bool checkIfBarStart(int beat) {
         return beat % TimeData::instance().timeSignature.getNumerator() == 0;
     }
 
-    void DrawBars() {
-        TimelineContext ctx;
-
+    void DrawBars(const ArrangerContext& ctx) {
         int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
 
@@ -85,7 +68,7 @@ public:
         }
     }
 
-    void getCurrentBarCount(const TimelineContext& ctx) {
+    void getCurrentBarCount(const ArrangerContext& ctx) {
         int increment = TimeData::instance().timeSignature.getNumerator();
         increment = increment*2;
         if (ctx.firstVisibleBeat % increment == 0) {
@@ -94,7 +77,19 @@ public:
 
     }
 
-    void DrawBarBackgrounds(const TimelineContext& ctx) {
+    void renderPatternClips(const ArrangerContext& ctx){
+        auto clips = ArrangerManager::instance().getPatternClips();
+        for (auto clip : *clips){
+            ImVec2 p1((clip.startTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,
+                clip.track* ViewState::instance().getTrackHeight()+ctx.cursorPos.y);
+            ImVec2 p2((clip.endTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,clip.track * ViewState::instance().getTrackHeight()
+                +ctx.cursorPos.y+ViewState::instance().getTrackHeight());
+
+            ctx.drawList->AddRectFilled(p1,p2,Theme::currentThemeColours.barColourPacked,8);
+        }
+    }
+
+    void DrawBarBackgrounds(const ArrangerContext& ctx) {
         int beatsPerBackground = TimeData::instance().timeSignature.getNumerator() * 2;
         int firstBackgroundBeat = (ctx.firstVisibleBeat / beatsPerBackground) * beatsPerBackground;
         int backgroundIndex = firstBackgroundBeat / beatsPerBackground;
@@ -105,7 +100,7 @@ public:
         }
     }
 
-    void DrawBackground(const TimelineContext& ctx, int startBeat) {
+    void DrawBackground(const ArrangerContext& ctx, int startBeat) {
         ImVec2 rectStart = ImVec2(
             ctx.cursorPos.x + s->getPixelPerBeat(zoomFactor::arranger) * startBeat,
             ctx.cursorPos.y
@@ -122,7 +117,7 @@ public:
         );
     }
 
-    void DrawBarLine(const TimelineContext& ctx, ImVec2 start, ImVec2 end, bool barStart) {
+    void DrawBarLine(const ArrangerContext& ctx, ImVec2 start, ImVec2 end, bool barStart) {
         ctx.drawList->AddLine(
             start, end,
             barStart ? Theme::currentThemeColours.barColourPacked
@@ -132,10 +127,8 @@ public:
     }
 
 
-    void DrawTrackSeparator() {
-        TimelineContext ctx;
-
-        for (unsigned int i = 0; i < ProjectData::instance().getTrackAmount(); i++) {
+    void DrawTrackSeparator(const ArrangerContext& ctx) {
+        for (unsigned int i = 0; i < ArrangerManager::instance().getTrackAmount(); i++) {
             float yPos = ctx.cursorPos.y + i * s->getTrackHeight();
 
             ctx.drawList->AddLine(

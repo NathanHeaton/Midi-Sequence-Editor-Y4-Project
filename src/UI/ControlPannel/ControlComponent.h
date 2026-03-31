@@ -28,7 +28,6 @@ public:
             ImGui::TableNextColumn();
 
             if (ImGui::Button("New Pattern")) {
-                state.pianoRollWindow = !state.pianoRollWindow;
                 PatternManager::instance().addPattern();
             }
             if (ImGui::BeginCombo("Open Pattern",
@@ -42,6 +41,7 @@ public:
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
                         PatternManager::instance().setCurrentPattern(i);
+                        state.pianoRollWindow = true;
                     }
                 }
                 ImGui::EndCombo();

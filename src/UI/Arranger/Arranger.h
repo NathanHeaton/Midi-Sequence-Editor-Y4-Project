@@ -3,10 +3,11 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../../Theme.h"
 #include "TopControls.h"
-#include "Track.h"
+#include "TrackControls.h"
 #include "Timeline.h"
 #include "../../Singletons/ViewState.h"
 #include "../../Singletons/ProjectData.h"
+#include "../../Singletons/ArrangerManager.h"
 #include "../Common/timelineLabel.h"
 #include <iostream>
 
@@ -18,13 +19,10 @@ class Arranger
 public:
 
     TopControls topControls;
-    //PatternViewport patternViewport;
     Timeline timeline;
     TimelineLabel timelineLabel;
 
-    std::vector<std::unique_ptr<Track>> tracks;
-    //std::vector<std::unique_ptr<HeadingComponent>> trackComponents;
-
+    std::vector<std::unique_ptr<TrackControls>> tracksControls;
 
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::arranger)* ProjectData::instance().getTotalBars();
     float timelineXScroll = 0.0f;
@@ -64,10 +62,13 @@ public:
             ImGui::TableSetupColumn("Timeline");
 
             ImGui::TableNextColumn();
-            for (const auto& track : tracks) {
+            for (int i = 0; i < tracksControls.size(); i++) {
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-                track->newTrack();
+                tracksControls.at(i)->newTrack(i);
                 ImGui::PopStyleVar();
+            }
+            for (const auto& track : tracksControls) {
+
             }
 
             ImGui::TableNextColumn();
@@ -81,10 +82,9 @@ public:
     }
 
     void AddTrack()  {
-        DBG("adding track");
-        auto newTrack =  std::make_unique<Track>(); // create a new track
-        tracks.push_back(std::move(newTrack));
-        ProjectData::instance().addTrack();
+        auto newTrack =  std::make_unique<TrackControls>(); // create a new track
+        tracksControls.push_back(std::move(newTrack));
+        ArrangerManager::instance().addTrack();
     }
 
 

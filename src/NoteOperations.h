@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <variant>
 #include <vector>
-#include "NoteStructs.h"
+#include "GridStructs.h"
 
 struct SingleNoteCommit{
     uint32_t ID;

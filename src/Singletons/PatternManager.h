@@ -7,7 +7,7 @@
 #include "../Project_Logic/Pattern.h"
 #include "../MIDI_Logic/ParsedMidi.h"
 #include "ToolManager.h"
-#include "../NoteStructs.h"
+#include "../GridStructs.h"
 
 enum NoteHoverState: int{
     noNoteHover,
@@ -25,7 +25,8 @@ public:
 
     void addPattern() {
         std::string defaultTitle = "unamed_" + std::to_string(unnamedPatterns);
-        pattern.emplace_back(Pattern(defaultTitle));
+        auto& p = pattern.emplace_back(Pattern(defaultTitle));
+        p.assignID = [this]() { return assignNoteId(); };
         unnamedPatterns++;
     }
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
@@ -57,8 +58,7 @@ public:
     }
 
     void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        uint32_t ids[2] ={assignNoteId(),assignNoteId()};
-        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta, ids);
+        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta);
     }
 
     void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
@@ -104,7 +104,7 @@ public:
     }
 
     bool areNotesSelected(){
-        if (pattern.at(activePatternIndex).m_selectedNoteIDs.size() > 0)
+        if (pattern.at(activePatternIndex).m_selectedNoteOnIDs.size() > 0)
             {return true;}
         return false;
     }
@@ -159,17 +159,48 @@ public:
         setCurrentPattern(pattern.size()-1);
     }
 
+    void copyEventsSelectedEvents() {
+        if (!clipBoard.empty()){clipBoard.clear();}
+        auto& p = getCurrentPattern();
+        for ( auto id : p.m_selectedNoteOnIDs){
+            auto pair = p.getEventIDPairFromOnID(id);
+            clipBoard.push_back(*p.getMidiEventByID_ptr(pair->onID));
+            clipBoard.push_back(*p.getMidiEventByID_ptr(pair->offID));
+        }
+    }
+
+    void pasteEvents() {
+        if (clipBoard.empty()){return;}
+        pattern.at(activePatternIndex).pasteClipboard(clipBoard, NoteMoveDelta(0,0));
+    }
+
+    void pasteEventsOnMouse(NoteCoordinate snappedCoordinate){
+        if (clipBoard.empty()){return;}
+        NoteCoordinate topLeftEvent(clipBoard.at(0).getPitch(),clipBoard.at(0).getAbsoluteTime());
+        for (const auto& event : clipBoard) {
+            if (event.getAbsoluteTime() < topLeftEvent.absoluteTime) {
+                topLeftEvent.absoluteTime = event.getAbsoluteTime();
+                topLeftEvent.pitch = event.getPitch();
+            }
+        }
+        NoteMoveDelta offset(snappedCoordinate.pitch - topLeftEvent.pitch,
+             static_cast<signed>(snappedCoordinate.absoluteTime - topLeftEvent.absoluteTime));
+        pattern.at(activePatternIndex).pasteClipboard(clipBoard, offset);
+    }
+
+
+    uint32_t assignNoteId() { return m_nextNoteId++; }
+    size_t activePatternIndex = 0;
     private:
     PatternManager() = default;
 
+    std::vector<MidiEvent> clipBoard;
     std::vector<Pattern> pattern{};
-    size_t activePatternIndex = 0;
     u_int unnamedPatterns = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;
 
     uint32_t m_nextNoteId{0};
-    uint32_t assignNoteId() { return m_nextNoteId++; }
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {
         for (auto& event : events) {
