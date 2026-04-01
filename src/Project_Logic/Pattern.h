@@ -9,15 +9,16 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
-
+#include "../Singletons/TimeData.h"
 #include "../MIDI_Logic/MIDI_Events/MidiEvent.h"
 
-enum NoteHoverState : int;
+enum HoverState : int;
 class SessionData;
 
 struct NoteCoordinate;
 struct SelectionCoords;
 struct NoteMoveDelta;
+
 /*====================================
  * Stores of and on ID of events pairs
  ==================================*/
@@ -31,12 +32,14 @@ class Pattern {
 public:
     std::function<uint32_t()> assignID;
     float m_barLength;
+    // make sure to add code to update when time sig changes
+    uint32_t barSizeTicks =TimeData::instance().PPQ * TimeData::instance().timeSignature.getNumerator();
     std::string m_title;
-
+    uint32_t ID;
     std::vector<MidiEvent> m_events;
     std::vector<NoteEventPair> m_noteEvents;
     int ticksInMidiFile{0};
-    int m_bars{8};
+    int m_bars{1};
 
     std::unordered_set<uint32_t> m_selectedNoteOnIDs;
     std::unordered_set<uint32_t> m_hiddenNoteOnIDs;
@@ -59,7 +62,7 @@ public:
     void setLastBar();
     void insertEvent(MidiEvent& event, uint32_t absoluteTime);
     void addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t endDelta);
-
+    void updateBarCount(uint32_t endAbsolute);
     void removeNote(NoteEventPair notePair );
     void scaleNoteEventSelection(float scale);
     void removeNoteOperation(NoteEventPair notepair);
@@ -93,7 +96,7 @@ public:
     }
 
     std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
-    NoteHoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
+    HoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
 
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {

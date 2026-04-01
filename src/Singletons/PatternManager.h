@@ -9,10 +9,10 @@
 #include "ToolManager.h"
 #include "../GridStructs.h"
 
-enum NoteHoverState: int{
-    noNoteHover,
-    NoteEdgeHover,
-    NoteCenterHover
+enum HoverState: int{
+    NoHover,
+    EdgeHover,
+    CenterHover
 };
 
 class PatternManager {
@@ -27,8 +27,17 @@ public:
         std::string defaultTitle = "unamed_" + std::to_string(unnamedPatterns);
         auto& p = pattern.emplace_back(Pattern(defaultTitle));
         p.assignID = [this]() { return assignNoteId(); };
+        p.ID = assignPatternId();
         unnamedPatterns++;
     }
+
+    size_t getPatternIndexByID(uint32_t ID) {
+        for (auto& p : pattern) {
+            if (p.ID == ID){return p.ID;}
+        }
+        return NULL;
+    }
+
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
         pattern.emplace_back(title, events, fileTicks);
     }
@@ -75,7 +84,7 @@ public:
         activePatternIndex = newPattern;
     }
 
-    NoteHoverState getNoteHoverState(NoteCoordinate hoveredCoordinate) {
+    HoverState getNoteHoverState(NoteCoordinate hoveredCoordinate) {
         return pattern.at(activePatternIndex).findNoteHoverState(hoveredCoordinate);
     }
 
@@ -190,6 +199,8 @@ public:
 
 
     uint32_t assignNoteId() { return m_nextNoteId++; }
+    uint32_t assignPatternId() {return m_nextPatternId++;}
+
     size_t activePatternIndex = 0;
     private:
     PatternManager() = default;
@@ -201,6 +212,7 @@ public:
     std::vector<ParsedMidi> parsedMidiFile;
 
     uint32_t m_nextNoteId{0};
+    uint32_t m_nextPatternId{0};
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {
         for (auto& event : events) {

@@ -22,7 +22,7 @@ class TimelineLabel {
     TimelineLabel() = default;
 
     void create(float timelineLength, float &xScroll, int bars, float t_zoomFactor) {
-        totalBars = bars;
+        totalBars = bars + 1;
         m_zoomFactor =t_zoomFactor;
         barWidth = ViewState::instance().getPixelPerBar(m_zoomFactor);
         if (ImGui::BeginChild("Timeline", ImVec2(0, height),

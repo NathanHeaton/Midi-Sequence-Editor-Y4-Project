@@ -15,11 +15,13 @@
 //
 
 void Pattern::setLastBar() {
-    const auto barSize = TimeData::instance().PPQ * TimeData::instance().timeSignature.getNumerator();
+    auto barSize = TimeData::instance().PPQ * TimeData::instance().timeSignature.getNumerator();
     int endAbsolute = m_events.back().m_absoluteTime;
 
     float bars = static_cast<float>(endAbsolute) / static_cast<float>(barSize);
+    std::cout << "before setting bars" << std::endl;
     m_bars = ceil(bars);
+    std::cout << "after setting bars" << std::endl;
 }
 
 void Pattern::createNoteEventPairs(){
@@ -210,11 +212,10 @@ uint32_t Pattern::calculateDelta(size_t insertionIndex, uint32_t absoluteTime) c
 void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
     size_t index    = findInsertionPoint(absoluteTime);
     uint32_t delta  = calculateDelta(index, absoluteTime);
-
     event.setDelta(delta);
     event.m_absoluteTime = absoluteTime;
-
     m_events.insert(m_events.begin() + index, event);
+    updateBarCount(absoluteTime);
 }
 
 void Pattern::removeNoteOperation(NoteEventPair notepair) {
@@ -270,8 +271,8 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
 }
 
 
-NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
-    NoteHoverState state = noNoteHover;
+HoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
+    HoverState state = NoHover;
     for (const auto& pair: m_noteEvents) {
         const auto onEvent = getMidiEventByID_ptr(pair.onID);
         const auto offEvent = getMidiEventByID_ptr(pair.offID);
@@ -282,10 +283,10 @@ NoteHoverState Pattern::findNoteHoverState(NoteCoordinate hoverCoordinate) {
                     (offEvent->getAbsoluteTime() - onEvent->getAbsoluteTime()) * 0.2;
                 auto hoverDelta = hoverCoordinate.absoluteTime;
                 if (hoverDelta <= centerRegion ) {
-                    state = NoteCenterHover;
+                    state = CenterHover;
                 }
                 else {
-                    state = NoteEdgeHover;
+                    state = EdgeHover;
                 }
                 break;
             }
@@ -366,7 +367,11 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition)
     createNoteEventPairs();
 
 }
-
+void Pattern::updateBarCount(uint32_t endAbsolute) {
+    if (endAbsolute >= (barSizeTicks * m_bars)) {
+        setLastBar();
+    }
+}
 void Pattern::moveNoteEventSelection(NoteMoveDelta coordinateDelta) {
     timeShiftOperation(coordinateDelta.timeDelta,m_selectedNoteOnIDs);
     pitchShiftSelection(coordinateDelta.pitchD);

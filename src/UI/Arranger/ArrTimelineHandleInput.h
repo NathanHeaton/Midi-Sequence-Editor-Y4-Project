@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Singletons/PatternManager.h"
+#include "../../Singletons/ArrangerManager.h"
 #include "../../Singletons/ToolManager.h"
 #include "../../Singletons/ViewState.h"
 #include "../../NoteOperations.h"
@@ -32,8 +32,6 @@ private:
             // add other fields once structre is established
         // case MOVE:   break;
         // case DELETE: break;
-        // case SNIP:   break;
-        // case SELECT: handleSelectTool(ctx); break;
         case EDIT:   handleEditTool(ctx);   break;
         }
     }
@@ -69,8 +67,15 @@ private:
         }
     }
     void handleEditTool(const ArrangerContext& ctx) {
+
+
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            ArrangerManager::instance().addClip(hover);
+            auto hoverState = ArrangerManager::instance().resolveHoverState(hover);
+            switch (hoverState) {
+                case CenterHover: ArrangerManager::instance().initMoveClip(hover);
+                case EdgeHover: ArrangerManager::instance().addClip(hover);
+                case NoHover: ArrangerManager::instance().addClip(hover);
+            }
         }
         else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             ArrangerManager::instance().removeClip(hover);
@@ -82,8 +87,8 @@ private:
         auto* vs = &ViewState::instance();
         int absoluteTime = static_cast<int>(
             ctx.relativeX / vs->getPixelPerBeat(zoomFactor::arranger) * TimeData::PPQ);
-        auto trackAmount = ArrangerManager::instance().getTrackAmount();
 
+        auto trackAmount = ArrangerManager::instance().getTrackAmount();
         int track =std::clamp(static_cast<int>(ctx.relativeY / (ViewState::instance().getTrackHeight())),0,trackAmount);
         return ArrangerCoordinate(absoluteTime, static_cast<uint32_t>(track));
     }

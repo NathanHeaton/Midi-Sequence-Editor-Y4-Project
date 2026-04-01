@@ -32,7 +32,8 @@ public:
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
             auto& pattern = PatternManager::instance().getCurrentPattern();
-            lengthX =  view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+
+            lengthX =  view_state->getPixelPerBar(pianoRoll) * (pattern.m_bars+1);// extra bar for visual purposes
             ImGui::Dummy(ImVec2(lengthX ,view_state->WHITE_KEYS*view_state->getWhiteSize().y));
         }
         ImGui::EndChild();

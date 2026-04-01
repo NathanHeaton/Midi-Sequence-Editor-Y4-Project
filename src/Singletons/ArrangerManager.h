@@ -7,12 +7,15 @@
 #include <string>
 #include <vector>
 #include "PatternManager.h"
+#include "TimeData.h"
+
 struct PatternClip{
-    size_t patternIndex;
+    size_t patternID;
     uint32_t startTime;
     uint32_t endTime;
     uint32_t track;
     uint32_t ID;
+    bool enabled;
 };
 
 struct Track{
@@ -22,6 +25,8 @@ struct Track{
     bool solo=false;
     // TODO: type for instrument
 };
+
+
 
 class ArrangerManager
 {
@@ -45,7 +50,12 @@ public:
 
     [[nodiscard]] std::vector<PatternClip*> getClipsOnTrack(size_t trackIndex);
     [[nodiscard]] std::vector<PatternClip*> getClipsInRange(uint32_t start, uint32_t end);
-    [[nodiscard]] PatternClip* getClipByID(uint32_t id);
+    [[nodiscard]] PatternClip* getClipByID(uint32_t id) {
+        for (auto& clips : patternClips) {
+            if (clips.ID == id) return &clips;
+        }
+        return nullptr;
+    }
     [[nodiscard]] PatternClip* getClipByIndex(size_t i){
         if (i < patternClips.size()) return &patternClips[i];
         else return nullptr;
@@ -61,9 +71,23 @@ public:
         }
     }
 
+    //uin
+
+    HoverState resolveHoverState(ArrangerCoordinate pos) {
+        for (auto clips : patternClips) {
+            if (clips.startTime < pos.time && clips.endTime > pos.time && clips.track == pos.track) {
+                return CenterHover;
+                std::cout<<"center Hover"<<std::endl;
+            }
+        }
+        return NoHover;
+    }
+
     void addClip(ArrangerCoordinate pos) {
-        PatternClip clip(PatternManager::instance().activePatternIndex,
-            pos.time,pos.time + 960,
+        const auto& p = PatternManager::instance().getCurrentPattern();
+        PatternClip clip(p.ID,
+            pos.time,pos.time +
+            (p.m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
             pos.track,
             assignID());
         patternClips.push_back(clip);
@@ -71,7 +95,11 @@ public:
 
     void removeAllClipsOnTrack(size_t trackIndex);
 
+    void initMoveClip(ArrangerCoordinate pos) {
+
+    };
     void moveClip(uint32_t id, size_t newTrackIndex, uint32_t newStartTime);
+
     void trimClip(uint32_t id, uint32_t newStartTime, uint32_t newEndTime);
 
     void duplicateClip(uint32_t id, uint32_t newStartTime);

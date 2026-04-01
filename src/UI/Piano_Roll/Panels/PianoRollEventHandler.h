@@ -100,8 +100,8 @@ private:
                 beginScaleNote(hover);
             } else {
                 switch (hoverState) {
-                    case NoteCenterHover: beginMoveNote(snapped);    break;
-                    case NoteEdgeHover:   beginStretchNote(snapped); break;
+                    case CenterHover: beginMoveNote(snapped);    break;
+                    case EdgeHover:   beginStretchNote(snapped); break;
                     default:              sendNewNote(snapped);       break;
                 }
             }
