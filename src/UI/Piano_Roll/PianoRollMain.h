@@ -2,10 +2,6 @@
 // Created by nathan on 24/11/2025.
 //
 #pragma once
-
-#include <juce_gui_extra/juce_gui_extra.h>
-#include "../../Theme.h"
-#include "../Common/Tools.h"
 #include "Panels/PianoRollComponent.h"
 #include <iostream>
 #include <imgui.h>
@@ -14,19 +10,27 @@
 #include "Panels/velocity.h"
 #include  "Panels/velocityLabel.h"
 
+#include "../Common/Toolbar.h"
+#include "../Common/ToolbarGroups.h"
 class PianoRollMain : public juce::Component
 {
 public:
-    Tools toolbar;
     TimelineLabel timelineLabel;
     Piano piano;
     PianoRollComponent pianoRoll;
     Velocity velocity;
     VelocityLabels velocityLabels;
+    Toolbar pianoRollToolbar;
+
     float timelineXScroll = 0.0f;
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
 
-    PianoRollMain() = default;
+    PianoRollMain() {
+        pianoRollToolbar.addGroup(ToolbarGroups::snapping());
+        pianoRollToolbar.addGroup(ToolbarGroups::pianoRollTools());
+        pianoRollToolbar.addGroup(ToolbarGroups::playback());
+        pianoRollToolbar.addGroup(ToolbarGroups::pianoRollZoom());
+    }
 
     float pianoRollScrollY = 300.0f;
     float pianoRollScrollX;
@@ -38,7 +42,7 @@ void create() {
     if (ImGui::Begin("pianoRollComponent", nullptr,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
 
-        toolbar.create();
+        pianoRollToolbar.create();
 
         if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
             ImGui::TableSetupColumn("gap", ImGuiTableColumnFlags_WidthFixed,

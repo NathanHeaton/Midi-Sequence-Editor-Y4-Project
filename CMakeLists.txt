@@ -27,6 +27,9 @@ add_library(imgui STATIC
         src/Singletons/ToolManager.h
         src/UI/Piano_Roll/Panels/velocity.h
         src/UI/Piano_Roll/Panels/velocityLabel.h
+        src/UI/Common/ToolbarGroup.h
+        src/UI/Common/ToolbarGroups.h
+        src/UI/Common/Toolbar.h
 
 )
 

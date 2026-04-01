@@ -6,7 +6,7 @@
 #include "../../utils.h"
 #include "ArrangerContext.h"
 
-class TimelineHandleInput
+class ArrTimelineHandleInput
 {
 public:
 

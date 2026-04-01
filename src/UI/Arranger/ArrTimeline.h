@@ -6,14 +6,14 @@
 #include "../../Singletons/ViewState.h"
 #include "../../Singletons/ProjectData.h"
 #include "../../Theme.h"
-#include "TimelineHandleInput.h"
+#include "ArrTimelineHandleInput.h"
 #include "ArrangerContext.h"
 
-class Timeline {
+class ArrTimeline {
 public:
-    Timeline() = default;
+    ArrTimeline() = default;
     ViewState* s = &ViewState::instance();
-    TimelineHandleInput timelineHandleInput;
+    ArrTimelineHandleInput timelineHandleInput;
     bool bg_tone{true};
     int barBackgroundCount{0};
 
@@ -21,7 +21,7 @@ public:
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::BeginChild("Timeline", ImVec2(0, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()),
             false,
-            ImGuiWindowFlags_AlwaysHorizontalScrollbar)) {
+            ImGuiWindowFlags_NoScrollbar)) {
             ArrangerContext ctx;
 
             renderSteps(ctx);
@@ -32,7 +32,7 @@ public:
                     timelineLength = ProjectData::instance().getTotalBars() * s->getPixelPerBar(zoomFactor::arranger);
                 }
             }
-            xScroll = ImGui::GetScrollX();
+            ImGui::SetScrollX(xScroll);
             ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()));
 
         }
