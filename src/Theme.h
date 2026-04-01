@@ -7,6 +7,13 @@
 #ifndef MYPROJECT_THEME_H
 #define MYPROJECT_THEME_H
 
+struct Gradient
+{
+    ImVec2 p0;
+    ImVec2 p1;
+    ImU32 col0;
+    ImU32 col1;
+};
 
 namespace Theme
 {
@@ -38,16 +45,10 @@ namespace Theme
         ImU32 beatColourPacked;
         ImU32 subBeatColourPacked;
         ImU32 accentPacked;
+        Gradient patternClip;
 
     };
 
-    struct gradient
-    {
-        ImVec2 p0;
-        ImVec2 p1;
-        ImU32 col0;
-        ImU32 col1;
-    };
 
     inline const  ColourScheme DarkBColours = {
         ImVec4(9.0f / 255.0f, 16.0f / 255.0f, 28.0f / 255.0f, 1.0f),
@@ -67,7 +68,12 @@ namespace Theme
         IM_COL32(132,161,215,255),
         IM_COL32(70,87,118,255),
         IM_COL32(37,47,64,255),
-        IM_COL32(243,180,64,255)
+        IM_COL32(243,180,64,255),
+
+        Gradient(ImVec2(1,1),
+            ImVec2(1,4),
+            IM_COL32(9,16,29,255),
+            IM_COL32(9,16,29,123))
 
     };
 

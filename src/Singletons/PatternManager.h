@@ -31,11 +31,11 @@ public:
         unnamedPatterns++;
     }
 
-    size_t getPatternIndexByID(uint32_t ID) {
-        for (auto& p : pattern) {
-            if (p.ID == ID){return p.ID;}
+    Pattern* getPatternByID(uint32_t ID) {
+        for (auto i{0u}; i < pattern.size(); i++) {
+            if (pattern.at(i).ID == ID){return &pattern.at(i);}
         }
-        return NULL;
+        return nullptr;
     }
 
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {

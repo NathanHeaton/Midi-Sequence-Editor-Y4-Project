@@ -85,7 +85,21 @@ public:
             ImVec2 p2((clip.endTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,clip.track * ViewState::instance().getTrackHeight()
                 +ctx.cursorPos.y+ViewState::instance().getTrackHeight());
 
-            ctx.drawList->AddRectFilled(p1,p2,Theme::currentThemeColours.barColourPacked,8);
+            ctx.drawList->AddRectFilledMultiColor(p1,p2,
+                Theme::currentThemeColours.patternClip.col0,
+                Theme::currentThemeColours.patternClip.col0,
+                Theme::currentThemeColours.patternClip.col1,
+                Theme::currentThemeColours.patternClip.col1
+                );
+            ctx.drawList->AddRect(p1,p2,
+            Theme::currentThemeColours.barColourPacked,
+            3.0f,
+            0,
+            1.0f
+            );
+        auto pattern = PatternManager::instance().getPatternByID(clip.ID);
+        ctx.drawList->AddText(p1 ,Theme::currentThemeColours.barColourPacked,
+            pattern->m_title.c_str());
         }
     }
 
