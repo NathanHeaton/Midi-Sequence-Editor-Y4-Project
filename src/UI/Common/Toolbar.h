@@ -17,7 +17,7 @@ public:
 
         for (auto& group : m_groups) {
             ImGui::TableNextColumn();
-            group.render();
+            group.render(true);
         }
 
         ImGui::EndTable();

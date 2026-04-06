@@ -27,8 +27,8 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         if (offEvent->m_absoluteTime != 0){endDelta =
             static_cast<float>(offEvent->m_absoluteTime) / TimeData::PPQ;}
 
-        float startPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * startDelta;
-        float endPixel = view_state->getPixelPerBeat(zoomFactor::pianoRoll) * endDelta ;
+        float startPixel = view_state->getPixelPerBeat(pianoRoll) * startDelta;
+        float endPixel = view_state->getPixelPerBeat(pianoRoll) * endDelta ;
 
         float yStart = ctx.cursorPos.y + (ctx.height - (onEvent->getPitch()+1)*ctx.noteHeight);
         float xStart = ctx.cursorPos.x + startPixel;

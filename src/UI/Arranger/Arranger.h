@@ -26,6 +26,7 @@ public:
     float timelineXScroll = 0.0f;
     Arranger() {
         AddTrack();
+        arrangerToolbar.addGroup(ToolbarGroups::snapping(true));
         arrangerToolbar.addGroup(ToolbarGroups::arrangerTools());
         arrangerToolbar.addGroup(ToolbarGroups::playback());
         arrangerToolbar.addGroup(ToolbarGroups::arrangerZoom());

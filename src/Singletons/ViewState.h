@@ -50,12 +50,12 @@ public:
     void setTrackHeight(float newTrackHeight) {TrackHeight = newTrackHeight;}
     void setBarWidth(float newBarWidth) {barWidth = newBarWidth;}
 
-    void setRenderedSubDivisions(int newDivisions) {subdivisionsPianoRoll.renderedIndex = newDivisions;}
-    void setSnapSubDivisions(int newSnap) {subdivisionsPianoRoll.snapIndex = newSnap;}
+    void setRenderedSubDivisions(size_t newDivisions) {subdivisionsPianoRoll.renderedIndex = newDivisions;}
+    void setSnapSubDivisions(size_t newSnap) {subdivisionsPianoRoll.snapIndex = newSnap;}
 
 
-    void setRenderedSubDivisionsArr(int newDivisions) {subdivisionsArr.renderedIndex = newDivisions;}
-    void setSnapSubDivisionsArr(int newSnap) {subdivisionsArr.snapIndex = newSnap;}
+    void setRenderedSubDivisionsArr(size_t newDivisions) {subdivisionsArr.renderedIndex = newDivisions;}
+    void setSnapSubDivisionsArr(size_t newSnap) {subdivisionsArr.snapIndex = newSnap;}
 
     static constexpr int WHITE_KEYS{75};
     static constexpr int BLACK_KEYS{53};

@@ -4,5 +4,5 @@
 
 struct ToolbarGroup {
     std::string groupId;
-    std::function<void()> render;
+    std::function<void(bool)> render;
 };

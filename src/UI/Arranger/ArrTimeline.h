@@ -96,9 +96,9 @@ public:
         auto vs = &ViewState::instance();
         auto clips = ArrangerManager::instance().getPatternClips();
         for (auto clip : *clips){
-            ImVec2 p1((clip.startTime/ TimeData::PPQ) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
+            ImVec2 p1((clip.startTime/ static_cast<float>(TimeData::PPQ)) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
                 clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y);
-            ImVec2 p2((clip.endTime/ TimeData::PPQ) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
+            ImVec2 p2((clip.endTime/  static_cast<float>(TimeData::PPQ)) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
                 clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y + ViewState::instance().getTrackHeight());
 
             ctx.drawList->AddRectFilledMultiColor(p1,p2,

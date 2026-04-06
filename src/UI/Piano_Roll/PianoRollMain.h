@@ -27,7 +27,7 @@ public:
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll) * 8;
 
     PianoRollMain() {
-        pianoRollToolbar.addGroup(ToolbarGroups::snapping());
+        pianoRollToolbar.addGroup(ToolbarGroups::snapping(false));
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollTools());
         pianoRollToolbar.addGroup(ToolbarGroups::playback());
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollZoom());
