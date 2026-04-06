@@ -65,7 +65,7 @@ public:
 
     void removeClip(ArrangerCoordinate pos) {
         for (auto clips : patternClips) {
-            if (clips.startTime < pos.time && clips.endTime > pos.time && clips.track == pos.track) {
+            if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.track == pos.track) {
                 patternClips.erase(patternClips.begin() + clips.startTime);
             }
         }
@@ -75,7 +75,7 @@ public:
 
     HoverState resolveHoverState(ArrangerCoordinate pos) {
         for (auto clips : patternClips) {
-            if (clips.startTime < pos.time && clips.endTime > pos.time && clips.track == pos.track) {
+            if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.track == pos.track) {
                 return CenterHover;
                 std::cout<<"center Hover"<<std::endl;
             }
@@ -85,6 +85,7 @@ public:
 
     void addClip(ArrangerCoordinate pos) {
         const auto& p = PatternManager::instance().getCurrentPattern();
+        std::cout << pos.track<< ", " << pos.time  << std::endl;
         PatternClip clip(p.ID,
             pos.time,pos.time +
             (p.m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),

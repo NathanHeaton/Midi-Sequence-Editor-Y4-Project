@@ -27,7 +27,7 @@ private:
             return;
         }
         hover   = resolveHoverCoordinate(ctx);
-        //snapped = resolveSnappedCoordinate(ctx);
+        snapped = resolveSnappedCoordinate(ctx);
         switch (ctx.activeTool) {
             // add other fields once structre is established
         // case MOVE:   break;
@@ -73,11 +73,13 @@ private:
             auto hoverState = ArrangerManager::instance().resolveHoverState(hover);
             switch (hoverState) {
                 case CenterHover: ArrangerManager::instance().initMoveClip(hover);
-                case EdgeHover: ArrangerManager::instance().addClip(hover);
-                case NoHover: ArrangerManager::instance().addClip(hover);
+                case EdgeHover: ArrangerManager::instance().addClip(snapped);
+                case NoHover: ArrangerManager::instance().addClip(snapped);
             }
         }
         else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            std::cout << hover.track<< ", " << hover.time  << std::endl;
+            std::cout << snapped.track<< ", " << snapped.time  << std::endl;
             ArrangerManager::instance().removeClip(hover);
         }
 
@@ -90,6 +92,16 @@ private:
 
         auto trackAmount = ArrangerManager::instance().getTrackAmount();
         int track =std::clamp(static_cast<int>(ctx.relativeY / (ViewState::instance().getTrackHeight())),0,trackAmount);
-        return ArrangerCoordinate(absoluteTime, static_cast<uint32_t>(track));
+        return ArrangerCoordinate(static_cast<uint32_t>(absoluteTime), static_cast<uint32_t>(track));
+    }
+
+    [[nodiscard]] ArrangerCoordinate resolveSnappedCoordinate(const ArrangerContext& ctx) const {
+        auto* vs = &ViewState::instance();
+        int patternTime = static_cast<int>(
+                    ctx.relativeX / vs->getPixelPerBeat(arranger) * vs->getSnappedSubDivisionsArr());
+        int snappedTime = patternTime * (static_cast<float>(TimeData::PPQ) / vs->getSnappedSubDivisionsArr());
+        auto trackAmount = ArrangerManager::instance().getTrackAmount();
+        int track =std::clamp(static_cast<int>(ctx.relativeY / (ViewState::instance().getTrackHeight())),0,trackAmount);
+        return ArrangerCoordinate(static_cast<uint32_t>(snappedTime), static_cast<uint32_t>(track));
     }
 };
