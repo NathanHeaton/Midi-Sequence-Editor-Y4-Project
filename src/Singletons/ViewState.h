@@ -32,7 +32,7 @@ public:
     [[nodiscard]] char getRenderedSubDivisions() const { return subdivisions.renderList[subdivisions.renderedIndex]; }
     [[nodiscard]] long getSnappedSubDivisions() const { return subdivisions.snapList[subdivisions.snapIndex]; }
     [[nodiscard]] float getTrackHeight() const { return TrackHeight; }
-    [[nodiscard]] uint getStandardSnapTime() const
+    [[nodiscard]] uint32_t getStandardSnapTime() const
     {
         if (subdivisions.snapList.end() == subdivisions.snapList.begin()+subdivisions.snapIndex)
         {

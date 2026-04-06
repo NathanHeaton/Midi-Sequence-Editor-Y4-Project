@@ -6,12 +6,13 @@
 #include <iostream>
 #include <imgui.h>
 #include "Panels/piano.h"
-#include "../Common/timelineLabel.h"
+#include "../Common/TimelineLabel.h"
 #include "Panels/velocity.h"
 #include  "Panels/velocityLabel.h"
-
 #include "../Common/Toolbar.h"
 #include "../Common/ToolbarGroups.h"
+
+
 class PianoRollMain : public juce::Component
 {
 public:
@@ -28,7 +29,7 @@ public:
     PianoRollMain() {
         pianoRollToolbar.addGroup(ToolbarGroups::snapping());
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollTools());
-        //pianoRollToolbar.addGroup(ToolbarGroups::playback());
+        pianoRollToolbar.addGroup(ToolbarGroups::playback());
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollZoom());
     }
 
@@ -42,7 +43,7 @@ void create() {
     if (ImGui::Begin("pianoRollComponent", nullptr,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
 
-        //pianoRollToolbar.create();
+        pianoRollToolbar.create();
 
         if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
             ImGui::TableSetupColumn("gap", ImGuiTableColumnFlags_WidthFixed,
@@ -56,9 +57,9 @@ void create() {
                 ImGui::Dummy(ImVec2(timelineLength, 15));
                 timelineXScroll = ImGui::GetScrollX();
                 } ImGui::EndChild();
-            // timelineLabel.create(timelineLength, timelineXScroll,
-            //     PatternManager::instance().getCurrentPattern().m_bars,
-            //     zoomFactor::pianoRoll);
+            timelineLabel.create(timelineLength, timelineXScroll,
+                PatternManager::instance().getCurrentPattern().m_bars,
+                zoomFactor::pianoRoll);
         }
         ImGui::EndTable();
 

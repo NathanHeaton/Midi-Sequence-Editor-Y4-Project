@@ -10,31 +10,30 @@
 #include "../../Singletons/ProjectData.h"
 #include "../../Singletons/ArrangerManager.h"
 #include "../Common/Toolbar.h"
-
-
-class TimelineLabel;
-
+#include "../Common/ToolbarGroups.h"
+#include "../Common/TimelineLabel.h"
 class Arranger
 {
 public:
     TopControls topControls;
     ArrTimeline arrangerTimeline;
     Toolbar arrangerToolbar;
+    TimelineLabel timelineLabel;
     std::vector<std::unique_ptr<TrackControls>> tracksControls;
     const float trackControlWidth = 250.0f;
 
     float timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::arranger)* ProjectData::instance().getTotalBars();
     float timelineXScroll = 0.0f;
     Arranger() {
-        // AddTrack();
-        // arrangerToolbar.addGroup(ToolbarGroups::arrangerTools());
-        // arrangerToolbar.addGroup(ToolbarGroups::playback());
-        // arrangerToolbar.addGroup(ToolbarGroups::arrangerZoom());
+        AddTrack();
+        arrangerToolbar.addGroup(ToolbarGroups::arrangerTools());
+        arrangerToolbar.addGroup(ToolbarGroups::playback());
+        arrangerToolbar.addGroup(ToolbarGroups::arrangerZoom());
     }
 
 
     void create();
     void AddTrack();
     private:
-    std::unique_ptr<TimelineLabel> timelineLabel; // pointer so forward decl works
+
 };

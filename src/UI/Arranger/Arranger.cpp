@@ -1,6 +1,6 @@
 
 #include "Arranger.h"
-#include "../Common/timelineLabel.h"
+#include "../Common/TimelineLabel.h"
 
 void Arranger::create() {
         ImGui::BeginChild("Arranger");
@@ -10,7 +10,7 @@ void Arranger::create() {
             ImGui::TableNextColumn();
             ImGui::Text("Arranger");
             ImGui::TableNextColumn();
-            //arrangerToolbar.create();
+            arrangerToolbar.create();
         }ImGui::EndTable();
 
         if (ImGui::BeginTable("Add and Scroll", 2)) {
@@ -33,10 +33,10 @@ void Arranger::create() {
             ImGui::TableNextColumn();
             ImGui::Text("Tracks");
             ImGui::TableNextColumn();
-            //
-            // timelineLabel->create(timelineLength,timelineXScroll,
-            //     ProjectData::instance().getTotalBars(),
-            //     zoomFactor::arranger);
+
+            timelineLabel.create(timelineLength,timelineXScroll,
+                ProjectData::instance().getTotalBars(),
+                zoomFactor::arranger);
 
         }ImGui::EndTable();
         ImGui::PopStyleVar();

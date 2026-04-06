@@ -10,16 +10,16 @@ public:
 
     class TimeSignature {
     public:
-        TimeSignature(uint n, uint d) : numerator(n), denominator(d) {}
-        void change(uint n, uint d) {
+        TimeSignature(uint32_t n, uint32_t d) : numerator(n), denominator(d) {}
+        void change(uint32_t n, uint32_t d) {
             numerator = n;
             denominator = d;
         }
-        uint getNumerator() const { return numerator; }
-        uint getDenominator() const { return denominator; }
+        uint32_t getNumerator() const { return numerator; }
+        uint32_t getDenominator() const { return denominator; }
     private:
-        uint numerator;
-        uint denominator;
+        uint32_t numerator;
+        uint32_t denominator;
     };
     [[nodiscard]] double getBPM() const { return BPM;}
 

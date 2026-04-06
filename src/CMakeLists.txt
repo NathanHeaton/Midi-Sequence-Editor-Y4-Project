@@ -9,10 +9,11 @@ target_sources(${PROJECT_NAME}
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
         Project_Logic/Pattern.cpp
+        UI/Arranger/Arranger.cpp
         UI/Common/ToolbarGroups.cpp
         Audio/MidiPlayer.cpp
         SetupAssets.cpp
-        UI/Arranger/Arranger.cpp
+        UI/Common/TimelineLabel.cpp
         UI/Piano_Roll/Panels/PianoRoll.cpp)
 
 target_compile_definitions(${PROJECT_NAME}
