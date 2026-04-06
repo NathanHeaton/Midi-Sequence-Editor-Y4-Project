@@ -93,12 +93,13 @@ public:
 
     void renderPatternClips(const ArrangerContext& ctx) {
         const float textLeftMargin = 5.0f;
+        auto vs = &ViewState::instance();
         auto clips = ArrangerManager::instance().getPatternClips();
         for (auto clip : *clips){
-            ImVec2 p1((clip.startTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,
-                clip.track* ViewState::instance().getTrackHeight()+ctx.cursorPos.y);
-            ImVec2 p2((clip.endTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,clip.track * ViewState::instance().getTrackHeight()
-                +ctx.cursorPos.y+ViewState::instance().getTrackHeight());
+            ImVec2 p1((clip.startTime/ TimeData::PPQ) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
+                clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y);
+            ImVec2 p2((clip.endTime/ TimeData::PPQ) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
+                clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y + ViewState::instance().getTrackHeight());
 
             ctx.drawList->AddRectFilledMultiColor(p1,p2,
                 Theme::currentThemeColours.patternClip.col0,

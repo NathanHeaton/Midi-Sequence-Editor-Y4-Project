@@ -32,8 +32,8 @@ public:
     [[nodiscard]] char getRenderedSubDivisions() const { return subdivisionsPianoRoll.renderList[subdivisionsPianoRoll.renderedIndex]; }
     [[nodiscard]] long getSnappedSubDivisions() const { return subdivisionsPianoRoll.snapList[subdivisionsPianoRoll.snapIndex]; }
 
-    [[nodiscard]] char getRenderedSubDivisionsArr() const { return subdivisionsArr.renderList[subdivisionsPianoRoll.renderedIndex]; }
-    [[nodiscard]] long getSnappedSubDivisionsArr() const { return subdivisionsArr.snapList[subdivisionsPianoRoll.snapIndex]; }
+    [[nodiscard]] char getRenderedSubDivisionsArr() const { return subdivisionsArr.renderList[subdivisionsArr.renderedIndex]; }
+    [[nodiscard]] long getSnappedSubDivisionsArr() const { return subdivisionsArr.snapList[subdivisionsArr.snapIndex]; }
 
     [[nodiscard]] float getTrackHeight() const { return TrackHeight; }
     [[nodiscard]] uint32_t getStandardSnapTime() const
@@ -92,13 +92,13 @@ private:
         size_t renderedIndex =3;
         size_t snapIndex=3;
 
-        Subdivision(size_t defaultInex) {
-            renderedIndex = defaultInex;
-            snapIndex = defaultInex;
+        Subdivision(size_t defaultIndex) {
+            renderedIndex = defaultIndex;
+            snapIndex = defaultIndex;
         }
     };
 
-    Subdivision subdivisionsArr{3};
-    Subdivision subdivisionsPianoRoll{0};
+    Subdivision subdivisionsArr{0};
+    Subdivision subdivisionsPianoRoll{3};
 };
 
