@@ -1,9 +1,14 @@
 #pragma once
-#include "ToolbarGroup.h"
 #include "../../Singletons/ToolManager.h"
-#include "../../Singletons/PlayBackManager.h"
 #include "../../Singletons/ViewState.h"
 #include "../../SetupAssets.h"
+#include <functional>
+#include <string>
+
+struct ToolbarGroup {
+    std::string groupId;
+    std::function<void()> render;
+};
 
 namespace ToolbarGroups {
 
@@ -58,14 +63,15 @@ namespace ToolbarGroups {
         return {
             "playback",
             []() {
-                auto& pb = PlayBackManager::instance();
-                void* icon = !pb.isPlaying()
-                    ? (void*)(intptr_t)ASSETS.playIcon.textureID
-                    : (void*)(intptr_t)ASSETS.pauseIcon.textureID;
+                //auto& pb = PlayBackManager::instance();
+                void* icon = //!pb.isPlaying()
+                   /* ? */(void*)(intptr_t)ASSETS.playIcon.textureID;
+                    //: (void*)(intptr_t)ASSETS.pauseIcon.textureID;
 
                 if (ImGui::ImageButton("play_button", icon, ImVec2(32,32)))
-                    pb.togglePlay();
+                    ;//pb.togglePlay();
             }
+
         };
     }
 

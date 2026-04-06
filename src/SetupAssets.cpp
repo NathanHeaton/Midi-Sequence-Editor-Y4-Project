@@ -4,11 +4,11 @@
 #include "SetupAssets.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include <cstdio>
-#include <GL/gl.h>
+//
+#include <juce_opengl/juce_opengl.h>
 
-AssetManager ASSETS;
 using namespace juce::gl;
+AssetManager ASSETS;
 
 IconTexture loadTextureFromFile(const char* filename) {
     IconTexture result = {0, 0, 0};

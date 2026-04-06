@@ -3,15 +3,17 @@ juce_add_gui_app(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
         PRIVATE
+        Main.cpp
         MIDI_Logic/MIDI_Events/MidiEvent.cpp
         MIDI_Logic/MidiByteReader.cpp
         MIDI_Logic/ParsedMidi.cpp
         MIDI_Logic/TrackChunk.cpp
         Project_Logic/Pattern.cpp
+        UI/Common/ToolbarGroups.cpp
         Audio/MidiPlayer.cpp
         SetupAssets.cpp
-        UI/Piano_Roll/Panels/PianoRoll.cpp
-        Main.cpp)
+        UI/Arranger/Arranger.cpp
+        UI/Piano_Roll/Panels/PianoRoll.cpp)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE
@@ -22,12 +24,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
-        juce::juce_gui_extra
-        juce::juce_opengl
+        imgui_impl_juce
         juce::juce_audio_devices
         juce::juce_audio_basics
+        juce::juce_gui_extra
+        juce::juce_opengl
         imgui
-        imgui_impl_juce
         PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

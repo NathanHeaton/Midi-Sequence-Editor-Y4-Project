@@ -40,6 +40,20 @@ public:
         ImGui::PopStyleVar();
     }
 
+    void DrawTrackSeparator(const ArrangerContext & ctx) {
+        for (unsigned int i = 0; i < ArrangerManager::instance().getTrackAmount(); i++) {
+            float yPos = ctx.cursorPos.y + i * s->getTrackHeight();
+
+            ctx.drawList->AddLine(
+                ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
+                ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
+                Theme::currentThemeColours.barColourPacked,
+                1.0f
+            );
+        }
+    }
+
+
     void renderSteps(const ArrangerContext& ctx)    {
         DrawBars(ctx);
         DrawTrackSeparator(ctx);
@@ -77,7 +91,8 @@ public:
 
     }
 
-    void renderPatternClips(const ArrangerContext& ctx){
+    void renderPatternClips(const ArrangerContext& ctx) {
+        const float textLeftMargin = 5.0f;
         auto clips = ArrangerManager::instance().getPatternClips();
         for (auto clip : *clips){
             ImVec2 p1((clip.startTime/TimeData::PPQ)*ViewState::instance().getPixelPerBeat(arranger)+ctx.cursorPos.x,
@@ -97,9 +112,19 @@ public:
             0,
             1.0f
             );
-        auto pattern = PatternManager::instance().getPatternByID(clip.ID);
-        ctx.drawList->AddText(p1 ,Theme::currentThemeColours.barColourPacked,
-            pattern->m_title.c_str());
+            auto pattern = PatternManager::instance().getPatternByID(clip.patternID);
+            ImVec4 clipRect(p1.x, p1.y, p2.x, p2.y);
+            p1.x += textLeftMargin;
+            ctx.drawList->AddText(
+                ImGui::GetDefaultFont(),
+                8.0f,
+                p1,
+                Theme::currentThemeColours.barColourPacked,
+                pattern->m_title.c_str(),
+                nullptr,
+                0.0f,
+                &clipRect
+            );
         }
     }
 
@@ -141,16 +166,4 @@ public:
     }
 
 
-    void DrawTrackSeparator(const ArrangerContext& ctx) {
-        for (unsigned int i = 0; i < ArrangerManager::instance().getTrackAmount(); i++) {
-            float yPos = ctx.cursorPos.y + i * s->getTrackHeight();
-
-            ctx.drawList->AddLine(
-                ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
-                ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.barColourPacked,
-                1.0f
-            );
-        }
-    }
 };

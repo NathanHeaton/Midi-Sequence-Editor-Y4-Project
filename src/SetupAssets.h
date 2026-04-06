@@ -1,8 +1,8 @@
 #pragma once
+#include <cstdint>
 
-#include <juce_opengl/juce_opengl.h>
+using GLuint = uint32_t;
 
-// Ai code //
 struct IconTexture {
     GLuint textureID;
     int width;

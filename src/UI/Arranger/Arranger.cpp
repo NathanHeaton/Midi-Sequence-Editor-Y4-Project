@@ -1,0 +1,72 @@
+
+#include "Arranger.h"
+#include "../Common/timelineLabel.h"
+
+void Arranger::create() {
+        ImGui::BeginChild("Arranger");
+
+        if (ImGui::BeginTable("arranngerchild", 2)) {
+            ImGui::TableSetupColumn("Top Controls", ImGuiTableColumnFlags_WidthFixed,trackControlWidth);
+            ImGui::TableNextColumn();
+            ImGui::Text("Arranger");
+            ImGui::TableNextColumn();
+            //arrangerToolbar.create();
+        }ImGui::EndTable();
+
+        if (ImGui::BeginTable("Add and Scroll", 2)) {
+            ImGui::TableSetupColumn("Top Controls", ImGuiTableColumnFlags_WidthFixed,trackControlWidth);
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Add Track")) {
+                AddTrack();
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::BeginChild("horizontalScroll", ImVec2(0, 15), false,
+                ImGuiWindowFlags_HorizontalScrollbar)) {
+                ImGui::Dummy(ImVec2(timelineLength, 15));
+                timelineXScroll = ImGui::GetScrollX();
+            } ImGui::EndChild();
+        }ImGui::EndTable();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (ImGui::BeginTable("Track Timeline label", 2)) {
+            ImGui::TableSetupColumn("Tracks1", ImGuiTableColumnFlags_WidthFixed, trackControlWidth);
+            ImGui::TableNextColumn();
+            ImGui::Text("Tracks");
+            ImGui::TableNextColumn();
+            //
+            // timelineLabel->create(timelineLength,timelineXScroll,
+            //     ProjectData::instance().getTotalBars(),
+            //     zoomFactor::arranger);
+
+        }ImGui::EndTable();
+        ImGui::PopStyleVar();
+
+        if (ImGui::BeginTable("Track Timline", 2)) {
+            ImGui::TableSetupColumn("Tracks", ImGuiTableColumnFlags_WidthFixed, trackControlWidth);
+            ImGui::TableSetupColumn("Timeline");
+
+            ImGui::TableNextColumn();
+            for (int i = 0; i < tracksControls.size(); i++) {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+                tracksControls.at(i)->newTrack(i);
+                ImGui::PopStyleVar();
+            }
+            for (const auto& track : tracksControls) {
+
+            }
+
+            ImGui::TableNextColumn();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+            arrangerTimeline.createTimeline(timelineLength,timelineXScroll);
+            ImGui::PopStyleVar();
+        }
+        ImGui::EndTable();
+
+        ImGui::EndChild();
+    }
+
+void Arranger::AddTrack()  {
+    auto newTrack =  std::make_unique<TrackControls>(); // create a new track
+    tracksControls.push_back(std::move(newTrack));
+    ArrangerManager::instance().addTrack();
+}

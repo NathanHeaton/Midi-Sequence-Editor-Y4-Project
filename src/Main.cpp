@@ -40,7 +40,7 @@ public:
     }
     void shutdown() override {
         ASSETS.Cleanup();
-        PlayBackManager::instance().shutDown();
+        // PlayBackManager::instance().shutDown();
         win = nullptr;
     }
 

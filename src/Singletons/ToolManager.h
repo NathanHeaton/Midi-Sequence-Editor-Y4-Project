@@ -1,7 +1,8 @@
 #pragma once
 
 #include <imgui.h>
-
+#include <cstdint>
+#include <algorithm>
 enum ToolTypes {
     SELECT,
     EDIT,

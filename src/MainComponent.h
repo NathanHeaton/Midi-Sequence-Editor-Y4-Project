@@ -7,11 +7,11 @@
 #include "UI/Top_nav/TopNavComponent.h"
 #include "UI/Arranger/Arranger.h"
 #include "Theme.h"
-#include <imgui.h>
 #include "backends/imgui_impl_opengl3.h"
-
 #include <imgui_impl_juce/imgui_impl_juce.h>
 #include <juce_opengl/juce_opengl.h>
+
+#include <imgui.h>
 #include  "UI/Piano_Roll/PianoRollMain.h"
 
 struct windowStateM {
@@ -73,7 +73,7 @@ public:
 
         control_component.ControlPanel(state);
 
-        arranger_component.arranger();
+        arranger_component.create();
         if (state.pianoRollWindow) {
             pianoRollMain.create();
         }

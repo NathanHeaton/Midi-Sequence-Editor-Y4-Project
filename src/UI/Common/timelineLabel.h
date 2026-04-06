@@ -6,10 +6,8 @@
 #include "imgui.h"
 #include "../../Singletons/ViewState.h"
 #include "../../Singletons/TimeData.h"
-#include "../../Singletons/PlayBackManager.h"
+//#include "../../Singletons/PlayBackManager.h"
 #include "../../Theme.h"
-
-
 
 class TimelineLabel {
     public:
@@ -55,16 +53,16 @@ class TimelineLabel {
     }
 
     void DrawPlayHead() {
-        auto cursorPos = ImGui::GetCursorScreenPos();
-        auto drawList = ImGui::GetWindowDrawList();
-
-        float xPos = cursorPos.x + ViewState::instance().getPixelPerBeat(pianoRoll)*
-            (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
-
-        drawList->AddLine(ImVec2(xPos,cursorPos.y+ 0),
-        ImVec2(xPos,cursorPos.y+ height),
-        Theme::currentThemeColours.accentPacked, 15
-            );
+        // auto cursorPos = ImGui::GetCursorScreenPos();
+        // auto drawList = ImGui::GetWindowDrawList();
+        //
+        // float xPos = cursorPos.x + ViewState::instance().getPixelPerBeat(pianoRoll)*
+        //     (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
+        //
+        // drawList->AddLine(ImVec2(xPos,cursorPos.y+ 0),
+        // ImVec2(xPos,cursorPos.y+ height),
+        // Theme::currentThemeColours.accentPacked, 15
+        //     );
     }
     bool firstMouseUp = false;
     bool mouseDown = false;
@@ -73,18 +71,18 @@ class TimelineLabel {
         auto mousePos = ImGui::GetMousePos();
 
 
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
-            PlayBackManager::instance().setPlaying(false);
-            unsigned int ticks = TimeData::instance().PPQ *((mousePos.x - cursorPos.x)/ ViewState::instance().getPixelPerBeat(pianoRoll));
-            PlayBackManager::instance().setPlayHeadPositionTicks(ticks);
-            mouseDown = true;
-        }
-        else if (mouseDown){firstMouseUp = true; mouseDown = false;}
-
-        if(firstMouseUp) {
-            PlayBackManager::instance().togglePlay();
-            firstMouseUp = false;
-        }
+        // if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
+        //     PlayBackManager::instance().setPlaying(false);
+        //     unsigned int ticks = TimeData::instance().PPQ *((mousePos.x - cursorPos.x)/ ViewState::instance().getPixelPerBeat(pianoRoll));
+        //     PlayBackManager::instance().setPlayHeadPositionTicks(ticks);
+        //     mouseDown = true;
+        // }
+        // else if (mouseDown){firstMouseUp = true; mouseDown = false;}
+        //
+        // if(firstMouseUp) {
+        //     PlayBackManager::instance().togglePlay();
+        //     firstMouseUp = false;
+        // }
     }
 
 };

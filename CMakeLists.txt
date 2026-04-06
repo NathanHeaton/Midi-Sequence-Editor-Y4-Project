@@ -10,8 +10,6 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO OFF)
 set(JUCE_ENABLE_LTO OFF CACHE BOOL "Disable JUCE LTO" FORCE)
 
 # Add JUCE
-#set(JUCE_DIR "/home/idad/Projects/4th_year_project_stuff/JUCE/install/lib/cmake/JUCE-8.0.10")
-
 set(JUCE_DIR "../../JUCE/install/lib/cmake/JUCE-8.0.10")
 
 find_package(JUCE CONFIG REQUIRED)
@@ -24,12 +22,6 @@ add_library(imgui STATIC
         Dependencies/imgui/imgui_tables.cpp
         Dependencies/imgui/imgui_widgets.cpp
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-        src/Singletons/ToolManager.h
-        src/UI/Piano_Roll/Panels/velocity.h
-        src/UI/Piano_Roll/Panels/velocityLabel.h
-        src/UI/Common/ToolbarGroup.h
-        src/UI/Common/ToolbarGroups.h
-        src/UI/Common/Toolbar.h
 
 )
 
@@ -43,7 +35,6 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(imgui PUBLIC OpenGL::GL)
 
 add_subdirectory(Dependencies/imgui_juce)
-
 # Source
 add_subdirectory(src)
 
