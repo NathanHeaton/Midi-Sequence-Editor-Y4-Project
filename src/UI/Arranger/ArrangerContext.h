@@ -14,6 +14,7 @@ struct ArrangerContext {
     ToolTypes activeTool;
     float relativeX;
     float relativeY;
+    uint8_t minPitchRange;
 
     ArrangerContext() {
         cursorPos = ImGui::GetCursorScreenPos();
@@ -23,6 +24,7 @@ struct ArrangerContext {
         scrollX = ImGui::GetScrollX();
         activeTool = EDIT;
         barWidth = ViewState::instance().getPixelPerBar(zoomFactor::arranger);
+        minPitchRange = 10;
         ImVec2 mousePos = ImGui::GetMousePos();
         relativeX = mousePos.x - cursorPos.x;
         relativeY = mousePos.y - cursorPos.y;

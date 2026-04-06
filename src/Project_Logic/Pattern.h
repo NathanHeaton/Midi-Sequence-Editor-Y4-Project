@@ -28,8 +28,19 @@ struct NoteEventPair {
     bool hidden = false;
 };
 
+struct PitchRange {
+    uint8_t lowest  = 127;
+    uint8_t highest = 0;
+
+    uint8_t getPitchRange() {
+        return highest - lowest;
+    }
+};
+
+
 class Pattern {
 public:
+    PitchRange m_pitchRange;
     std::function<uint32_t()> assignID;
     float m_barLength;
     // make sure to add code to update when time sig changes

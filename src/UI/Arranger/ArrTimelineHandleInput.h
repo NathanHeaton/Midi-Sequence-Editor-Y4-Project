@@ -67,22 +67,36 @@ private:
         }
     }
     void handleEditTool(const ArrangerContext& ctx) {
+        auto& am = ArrangerManager::instance();
 
+        if (am.moveOperation.isActive) {
+            updateMoveOperation(ctx);
+            return;
+        }
 
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            auto hoverState = ArrangerManager::instance().resolveHoverState(hover);
+            auto hoverState = am.resolveHoverState(hover);
             switch (hoverState) {
-                case CenterHover: ArrangerManager::instance().initMoveClip(hover);
-                case EdgeHover: ArrangerManager::instance().addClip(snapped);
-                case NoHover: ArrangerManager::instance().addClip(snapped);
+                case CenterHover: am.initMoveClip(hover);  break;
+                case EdgeHover:
+                case NoHover:     am.addClip(snapped);     break;
             }
         }
         else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            std::cout << hover.track<< ", " << hover.time  << std::endl;
-            std::cout << snapped.track<< ", " << snapped.time  << std::endl;
-            ArrangerManager::instance().removeClip(hover);
+            am.removeClip(hover);
         }
+    }
 
+    void updateMoveOperation(const ArrangerContext& ctx) {
+        auto& am = ArrangerManager::instance();
+
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+            am.moveOperation.update(snapped);
+            am.moveClip(am.moveOperation.clipID, snapped.time, snapped.track);
+        }
+        else {
+            am.moveOperation.reset();
+        }
     }
 
     [[nodiscard]] ArrangerCoordinate resolveHoverCoordinate(const ArrangerContext& ctx) const {

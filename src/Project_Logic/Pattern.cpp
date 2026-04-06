@@ -58,6 +58,12 @@ void Pattern::createNoteEventPairs(){
             pendingEvents.emplace_back(event.getID(),event.getPitch(),event.getChannel());
         }
     }
+    m_pitchRange = {};
+    for (const auto& pair : m_noteEvents) {
+        uint8_t pitch = getMidiEventByID_ptr(pair.onID)->getPitch();
+        m_pitchRange.lowest  = std::min(m_pitchRange.lowest,  pitch);
+        m_pitchRange.highest = std::max(m_pitchRange.highest, pitch);
+    }
 }
 
 void Pattern::convertMidiTicksToPPQ() {

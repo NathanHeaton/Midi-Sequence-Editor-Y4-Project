@@ -117,7 +117,7 @@ public:
             p1.x += textLeftMargin;
             ctx.drawList->AddText(
                 ImGui::GetDefaultFont(),
-                8.0f,
+                12.0f,
                 p1,
                 Theme::currentThemeColours.barColourPacked,
                 pattern->m_title.c_str(),
@@ -125,8 +125,55 @@ public:
                 0.0f,
                 &clipRect
             );
+            renderNotesInPatternClip(ctx,clip);
         }
     }
+
+    void renderNotesInPatternClip(const ArrangerContext& ctx,const PatternClip& clip) {
+        auto pattern = PatternManager::instance().getPatternByID(clip.patternID);
+
+        const uint8_t NOTEPADDING = 2;
+        auto range = pattern->m_pitchRange.getPitchRange() + NOTEPADDING;
+        if (range < ctx.minPitchRange) {range = ctx.minPitchRange;}
+
+        auto noteHeight = ViewState::instance().getTrackHeight() / range;
+
+        for (auto noteIDs : pattern->m_noteEvents) {
+            auto onEvent = pattern->getMidiEventByID_ptr(noteIDs.onID);
+            if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID)){continue;}
+            auto offEvent = pattern->getMidiEventByID_ptr(noteIDs.offID);
+            if (offEvent->getAbsoluteTime() + clip.startTime > clip.endTime){continue;}
+
+            float startDelta = static_cast<float>(clip.startTime)/ TimeData::PPQ;
+            if (onEvent->m_absoluteTime != 0)
+                {startDelta = static_cast<float>(onEvent->m_absoluteTime + clip.startTime) / TimeData::PPQ;}
+
+            float endDelta = static_cast<float>(offEvent->m_absoluteTime + clip.startTime) / TimeData::PPQ;
+
+            float startPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * startDelta;
+            float endPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * endDelta ;
+
+            float yStart = ctx.cursorPos.y + (ViewState::instance().getTrackHeight() * (clip.track+1) -
+                ((onEvent->getPitch() - pattern->m_pitchRange.lowest) +1)* noteHeight);
+            float xStart = ctx.cursorPos.x + startPixel;
+            float xEnd =  ctx.cursorPos.x + endPixel;
+            float yEnd = yStart + noteHeight;
+
+            auto colour = Theme::currentThemeColours.barColourPacked;
+            for (auto id : pattern->m_selectedNoteOnIDs) {
+                if (noteIDs.onID == id) {
+                    colour = Theme::currentThemeColours.beatColourPacked;
+                    break;
+                }
+            }
+            ctx.drawList->AddRectFilled(
+                ImVec2(xStart, yStart),
+                ImVec2(xEnd,yEnd),
+                    colour, 3.0f);
+        }
+
+    }
+
 
     void DrawBarBackgrounds(const ArrangerContext& ctx) {
         int beatsPerBackground = TimeData::instance().timeSignature.getNumerator() * 2;

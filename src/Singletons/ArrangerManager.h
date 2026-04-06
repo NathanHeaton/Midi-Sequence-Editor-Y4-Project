@@ -26,11 +26,28 @@ struct Track{
     // TODO: type for instrument
 };
 
+struct ClipMoveOperation {
+    bool isActive = false;
+    uint32_t clipID = 0;
+    ArrangerCoordinate originalCoord{0,0};
+    ArrangerCoordinate currentCoord{0,0};
+
+    void begin(uint32_t id, ArrangerCoordinate coord) {
+        isActive = true;
+        clipID = id;
+        originalCoord = coord;
+        currentCoord = coord;
+    }
+    void update(ArrangerCoordinate coord) { currentCoord = coord; }
+    void reset() { isActive = false; clipID = 0; }
+};
+
 
 
 class ArrangerManager
 {
 public:
+    ClipMoveOperation moveOperation;
     std::vector<Track> tracks;
     std::vector<PatternClip> patternClips;
 
@@ -56,6 +73,13 @@ public:
         }
         return nullptr;
     }
+    [[nodiscard]]  size_t getIndexFromID(uint32_t id) const {
+        for (auto i{0u}; i < patternClips.size(); i++) {
+            if (patternClips[i].ID == id) return i;
+        }
+        return SIZE_MAX;
+    }
+
     [[nodiscard]] PatternClip* getClipByIndex(size_t i){
         if (i < patternClips.size()) return &patternClips[i];
         else return nullptr;
@@ -64,14 +88,15 @@ public:
     [[nodiscard]] bool hasOverlap(size_t trackIndex, uint32_t start, uint32_t end, uint32_t excludeID = UINT32_MAX) const;
 
     void removeClip(ArrangerCoordinate pos) {
-        for (auto clips : patternClips) {
-            if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.track == pos.track) {
-                patternClips.erase(patternClips.begin() + clips.startTime);
+        for (auto clip : patternClips) {
+            if ((clip.startTime <= pos.time && clip.endTime >= pos.time) && clip.track == pos.track) {
+                std::cout<<clip.ID<<std::endl;
+
+                patternClips.erase(patternClips.begin() + getIndexFromID(clip.ID));
+                return;
             }
         }
     }
-
-    //uin
 
     HoverState resolveHoverState(ArrangerCoordinate pos) {
         for (auto clips : patternClips) {
@@ -91,15 +116,29 @@ public:
             (p.m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
             pos.track,
             assignID());
-        patternClips.push_back(clip);
+        patternClips.emplace_back(clip);
     }
 
     void removeAllClipsOnTrack(size_t trackIndex);
 
     void initMoveClip(ArrangerCoordinate pos) {
+        for (auto& clip : patternClips) {
+            if (clip.startTime <= pos.time && clip.endTime >= pos.time && clip.track == pos.track) {
+                moveOperation.begin(clip.ID, pos);
+                return;
+            }
+        }
+    }
 
-    };
-    void moveClip(uint32_t id, size_t newTrackIndex, uint32_t newStartTime);
+    void moveClip(uint32_t id, uint32_t newStartTime, size_t newTrack) {
+        auto* clip = getClipByID(id);
+        if (!clip) return;
+        uint32_t duration = clip->endTime - clip->startTime;
+        clip->startTime = newStartTime;
+        clip->endTime   = newStartTime + duration;
+        clip->track     = newTrack;
+    }
+
 
     void trimClip(uint32_t id, uint32_t newStartTime, uint32_t newEndTime);
 
