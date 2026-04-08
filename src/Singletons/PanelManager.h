@@ -23,7 +23,13 @@ public:
             if (p.patternID == ID) { p.open = true; return; }
 
         newPaternPanelJustCreated = true;
+        ImVec2 pos = {300,300};
+        if (!m_paternPanels.empty()) {
+            pos = {m_paternPanels.back().pos.x +OFFSET.x, m_paternPanels.back().pos.y + OFFSET.y};
+        }
+
         m_paternPanels.push_back({ ID });
+        m_paternPanels.back().pos = pos;
     }
 
     void closePanel(size_t index)  { m_paternPanels.at(index).open = false; }
@@ -31,6 +37,7 @@ public:
 
 
 private:
+    ImVec2 OFFSET = {50.0f, 50.0f};
     PanelManager() = default;
     std::deque<PatternPanelState> m_paternPanels;
 };

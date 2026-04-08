@@ -31,23 +31,26 @@ public:
             if (ImGui::Button("New Pattern")) {
                 PatternManager::instance().addPattern();
             }
-            if (ImGui::BeginCombo("Open Pattern",
+            if (ImGui::BeginCombo("Select Pattern",
                 patterns.at(selectedPattern).m_title.c_str()))
                 {
                 for (size_t i{0}; i < patterns.size(); i++) {
                     bool is_selected = (selectedPattern == i);
                     if (ImGui::Selectable(patterns.at(i).m_title.c_str(), is_selected)) {
                         selectedPattern = i;
+                        PatternManager::instance().setCurrentPattern(i);
+                        PatternManager::instance().setActivePatternID(PatternManager::instance().getCurrentPattern().ID);
                     }
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
-                        PatternManager::instance().setCurrentPattern(i);
-                        PanelManager::instance().openPatern(PatternManager::instance().getCurrentPattern().ID);
                     }
                 }
                 ImGui::EndCombo();
             }
-            if (ImGui::Button("load midi")) {
+            if (ImGui::Button("piano roll")) {
+                PanelManager::instance().openPatern(PatternManager::instance().getCurrentPattern().ID);
+            }
+            if (ImGui::Button("import midi")) {
                 openMidiFilePicker();
             }
 

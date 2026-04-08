@@ -48,7 +48,7 @@ public:
             ImGui::SetNextWindowSize(panelDetails->size);
         }
         auto patternTitle = PatternManager::instance().getPatternByID(panelDetails->patternID)->m_title;
-        if (ImGui::Begin(patternTitle.c_str(), nullptr,
+        if (ImGui::Begin(patternTitle.c_str(), &panelDetails->open,
             ImGuiWindowFlags_NoScrollbar)) {
             pianoRollToolbar.create();
 
