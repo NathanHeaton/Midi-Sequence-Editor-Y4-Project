@@ -22,6 +22,7 @@ add_library(imgui STATIC
         Dependencies/imgui/imgui_tables.cpp
         Dependencies/imgui/imgui_widgets.cpp
         Dependencies/imgui/backends/imgui_impl_opengl3.cpp
+        src/Singletons/PanelManager.h
 
 )
 

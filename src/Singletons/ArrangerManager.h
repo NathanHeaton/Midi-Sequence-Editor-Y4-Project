@@ -26,36 +26,41 @@ struct Track{
     // TODO: type for instrument
 };
 
-struct ClipMoveOperation {
-    bool isActive = false;
-    uint32_t clipID = 0;
-    ArrangerCoordinate originalCoord{0,0};
-    ArrangerCoordinate currentCoord{0,0};
 
-    void begin(uint32_t id, ArrangerCoordinate coord) {
-        isActive = true;
-        clipID = id;
-        originalCoord = coord;
-        currentCoord = coord;
-    }
-    void update(ArrangerCoordinate coord) { currentCoord = coord; }
-    void reset() { isActive = false; clipID = 0; }
-};
 
 struct ClipResizeOperation {
     bool isActive = false;
     uint32_t clipID = 0;
-    ArrangerCoordinate originalCoord{0,0};
-    ArrangerCoordinate currentCoord{0,0};
 
-    void begin(uint32_t id, ArrangerCoordinate coord) {
+    void begin(uint32_t id) {
         isActive = true;
         clipID = id;
-        originalCoord = coord;
-        currentCoord = coord;
     }
-    void update(ArrangerCoordinate coord) { currentCoord = coord; }
     void reset() { isActive = false; clipID = 0; }
+};
+
+struct ClipMoveOperation {
+    bool isActive = false;
+    uint32_t clipID = 0;
+    ArrangerCoordinate currentCoord{0,0};
+    uint32_t mouseOffset{0};
+
+    void begin(uint32_t id, ArrangerCoordinate inputCoord, uint32_t clipStartTime) {
+        isActive = true;
+        clipID = id;
+        mouseOffset = inputCoord.time - clipStartTime;
+        currentCoord = {setTime(inputCoord.time), inputCoord.track};
+    }
+    void update(ArrangerCoordinate coord)
+    { currentCoord = {setTime(coord.time), coord.track};}
+    void reset() { isActive = false; clipID = 0; }
+
+private:
+    uint32_t setTime(uint32_t time) {
+        int newTime =  static_cast<signed>(time - mouseOffset);
+        if (newTime<= 0) newTime = 0;
+        return static_cast<uint32_t>(newTime);
+    }
 };
 
 struct ClipIDHoverState {
@@ -65,6 +70,7 @@ struct ClipIDHoverState {
 
 class ArrangerManager
 {
+
 public:
     ClipMoveOperation moveOperation;
     ClipResizeOperation resizeOperation;
@@ -112,7 +118,7 @@ public:
             if ((clip.startTime <= pos.time && clip.endTime >= pos.time) && clip.track == pos.track) {
                 std::cout<<clip.ID<<std::endl;
 
-                patternClips.erase(patternClips.begin() + getIndexFromID(clip.ID));
+                patternClips.erase(patternClips.begin() + static_cast<signed>(getIndexFromID(clip.ID)));
                 return;
             }
         }
@@ -144,13 +150,13 @@ public:
 
     void removeAllClipsOnTrack(size_t trackIndex);
 
-    void moveClip(uint32_t id, uint32_t newStartTime, size_t newTrack) {
+    void moveClip(uint32_t id, ArrangerCoordinate pos) {
         auto* clip = getClipByID(id);
         if (!clip) return;
         uint32_t duration = clip->endTime - clip->startTime;
-        clip->startTime = newStartTime;
-        clip->endTime   = newStartTime + duration;
-        clip->track     = newTrack;
+        clip->startTime = pos.time;
+        clip->endTime   = pos.time + duration;
+        clip->track     = pos.track;
     }
 
     void resizeClip(uint32_t id, uint32_t endTime) {

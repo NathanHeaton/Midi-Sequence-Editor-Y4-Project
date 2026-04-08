@@ -3,6 +3,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../../MIDI_Logic/MidiFileManager.h"
 #include "imgui.h"
+#include "../../Singletons/PanelManager.h"
 
 class ControlComponent {
 public:
@@ -15,7 +16,7 @@ public:
         PatternManager::instance().addPattern();
     };
 
-    void ControlPanel(auto &state) {
+    void ControlPanel() {
         auto& patterns = PatternManager::instance().getPatterns();
         if (ImGui::BeginTable("Control Panel",4)) {
             ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
@@ -41,7 +42,7 @@ public:
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
                         PatternManager::instance().setCurrentPattern(i);
-                        state.pianoRollWindow = true;
+                        PanelManager::instance().openPatern(PatternManager::instance().getCurrentPattern().ID);
                     }
                 }
                 ImGui::EndCombo();

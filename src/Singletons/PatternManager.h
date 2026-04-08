@@ -32,8 +32,8 @@ public:
     }
 
     Pattern* getPatternByID(uint32_t ID) {
-        for (auto i{0u}; i < pattern.size(); i++) {
-            if (pattern.at(i).ID == ID){return &pattern.at(i);}
+        for (auto& p : pattern) {
+            if (p.ID == ID) { return &p; }
         }
         return nullptr;
     }
@@ -41,151 +41,124 @@ public:
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
         pattern.emplace_back(title, events, fileTicks);
     }
+
     bool anyPatterns() {
         return !pattern.empty();
     }
+
     const std::vector<Pattern>& getPatterns() {
         return pattern;
     }
 
+    // Legacy accessor used by MIDI import / non-roll code that still thinks in index terms
     const Pattern& getCurrentPattern() {
         return pattern.at(activePatternIndex);
     }
 
-    size_t getPatternSize() {return pattern.size();}
+    size_t getPatternSize() { return pattern.size(); }
 
-    void pitchShiftSelection(signed short t_pitchDelta) {
-        pattern.at(activePatternIndex).pitchShiftSelection(t_pitchDelta);
+    // ----------------------------------------------------------------
+    // Mutation methods – all now take an explicit patternID
+    // ----------------------------------------------------------------
+
+    void pitchShiftSelection(uint32_t patternID, signed short t_pitchDelta) {
+        patternAt(patternID).pitchShiftSelection(t_pitchDelta);
     }
 
-    void timeShiftSelection(int32_t t_timeDelta) {
-        pattern.at(activePatternIndex).timeShiftSelection(t_timeDelta);
+    void timeShiftSelection(uint32_t patternID, int32_t t_timeDelta) {
+        patternAt(patternID).timeShiftSelection(t_timeDelta);
     }
 
-    void deleteSelection() {
-        pattern.at(activePatternIndex).deleteSelection();
+    void deleteSelection(uint32_t patternID) {
+        patternAt(patternID).deleteSelection();
     }
 
-    void addNoteToPattern(uint8_t t_pitch, int absoluteTime, int endDelta) {
-        pattern.at(activePatternIndex).addNote( t_pitch,  absoluteTime,  endDelta);
+    void addNoteToPattern(uint32_t patternID, uint8_t t_pitch, int absoluteTime, int endDelta) {
+        patternAt(patternID).addNote(t_pitch, absoluteTime, endDelta);
     }
 
-    void removeNoteFromPattern(NoteCoordinate noteCoordinate ) {
+    void removeNoteFromPattern(uint32_t patternID, NoteCoordinate noteCoordinate) {
         std::vector<NoteCoordinate> coords;
         coords.push_back(noteCoordinate);
-        pattern.at(activePatternIndex).removeSelection(coords);
+        patternAt(patternID).removeSelection(coords);
     }
 
-    void moveSelection(NoteMoveDelta coordinate) {
-        pattern.at(activePatternIndex).moveNoteEventSelection(coordinate);
+    void moveSelection(uint32_t patternID, NoteMoveDelta coordinate) {
+        patternAt(patternID).moveNoteEventSelection(coordinate);
     }
 
-    void setCurrentPattern(size_t newPattern) {
-        activePatternIndex = newPattern;
+    HoverState getNoteHoverState(uint32_t patternID, NoteCoordinate hoveredCoordinate) {
+        return patternAt(patternID).findNoteHoverState(hoveredCoordinate);
     }
 
-    HoverState getNoteHoverState(NoteCoordinate hoveredCoordinate) {
-        return pattern.at(activePatternIndex).findNoteHoverState(hoveredCoordinate);
+    void hideNoteEvent(uint32_t patternID, NoteCoordinate noteCoordinate) {
+        patternAt(patternID).hideNoteEvent(noteCoordinate);
     }
 
-    void hideNoteEvent(NoteCoordinate noteCoordinate)
-    {
-        pattern.at(activePatternIndex).hideNoteEvent(noteCoordinate);
+    void hideNoteEventByID(uint32_t patternID, uint32_t noteID) {
+        patternAt(patternID).hideNoteByID(noteID);
     }
 
-    void hideNoteEventByID(uint32_t ID)
-    {
-        pattern.at(activePatternIndex).hideNoteByID(ID);
+    void showAllEvents(uint32_t patternID) {
+        patternAt(patternID).showAllNoteEvents();
     }
 
-    void showAllEvents()
-    {
-        pattern.at(activePatternIndex).showAllNoteEvents();
+    NoteEventPair getNoteEventPairFromCoordinate(uint32_t patternID, NoteCoordinate noteCoordinate) {
+        return *patternAt(patternID).findNoteBasedOnPoint(noteCoordinate);
     }
 
-    NoteEventPair getNoteEventPairFromCoordinate(NoteCoordinate noteCoordinate)
-    {
-        return *pattern.at(activePatternIndex).findNoteBasedOnPoint(noteCoordinate);
+    void setSelection(uint32_t patternID, const SelectionCoords& t_selection) {
+        patternAt(patternID).calculateSelection(t_selection);
     }
 
-    void setSelection(const SelectionCoords &t_selection) {
-        pattern.at(activePatternIndex).calculateSelection(t_selection);
+    bool areNotesSelected(uint32_t patternID) {
+        return !patternAt(patternID).m_selectedNoteOnIDs.empty();
     }
 
-    bool areNotesSelected(){
-        if (pattern.at(activePatternIndex).m_selectedNoteOnIDs.size() > 0)
-            {return true;}
-        return false;
+    void scaleSelection(uint32_t patternID, float s) {
+        patternAt(patternID).scaleNoteEventSelection(s);
     }
 
-    void scaleSelection(float s) {
-        pattern.at(activePatternIndex).scaleNoteEventSelection(s);
+    void clearPattern(uint32_t patternID) {
+        patternAt(patternID).clearPattern();
     }
 
-    void clearPattern(){
-        pattern.at(activePatternIndex).clearPattern();
-    }
-
-    void addParsedMidi(auto& data, std::string title) {
-        parsedMidiFile.emplace_back(data,title);
-        updatePatternWithMidiData();
-    }
-
-    void stretchNoteEvent(uint32_t ID, int32_t newEndDeltaOffset) {
+    void stretchNoteEvent(uint32_t patternID, uint32_t noteID, int32_t newEndDeltaOffset) {
         ToolManager::instance().setLastNoteDuration(
-            ToolManager::instance().getLastNoteDuration()
-            +newEndDeltaOffset);
-        pattern.at(activePatternIndex).stretchNoteEvent(ID,newEndDeltaOffset);
+            ToolManager::instance().getLastNoteDuration() + newEndDeltaOffset);
+        patternAt(patternID).stretchNoteEvent(noteID, newEndDeltaOffset);
     }
 
-    void stretchSelection(NoteMoveDelta offsetDelta)
-    {
-        pattern.at(activePatternIndex).stretchNoteEventSelection(offsetDelta);
+    void stretchSelection(uint32_t patternID, NoteMoveDelta offsetDelta) {
+        patternAt(patternID).stretchNoteEventSelection(offsetDelta);
     }
 
-    void moveNoteEvent(uint32_t ID, NoteCoordinate coordinatePosition)
-    {
-        pattern.at(activePatternIndex).moveNoteEvent(ID, coordinatePosition);
+    void moveNoteEvent(uint32_t patternID, uint32_t noteID, NoteCoordinate coordinatePosition) {
+        patternAt(patternID).moveNoteEvent(noteID, coordinatePosition);
     }
 
-    //ParsedMidi* currentFile;
-    void updatePatternWithMidiData() {
-        ParsedMidi& currentFile = parsedMidiFile.at(parsedMidiFile.size()-1);
+    // ----------------------------------------------------------------
+    // Clipboard
+    // ----------------------------------------------------------------
 
-        size_t tracks = currentFile.m_tracks.size();
-        if (currentFile.MIDI_FORMAT == 0) {
-            std::vector<MidiEvent> combinedTracks;
-            auto title =  currentFile.m_title + " ";
-            for (size_t track = 0; track < tracks; track++) {
-                assignIdsToMidi(currentFile.m_tracks.at(track).Events);
-                combinedTracks.insert(combinedTracks.end(), currentFile.m_tracks.at(track).Events.begin() ,currentFile.m_tracks.at(track).Events.end());
-            }
-            addPatternFromMidi(title,combinedTracks, currentFile.ticksInQuarterNote);
-        }
-        else {
-            loopThroughTracks(currentFile);
-        }
-        setCurrentPattern(pattern.size()-1);
-    }
-
-    void copyEventsSelectedEvents() {
-        if (!clipBoard.empty()){clipBoard.clear();}
-        auto& p = getCurrentPattern();
-        for ( auto id : p.m_selectedNoteOnIDs){
+    void copyEventsSelectedEvents(uint32_t patternID) {
+        if (!clipBoard.empty()) { clipBoard.clear(); }
+        auto& p = patternAt(patternID);
+        for (auto id : p.m_selectedNoteOnIDs) {
             auto pair = p.getEventIDPairFromOnID(id);
             clipBoard.push_back(*p.getMidiEventByID_ptr(pair->onID));
             clipBoard.push_back(*p.getMidiEventByID_ptr(pair->offID));
         }
     }
 
-    void pasteEvents() {
-        if (clipBoard.empty()){return;}
-        pattern.at(activePatternIndex).pasteClipboard(clipBoard, NoteMoveDelta(0,0));
+    void pasteEvents(uint32_t patternID) {
+        if (clipBoard.empty()) { return; }
+        patternAt(patternID).pasteClipboard(clipBoard, NoteMoveDelta(0, 0));
     }
 
-    void pasteEventsOnMouse(NoteCoordinate snappedCoordinate){
-        if (clipBoard.empty()){return;}
-        NoteCoordinate topLeftEvent(clipBoard.at(0).getPitch(),clipBoard.at(0).getAbsoluteTime());
+    void pasteEventsOnMouse(uint32_t patternID, NoteCoordinate snappedCoordinate) {
+        if (clipBoard.empty()) { return; }
+        NoteCoordinate topLeftEvent(clipBoard.at(0).getPitch(), clipBoard.at(0).getAbsoluteTime());
         for (const auto& event : clipBoard) {
             if (event.getAbsoluteTime() < topLeftEvent.absoluteTime) {
                 topLeftEvent.absoluteTime = event.getAbsoluteTime();
@@ -193,26 +166,69 @@ public:
             }
         }
         NoteMoveDelta offset(snappedCoordinate.pitch - topLeftEvent.pitch,
-             static_cast<signed>(snappedCoordinate.absoluteTime - topLeftEvent.absoluteTime));
-        pattern.at(activePatternIndex).pasteClipboard(clipBoard, offset);
+            static_cast<signed>(snappedCoordinate.absoluteTime - topLeftEvent.absoluteTime));
+        patternAt(patternID).pasteClipboard(clipBoard, offset);
     }
 
+    // ----------------------------------------------------------------
+    // MIDI import  (still uses activePatternIndex to track last import)
+    // ----------------------------------------------------------------
 
-    uint32_t assignNoteId() { return m_nextNoteId++; }
-    uint32_t assignPatternId() {return m_nextPatternId++;}
+    void addParsedMidi(auto& data, std::string title) {
+        parsedMidiFile.emplace_back(data, title);
+        updatePatternWithMidiData();
+    }
+
+    void setCurrentPattern(size_t newPattern) {
+        activePatternIndex = newPattern;
+    }
+
+    uint32_t assignNoteId()    { return m_nextNoteId++; }
+    uint32_t assignPatternId() { return m_nextPatternId++; }
 
     size_t activePatternIndex = 0;
-    private:
+
+private:
     PatternManager() = default;
 
     std::vector<MidiEvent> clipBoard;
-    std::vector<Pattern> pattern{};
+    std::vector<Pattern>   pattern{};
     u_int unnamedPatterns = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;
 
     uint32_t m_nextNoteId{0};
     uint32_t m_nextPatternId{0};
+
+    // Central lookup – all mutation methods go through here
+    Pattern& patternAt(uint32_t id) {
+        for (auto& p : pattern) {
+            if (p.ID == id) { return p; }
+        }
+        // Fallback should never happen in practice; caller must pass a valid ID
+        throw std::out_of_range("PatternManager::patternAt – unknown pattern ID");
+    }
+
+    void updatePatternWithMidiData() {
+        ParsedMidi& currentFile = parsedMidiFile.back();
+
+        size_t tracks = currentFile.m_tracks.size();
+        if (currentFile.MIDI_FORMAT == 0) {
+            std::vector<MidiEvent> combinedTracks;
+            auto title = currentFile.m_title + " ";
+            for (size_t track = 0; track < tracks; track++) {
+                assignIdsToMidi(currentFile.m_tracks.at(track).Events);
+                combinedTracks.insert(combinedTracks.end(),
+                    currentFile.m_tracks.at(track).Events.begin(),
+                    currentFile.m_tracks.at(track).Events.end());
+            }
+            addPatternFromMidi(title, combinedTracks, currentFile.ticksInQuarterNote);
+        }
+        else {
+            loopThroughTracks(currentFile);
+        }
+        setCurrentPattern(pattern.size() - 1);
+    }
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {
         for (auto& event : events) {
@@ -223,16 +239,13 @@ public:
     void loopThroughTracks(auto& currentFile) {
         size_t tracks = currentFile.m_tracks.size();
         for (size_t track = 0; track < tracks; track++) {
-            auto title =  currentFile.m_title + " " + std::to_string(track);
+            auto title = currentFile.m_title + " " + std::to_string(track);
             assignIdsToMidi(currentFile.m_tracks.at(track).Events);
-
             if (currentFile.m_tracks.at(track).m_noteTrack) {
-                addPatternFromMidi(title,currentFile.m_tracks.at(track).Events, currentFile.ticksInQuarterNote);
+                addPatternFromMidi(title, currentFile.m_tracks.at(track).Events,
+                    currentFile.ticksInQuarterNote);
             }
-            else{std::cout << "skipping non note track" << std::endl;}
+            else { std::cout << "skipping non note track" << std::endl; }
         }
     }
-
-
-
 };

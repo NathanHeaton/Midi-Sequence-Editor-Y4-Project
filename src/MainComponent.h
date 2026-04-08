@@ -13,11 +13,8 @@
 
 #include <imgui.h>
 #include  "UI/Piano_Roll/PianoRollMain.h"
+#include "Singletons/PanelManager.h"
 
-struct windowStateM {
-    bool pianoRollWindow{true};
-    bool setttingsWindow{false};
-};
 
 class MainComponent
   : public juce::Component
@@ -27,11 +24,9 @@ public:
     TopNavComponent top_nav_component;
     ControlComponent control_component;
     Arranger arranger_component;
-    PianoRollMain pianoRollMain;
-    windowStateM state;
+    std::deque<PianoRollMain> pianoRollPanels;
 
-    MainComponent()
-    {
+    MainComponent() {
         setOpaque(true);
         setSize(1920, 1080);
         setWantsKeyboardFocus(true);
@@ -45,18 +40,16 @@ public:
         glctx.detach();
     }
 
-    void newOpenGLContextCreated() override
-    {
+    void newOpenGLContextCreated() override {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplJuce_Init(*this, glctx);
         ImGui_ImplOpenGL3_Init();
-
         ASSETS.LoadAll(); // after glcontext is setup
+        ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
     }
 
-    void renderOpenGL() override
-    {
+    void renderOpenGL() override {
         using namespace juce::gl;
 
         Theme::applyTheme();
@@ -70,36 +63,40 @@ public:
         ImGui::Begin("Main Window", nullptr, flags);
 
         top_nav_component.nav();
-
-        control_component.ControlPanel(state);
-
+        control_component.ControlPanel();
         arranger_component.create();
-        if (state.pianoRollWindow) {
-            pianoRollMain.create();
-        }
-        else if (state.setttingsWindow) {
 
+
+        if (PanelManager::instance().newPaternPanelJustCreated) {
+            pianoRollPanels.emplace_back(PanelManager::instance().getPanels().at(
+                PanelManager::instance().getPanels().size()-1));
+            PanelManager::instance().newPaternPanelJustCreated = false;
+        }
+
+        for (auto& p : pianoRollPanels){
+            if (p.panelDetails->open) {
+                if (PatternManager::instance().getPatternByID(p.panelDetails->patternID)==nullptr) {
+                    std::cout<<"can't find pattern of that ID"<<std::endl;
+                    continue;
+                }
+                p.create();
+            }
         }
 
         ImGui::End();
-
         ImGui::Render();
-
         // background begin
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
         // background end
-
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    void openGLContextClosing() override
-    {
+    void openGLContextClosing() override {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplJuce_Shutdown();
         ImGui::DestroyContext();
     }
-
 
 private:
     juce::OpenGLContext glctx;

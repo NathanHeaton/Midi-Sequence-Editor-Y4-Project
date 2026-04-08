@@ -37,10 +37,10 @@ void Pattern::createNoteEventPairs(){
             pitch = t_pitch;
             channel = t_chan;
         }
+
     };
     std::vector<PendingNoteEvent> pendingEvents;
     int cumulativeTime=0;
-
     for (auto& event : m_events) {
         cumulativeTime += event.getDelta();
         event.m_absoluteTime = cumulativeTime;

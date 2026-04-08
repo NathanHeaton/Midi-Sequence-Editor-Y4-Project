@@ -84,9 +84,9 @@ private:
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             auto ClipHovered = am.resolveHoverState(hover);
             switch (ClipHovered.hoverState) {
-                case CenterHover: am.moveOperation.begin(ClipHovered.ID, hover);
-                case EdgeHover:   am.resizeOperation.begin(ClipHovered.ID, hover);
-                case NoHover:     am.addClip(snapped);     break;
+                case CenterHover: {am.moveOperation.begin(ClipHovered.ID, snapped, am.getClipByID(ClipHovered.ID)->startTime); break;}
+                case EdgeHover:   {am.resizeOperation.begin(ClipHovered.ID); break;}
+                case NoHover:     {am.addClip(snapped);     break;}
             }
         }
         else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
@@ -95,11 +95,12 @@ private:
     }
 
     void updateMoveOperation() {
-        auto& am = ArrangerManager::instance();
-        std::cout << "moving clip" << std::endl;
+        auto& am = ArrangerManager::instance();;
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             am.moveOperation.update(snapped);
-            am.moveClip(am.moveOperation.clipID, snapped.time, snapped.track);
+
+            am.moveClip(am.moveOperation.clipID,
+                am.moveOperation.currentCoord);
         }
         else {
             am.moveOperation.reset();
@@ -109,8 +110,8 @@ private:
     void updateResizeOperation() {
         auto& am = ArrangerManager::instance();
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-            am.resizeOperation.update(snapped);
-            am.resizeClip(am.resizeOperation.clipID, snapped.time);
+            am.resizeClip(am.resizeOperation.clipID,
+                snapped.time);
         }
         else {
             am.resizeOperation.reset();

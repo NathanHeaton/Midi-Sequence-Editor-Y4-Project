@@ -20,14 +20,15 @@ public:
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
     PianoRollInputHandler inputHandler;
+    uint32_t m_patternID{0};
 
-    void create(float &scrollY, float &scrollX, float& lengthX, float height) {
+    void create(float &scrollY, float &scrollX, float& lengthX, float height, uint32_t patternID) {
         if (ImGui::BeginChild("piano grid", ImVec2(0, height),
             ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
             TimelineContext ctx;
-
+            m_patternID = patternID;
             renderSteps(ctx);
-            inputHandler.process(ctx);
+            inputHandler.process(ctx, patternID);
 
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);

@@ -7,7 +7,7 @@
 //
 
 void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
-    auto* pattern = &PatternManager::instance().getCurrentPattern();
+    auto* pattern = PatternManager::instance().getPatternByID(m_patternID);
 
     //pattern->
     for (auto noteIDs : pattern->m_noteEvents) {
@@ -123,9 +123,9 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
                 Theme::currentThemeColours.barColourPacked, 0.0f);
         }
     }
-    if (PatternManager::instance().areNotesSelected()){ // render scale effect
+    if (PatternManager::instance().areNotesSelected(m_patternID)){ // render scale effect
         auto tool = &ToolManager::instance();
-        const auto pattern = &PatternManager::instance().getCurrentPattern();
+        const auto pattern = PatternManager::instance().getPatternByID(m_patternID);
         auto middlePointY = 0;
         uint32_t endPointX = 0;
         for (auto onID :pattern->m_selectedNoteOnIDs)
