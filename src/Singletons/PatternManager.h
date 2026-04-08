@@ -50,15 +50,17 @@ public:
         return pattern;
     }
 
-    // Legacy accessor used by MIDI import / non-roll code that still thinks in index terms
     const Pattern& getCurrentPattern() {
         return pattern.at(activePatternIndex);
     }
 
+    void setActivePatternID(uint32_t patternID) {activePatternId = patternID;}
+    uint32_t getActivePatternID() {return activePatternId;}
+
     size_t getPatternSize() { return pattern.size(); }
 
     // ----------------------------------------------------------------
-    // Mutation methods – all now take an explicit patternID
+    // Mutation methods
     // ----------------------------------------------------------------
 
     void pitchShiftSelection(uint32_t patternID, signed short t_pitchDelta) {
@@ -171,7 +173,7 @@ public:
     }
 
     // ----------------------------------------------------------------
-    // MIDI import  (still uses activePatternIndex to track last import)
+    // MIDI import
     // ----------------------------------------------------------------
 
     void addParsedMidi(auto& data, std::string title) {
@@ -186,7 +188,7 @@ public:
     uint32_t assignNoteId()    { return m_nextNoteId++; }
     uint32_t assignPatternId() { return m_nextPatternId++; }
 
-    size_t activePatternIndex = 0;
+
 
 private:
     PatternManager() = default;
@@ -194,18 +196,18 @@ private:
     std::vector<MidiEvent> clipBoard;
     std::vector<Pattern>   pattern{};
     u_int unnamedPatterns = 0;
+    size_t activePatternIndex = 0;
+    uint32_t activePatternId = 0;
 
     std::vector<ParsedMidi> parsedMidiFile;
 
     uint32_t m_nextNoteId{0};
     uint32_t m_nextPatternId{0};
 
-    // Central lookup – all mutation methods go through here
     Pattern& patternAt(uint32_t id) {
         for (auto& p : pattern) {
             if (p.ID == id) { return p; }
         }
-        // Fallback should never happen in practice; caller must pass a valid ID
         throw std::out_of_range("PatternManager::patternAt – unknown pattern ID");
     }
 

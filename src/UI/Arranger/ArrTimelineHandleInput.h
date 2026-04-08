@@ -5,6 +5,7 @@
 #include "../../NoteOperations.h"
 #include "../../utils.h"
 #include "ArrangerContext.h"
+#include "../../Singletons/PanelManager.h"
 
 class ArrTimelineHandleInput
 {
@@ -68,10 +69,15 @@ private:
     }
     void handleEditTool(const ArrangerContext& ctx) {
         auto& am = ArrangerManager::instance();
-
-        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            std::cout << "opening pattern" << std::endl;
-            return;
+        auto ClipHovered = am.resolveHoverState(hover);
+        uint32_t pID;
+        if (ClipHovered.hoverState != NoHover) {
+            pID = am.getClipByID(ClipHovered.ID)->patternID;
+            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                std::cout << "opening pattern" << std::endl;
+                PanelManager::instance().openPatern(pID);
+                return;
+            }
         }
         if (am.moveOperation.isActive) {
             updateMoveOperation();
@@ -82,10 +88,18 @@ private:
         }
 
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            auto ClipHovered = am.resolveHoverState(hover);
+
             switch (ClipHovered.hoverState) {
-                case CenterHover: {am.moveOperation.begin(ClipHovered.ID, snapped, am.getClipByID(ClipHovered.ID)->startTime); break;}
-                case EdgeHover:   {am.resizeOperation.begin(ClipHovered.ID); break;}
+                case CenterHover: {
+                    am.moveOperation.begin(ClipHovered.ID, snapped, am.getClipByID(ClipHovered.ID)->startTime);
+                    PatternManager::instance().setActivePatternID(pID);
+                    break;
+                }
+                case EdgeHover:   {
+                    am.resizeOperation.begin(ClipHovered.ID);
+                    PatternManager::instance().setActivePatternID(pID);
+                    break;
+                }
                 case NoHover:     {am.addClip(snapped);     break;}
             }
         }

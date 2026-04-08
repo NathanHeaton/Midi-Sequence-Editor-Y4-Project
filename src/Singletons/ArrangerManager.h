@@ -138,11 +138,11 @@ public:
 
     void addClip(ArrangerCoordinate pos) {
         if (moveOperation.isActive || resizeOperation.isActive) {return;}
-        const auto& p = PatternManager::instance().getCurrentPattern();
+        const auto p = PatternManager::instance().getPatternByID(PatternManager::instance().getActivePatternID());
         std::cout << "adding clip" << std::endl;
-        PatternClip clip(p.ID,
+        PatternClip clip(p->ID,
             pos.time,pos.time +
-            (p.m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
+            (p->m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
             pos.track,
             assignID());
         patternClips.emplace_back(clip);
@@ -162,6 +162,9 @@ public:
     void resizeClip(uint32_t id, uint32_t endTime) {
         auto* clip = getClipByID(id);
         if (!clip) return;
+        if (clip->startTime >= endTime) {
+            endTime = clip->endTime;
+        }
         clip->endTime   = endTime;
     }
 
