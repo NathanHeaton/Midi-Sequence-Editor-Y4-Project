@@ -69,33 +69,51 @@ private:
     void handleEditTool(const ArrangerContext& ctx) {
         auto& am = ArrangerManager::instance();
 
-        if (am.moveOperation.isActive) {
-            updateMoveOperation(ctx);
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            std::cout << "opening pattern" << std::endl;
             return;
+        }
+        if (am.moveOperation.isActive) {
+            updateMoveOperation();
+            return;
+        }
+        if (am.resizeOperation.isActive) {
+            updateResizeOperation();
         }
 
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            auto hoverState = am.resolveHoverState(hover);
-            switch (hoverState) {
-                case CenterHover: am.initMoveClip(hover);  break;
-                case EdgeHover:
+            auto ClipHovered = am.resolveHoverState(hover);
+            switch (ClipHovered.hoverState) {
+                case CenterHover: am.moveOperation.begin(ClipHovered.ID, hover);
+                case EdgeHover:   am.resizeOperation.begin(ClipHovered.ID, hover);
                 case NoHover:     am.addClip(snapped);     break;
             }
         }
-        else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+        else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             am.removeClip(hover);
         }
     }
 
-    void updateMoveOperation(const ArrangerContext& ctx) {
+    void updateMoveOperation() {
         auto& am = ArrangerManager::instance();
-
+        std::cout << "moving clip" << std::endl;
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             am.moveOperation.update(snapped);
             am.moveClip(am.moveOperation.clipID, snapped.time, snapped.track);
         }
         else {
             am.moveOperation.reset();
+        }
+    }
+
+    void updateResizeOperation() {
+        auto& am = ArrangerManager::instance();
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+            am.resizeOperation.update(snapped);
+            am.resizeClip(am.resizeOperation.clipID, snapped.time);
+        }
+        else {
+            am.resizeOperation.reset();
         }
     }
 

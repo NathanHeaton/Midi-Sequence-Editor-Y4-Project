@@ -42,12 +42,32 @@ struct ClipMoveOperation {
     void reset() { isActive = false; clipID = 0; }
 };
 
+struct ClipResizeOperation {
+    bool isActive = false;
+    uint32_t clipID = 0;
+    ArrangerCoordinate originalCoord{0,0};
+    ArrangerCoordinate currentCoord{0,0};
 
+    void begin(uint32_t id, ArrangerCoordinate coord) {
+        isActive = true;
+        clipID = id;
+        originalCoord = coord;
+        currentCoord = coord;
+    }
+    void update(ArrangerCoordinate coord) { currentCoord = coord; }
+    void reset() { isActive = false; clipID = 0; }
+};
+
+struct ClipIDHoverState {
+    uint32_t ID;
+    HoverState hoverState{NoHover};
+};
 
 class ArrangerManager
 {
 public:
     ClipMoveOperation moveOperation;
+    ClipResizeOperation resizeOperation;
     std::vector<Track> tracks;
     std::vector<PatternClip> patternClips;
 
@@ -98,19 +118,22 @@ public:
         }
     }
 
-    HoverState resolveHoverState(ArrangerCoordinate pos) {
+    ClipIDHoverState resolveHoverState(ArrangerCoordinate pos) {
         for (auto clips : patternClips) {
             if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.track == pos.track) {
-                return CenterHover;
-                std::cout<<"center Hover"<<std::endl;
+                if (( clips.endTime - clips.startTime ) * 0.8 < pos.time - clips.startTime ) {
+                    return {clips.ID, EdgeHover};
+                }
+                return {clips.ID, CenterHover};
             }
         }
-        return NoHover;
+        return {};
     }
 
     void addClip(ArrangerCoordinate pos) {
+        if (moveOperation.isActive || resizeOperation.isActive) {return;}
         const auto& p = PatternManager::instance().getCurrentPattern();
-        std::cout << pos.track<< ", " << pos.time  << std::endl;
+        std::cout << "adding clip" << std::endl;
         PatternClip clip(p.ID,
             pos.time,pos.time +
             (p.m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
@@ -121,15 +144,6 @@ public:
 
     void removeAllClipsOnTrack(size_t trackIndex);
 
-    void initMoveClip(ArrangerCoordinate pos) {
-        for (auto& clip : patternClips) {
-            if (clip.startTime <= pos.time && clip.endTime >= pos.time && clip.track == pos.track) {
-                moveOperation.begin(clip.ID, pos);
-                return;
-            }
-        }
-    }
-
     void moveClip(uint32_t id, uint32_t newStartTime, size_t newTrack) {
         auto* clip = getClipByID(id);
         if (!clip) return;
@@ -139,6 +153,11 @@ public:
         clip->track     = newTrack;
     }
 
+    void resizeClip(uint32_t id, uint32_t endTime) {
+        auto* clip = getClipByID(id);
+        if (!clip) return;
+        clip->endTime   = endTime;
+    }
 
     void trimClip(uint32_t id, uint32_t newStartTime, uint32_t newEndTime);
 
