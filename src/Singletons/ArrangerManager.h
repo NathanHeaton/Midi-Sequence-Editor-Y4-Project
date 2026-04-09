@@ -15,7 +15,7 @@ struct PatternClip{
     uint32_t endTime;
     uint32_t track;
     uint32_t ID;
-    bool enabled;
+    bool enabled = true;
 };
 
 struct Track{

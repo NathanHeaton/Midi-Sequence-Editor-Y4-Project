@@ -1,135 +1,135 @@
-// MidiPlayer.h
 #pragma once
 #include <juce_audio_devices/juce_audio_devices.h>
 #include "AudioManager.h"
+#include "EventComplier.h"
 #include "../Singletons/TimeData.h"
-#include  "../Singletons/PatternManager.h"
+
+enum class PlaybackSource { PianoRoll, Arranger };
 
 class MidiPlayer : public juce::Timer {
 public:
-    MidiPlayer(AudioManager& audioMgr) : audioManager(audioMgr) {
-    }
+    explicit MidiPlayer(AudioManager& audio) : m_audio(audio) {}
+    ~MidiPlayer() { cleanUp(); }
 
-    ~MidiPlayer() {
-        cleanUp();
-    }
-
-    void cleanUp() {// clean up called before singleton deconstucting
+    void cleanUp() {
         stopTimer();
-        midiOutput.reset();
+        allNotesOff();
+        m_midiOut.reset();
     }
 
-    void intialiseMidiPlayer() {
+    void initialiseMidiPlayer() {
         auto devices = juce::MidiOutput::getAvailableDevices();
-        for (auto& device : devices) {
-            DBG("devices " << device.name << " " << device.identifier);
-        }
-        if (!devices.isEmpty()) {
-            midiOutput = juce::MidiOutput::openDevice(devices[0].identifier);
-        }
+        if (!devices.isEmpty())
+            m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
     }
 
-    void setPlayingPtr(bool* playingPTR) {
-        m_playingPtr = playingPTR;
-    }
+    void setPlayingPtr(bool* ptr) { m_playingPtr = ptr; }
 
-    void setPlaying(bool playing);
-    bool isPlaying() const;
+    void play(PlaybackSource source) {
+        const double bpm = TimeData::instance().getBPM();
 
-    void playCurrentPattern() {
-        pattern = &PatternManager::instance().getCurrentPattern();
-        eventIndex = 0;
-        startTime = juce::Time::getMillisecondCounterHiRes();
+        if (source == PlaybackSource::PianoRoll) {
+            m_events = EventCompiler::compilePattern(
+                PatternManager::instance().getCurrentPattern(), bpm);
+        } else {
+            m_events = EventCompiler::compileArranger(bpm);
+        }
+
+        // Find the first event at or after the current playhead position
+        m_eventIndex = firstEventAtOrAfter(m_playheadMs);
+        m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - m_playheadMs;
         startTimer(1);
     }
 
-    void pauseCurrentPattern() {
-        midiOutput->clearAllPendingMessages();
-        offMessageForPlayingEvents();
+    void pause() {
+        stopTimer();
+        allNotesOff();
+        // m_playheadMs already holds the current position — nothing extra needed
     }
 
-    void timerCallback() override {
-        if (pattern != &PatternManager::instance().getCurrentPattern() ) {
-            DBG("stoping song");
-        }
-        if (eventIndex >= pattern->m_events.size() || pattern != &PatternManager::instance().getCurrentPattern()) {
-            offMessageForPlayingEvents();
-            setPlaying(false);
-            stopTimer();
-            currentPatternElapsed = 0;
-            return;
-        }
-        m_elapsed = (juce::Time::getMillisecondCounterHiRes() + currentPatternElapsed - (startTime));
-        double msPerTick = (60000.0 / TimeData::instance().getBPM()) / TimeData::instance().PPQ;
-
-        auto& event = pattern->m_events[eventIndex];
-
-        double eventInMs = msPerTick * static_cast<double>(event.getAbsoluteTime());
-
-        if (m_elapsed >= eventInMs) {
-            juce::MidiMessage note;
-            if (event.isNoteOff()) {
-                note = juce::MidiMessage::noteOff(event.getChannel(), event.getPitch());
-                removePlayedEvents(event);
-            } else {
-                note = juce::MidiMessage::noteOn(event.getChannel(), event.getPitch(), event.getVelocity());
-                m_playingEvents.push_back(note);
-            }
-
-            //Send to internal synth
-            audioManager.addMidiMessage(note);
-            // Send to external MIDI device
-            if (midiOutput != nullptr) {
-                midiOutput->sendMessageNow(note);
-            }
-            eventIndex++;
-        }
-        if (!isPlaying()) {
-            currentPatternElapsed = m_elapsed;
-            stopTimer();
-        }
+    void stop() {
+        stopTimer();
+        allNotesOff();
+        m_playheadMs = 0.0;
+        m_eventIndex = 0;
     }
 
+    // Returns current playhead in ticks (for rendering the playhead line)
     [[nodiscard]] double getCurrentPositionTicks() const {
-        double ticks = m_elapsed / (60000.0/ TimeData::instance().getBPM() / TimeData::instance().PPQ);
-        return ticks;
+        return m_playheadMs / EventCompiler::msPerTick(TimeData::instance().getBPM());
     }
 
-    void setElapsedTime(unsigned int ticks) {
-        m_elapsed = ticks * (60000.0/ TimeData::instance().getBPM() / TimeData::instance().PPQ);
-        currentPatternElapsed = m_elapsed;
-    }
-
-    void removePlayedEvents(auto& event) {
-        for (auto i{0u};i < m_playingEvents.size(); ++i) {
-            if (m_playingEvents.at(i).getChannel() == event.getChannel() &&
-                m_playingEvents.at(i).getNoteNumber() == event.getPitch()) {
-                m_playingEvents.erase(m_playingEvents.begin()+i);
-                }
-        }
-    }
-
-    void offMessageForPlayingEvents() {
-        for (auto event : m_playingEvents) {
-            juce::MidiMessage note = juce::MidiMessage::noteOff(event.getChannel(), event.getNoteNumber());
-            //Send to internal synth
-            audioManager.addMidiMessage(note);
-            // Send to external MIDI device
-            if (midiOutput != nullptr) {
-                midiOutput->sendMessageNow(note);
-            }
-        }
-        m_playingEvents.clear();
+    // Seek: set playhead to a tick position
+    void seekToTicks(uint32_t ticks) {
+        const double mpt = EventCompiler::msPerTick(TimeData::instance().getBPM());
+        m_playheadMs = ticks * mpt;
+        m_eventIndex = firstEventAtOrAfter(m_playheadMs);
+        if (isTimerRunning())
+            m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - m_playheadMs;
     }
 
 private:
-    std::vector<juce::MidiMessage> m_playingEvents;
-    AudioManager& audioManager;
-    std::unique_ptr<juce::MidiOutput> midiOutput;
-    const Pattern* pattern = nullptr;
-    size_t eventIndex = 0;
-    double m_elapsed;
-    double startTime = 0;
-    double currentPatternElapsed = 0;
-    bool* m_playingPtr{nullptr};
+    // ---------------------------------------------------------------
+    void timerCallback() override {
+        m_playheadMs = juce::Time::getMillisecondCounterHiRes() - m_wallClockStart;
+
+        // Dispatch every event whose time has arrived
+        while (m_eventIndex < m_events.size() &&
+               m_events[m_eventIndex].absoluteTimeMs <= m_playheadMs)
+        {
+            sendEvent(m_events[m_eventIndex].message);
+            ++m_eventIndex;
+        }
+
+        // End of sequence
+        if (m_eventIndex >= m_events.size()) {
+            allNotesOff();
+            if (m_playingPtr) *m_playingPtr = false;
+            m_playheadMs = 0.0;
+            m_eventIndex = 0;
+            stopTimer();
+        }
+    }
+
+    void sendEvent(const juce::MidiMessage& msg) {
+        m_audio.addMidiMessage(msg);
+        if (m_midiOut) m_midiOut->sendMessageNow(msg);
+    }
+
+    void allNotesOff() {
+        for (int ch = 1; ch <= 16; ++ch) {
+            auto msg = juce::MidiMessage::allNotesOff(ch);
+            m_audio.addMidiMessage(msg);
+            if (m_midiOut) m_midiOut->sendMessageNow(msg);
+        }
+    }
+
+    size_t firstEventAtOrAfter(double ms) const {
+        // Binary search since m_events is sorted
+        size_t lo = 0, hi = m_events.size();
+        while (lo < hi) {
+            size_t mid = (lo + hi) / 2;
+            if (m_events[mid].absoluteTimeMs < ms) lo = mid + 1;
+            else hi = mid;
+        }
+        return lo;
+    }
+
+    void setPlaying(bool playing) {
+        if (m_playingPtr) {
+            *m_playingPtr = playing;
+        }
+    }
+
+    bool isPlaying() const {
+        return m_playingPtr ? *m_playingPtr : false;
+    }
+    // ---------------------------------------------------------------
+    AudioManager&                  m_audio;
+    std::unique_ptr<juce::MidiOutput> m_midiOut;
+    std::vector<ScheduledEvent>    m_events;
+    size_t                         m_eventIndex{0};
+    double                         m_playheadMs{0.0};
+    double                         m_wallClockStart{0.0};
+    bool*                          m_playingPtr{nullptr};
 };

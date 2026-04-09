@@ -53,16 +53,15 @@ void TimelineLabel::HandleMouse() {
     auto mousePos = ImGui::GetMousePos();
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
-        PlayBackManager::instance().setPlaying(false);
+        PlayBackManager::instance().stop();
         unsigned int ticks = TimeData::instance().PPQ *
             ((mousePos.x - cursorPos.x) / ViewState::instance().getPixelPerBeat(zoomFactor::pianoRoll));
-        PlayBackManager::instance().setPlayHeadPositionTicks(ticks);
+        PlayBackManager::instance().seekToTicks(ticks);
         mouseDown = true;
     }
     else if (mouseDown) { firstMouseUp = true; mouseDown = false; }
 
     if (firstMouseUp) {
-        PlayBackManager::instance().togglePlay();
         firstMouseUp = false;
     }
 }
