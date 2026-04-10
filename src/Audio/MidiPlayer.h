@@ -18,74 +18,92 @@ public:
     }
 
     void initialiseMidiPlayer() {
-        auto devices = juce::MidiOutput::getAvailableDevices();
-        if (!devices.isEmpty())
-            m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
+        juce::MessageManager::callAsync([this]() {
+            auto devices = juce::MidiOutput::getAvailableDevices();
+            if (!devices.isEmpty())
+                m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
+        });
     }
 
     void setPlayingPtr(bool* ptr) { m_playingPtr = ptr; }
 
     void play(PlaybackSource source) {
+        m_activeSource = source;
         const double bpm = TimeData::instance().getBPM();
-
         if (source == PlaybackSource::PianoRoll) {
             m_events = EventCompiler::compilePattern(
-                PatternManager::instance().getCurrentPattern(), bpm);
+                *PatternManager::instance().getCurrentPattern(), bpm);
         } else {
+            std::cout << "Arranger playing" <<std::endl;
             m_events = EventCompiler::compileArranger(bpm);
         }
-
-        // Find the first event at or after the current playhead position
-        m_eventIndex = firstEventAtOrAfter(m_playheadMs);
-        m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - m_playheadMs;
+        if (m_events.empty()) return;
+        double& playheadMs = activePlayheadMs();
+        m_eventIndex     = firstEventAtOrAfter(playheadMs);
+        m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - playheadMs;
         startTimer(1);
     }
 
     void pause() {
         stopTimer();
         allNotesOff();
-        // m_playheadMs already holds the current position — nothing extra needed
     }
 
     void stop() {
         stopTimer();
         allNotesOff();
-        m_playheadMs = 0.0;
+        activePlayheadMs() = 0.0;
         m_eventIndex = 0;
     }
 
-    // Returns current playhead in ticks (for rendering the playhead line)
+    // Returns current playhead in ticks for the active source
     [[nodiscard]] double getCurrentPositionTicks() const {
-        return m_playheadMs / EventCompiler::msPerTick(TimeData::instance().getBPM());
+        return activePlayheadMs() / msPerTick();
     }
 
-    // Seek: set playhead to a tick position
+    // Per-source getters (for rendering both playheads independently)
+    [[nodiscard]] double getPianoRollPositionTicks() const {
+        return m_pianoRollPlayheadMs / msPerTick();
+    }
+    [[nodiscard]] double getArrangerPositionTicks() const {
+        return m_arrangerPlayheadMs / msPerTick();
+    }
+
+
+    // Seek the active source to a tick position
     void seekToTicks(uint32_t ticks) {
-        const double mpt = EventCompiler::msPerTick(TimeData::instance().getBPM());
-        m_playheadMs = ticks * mpt;
-        m_eventIndex = firstEventAtOrAfter(m_playheadMs);
+        activePlayheadMs() = ticks * msPerTick();
+        m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
         if (isTimerRunning())
-            m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - m_playheadMs;
+            m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - activePlayheadMs();
+    }
+
+    // Seek a specific source without changing the active one
+    void seekSourceToTicks(PlaybackSource source, uint32_t ticks) {
+        playheadMsFor(source) = ticks * msPerTick();
+        if (m_activeSource == source) {
+            m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
+            if (isTimerRunning())
+                m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - activePlayheadMs();
+        }
     }
 
 private:
     // ---------------------------------------------------------------
     void timerCallback() override {
-        m_playheadMs = juce::Time::getMillisecondCounterHiRes() - m_wallClockStart;
+        activePlayheadMs() = juce::Time::getMillisecondCounterHiRes() - m_wallClockStart;
 
-        // Dispatch every event whose time has arrived
         while (m_eventIndex < m_events.size() &&
-               m_events[m_eventIndex].absoluteTimeMs <= m_playheadMs)
+               m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs())
         {
             sendEvent(m_events[m_eventIndex].message);
             ++m_eventIndex;
         }
 
-        // End of sequence
         if (m_eventIndex >= m_events.size()) {
             allNotesOff();
             if (m_playingPtr) *m_playingPtr = false;
-            m_playheadMs = 0.0;
+            activePlayheadMs() = 0.0;
             m_eventIndex = 0;
             stopTimer();
         }
@@ -105,7 +123,6 @@ private:
     }
 
     size_t firstEventAtOrAfter(double ms) const {
-        // Binary search since m_events is sorted
         size_t lo = 0, hi = m_events.size();
         while (lo < hi) {
             size_t mid = (lo + hi) / 2;
@@ -115,21 +132,35 @@ private:
         return lo;
     }
 
-    void setPlaying(bool playing) {
-        if (m_playingPtr) {
-            *m_playingPtr = playing;
-        }
+    [[nodiscard]] double msPerTick() const {
+        return EventCompiler::msPerTick(TimeData::instance().getBPM());
     }
 
-    bool isPlaying() const {
-        return m_playingPtr ? *m_playingPtr : false;
+    // Non-const helpers so timerCallback can write through them
+    double& activePlayheadMs() { return playheadMsFor(m_activeSource); }
+    [[nodiscard]] const double& activePlayheadMs() const { return playheadMsFor(m_activeSource); }
+
+    double& playheadMsFor(PlaybackSource source) {
+        return source == PlaybackSource::PianoRoll
+            ? m_pianoRollPlayheadMs
+            : m_arrangerPlayheadMs;
     }
+    [[nodiscard]] const double& playheadMsFor(PlaybackSource source) const {
+        return source == PlaybackSource::PianoRoll
+            ? m_pianoRollPlayheadMs
+            : m_arrangerPlayheadMs;
+    }
+
+    bool isPlaying() const { return m_playingPtr ? *m_playingPtr : false; }
+
     // ---------------------------------------------------------------
-    AudioManager&                  m_audio;
+    AudioManager&                     m_audio;
     std::unique_ptr<juce::MidiOutput> m_midiOut;
-    std::vector<ScheduledEvent>    m_events;
-    size_t                         m_eventIndex{0};
-    double                         m_playheadMs{0.0};
-    double                         m_wallClockStart{0.0};
-    bool*                          m_playingPtr{nullptr};
+    std::vector<ScheduledEvent>       m_events;
+    size_t                            m_eventIndex{0};
+    double                            m_pianoRollPlayheadMs{0.0};
+    double                            m_arrangerPlayheadMs{0.0};
+    double                            m_wallClockStart{0.0};
+    PlaybackSource                    m_activeSource{PlaybackSource::PianoRoll};
+    bool*                             m_playingPtr{nullptr};
 };

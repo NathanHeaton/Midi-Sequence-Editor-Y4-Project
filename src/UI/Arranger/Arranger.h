@@ -28,7 +28,7 @@ public:
         AddTrack();
         arrangerToolbar.addGroup(ToolbarGroups::snapping(true));
         arrangerToolbar.addGroup(ToolbarGroups::arrangerTools());
-        arrangerToolbar.addGroup(ToolbarGroups::playback());
+        arrangerToolbar.addGroup(ToolbarGroups::playback(true));
         arrangerToolbar.addGroup(ToolbarGroups::arrangerZoom());
     }
 

@@ -16,6 +16,14 @@ public:
         player.setSource(nullptr);
     }
 
+    // void initialiseMidiPlayer() {
+    //     juce::MessageManager::callAsync([this]() {
+    //         auto devices = juce::MidiOutput::getAvailableDevices();
+    //         if (!devices.isEmpty())
+    //             m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
+    //     });
+    // }
+
     void prepareToPlay(int samplesPerBlock, double sampleRate) override {
         synth.setCurrentPlaybackSampleRate(sampleRate);
         synth.addSound(new SineWaveSound());
@@ -27,12 +35,15 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override {
         bufferToFill.clearActiveBufferRegion();
-
-        synth.renderNextBlock(*bufferToFill.buffer, midiBuffer,
+        juce::MidiBuffer localBuffer;
+        {
+            const juce::ScopedLock sl(midiLock);
+            localBuffer = midiBuffer;
+            midiBuffer.clear();
+        }
+        synth.renderNextBlock(*bufferToFill.buffer, localBuffer,
                               bufferToFill.startSample,
                               bufferToFill.numSamples);
-
-        midiBuffer.clear();
     }
 
     void releaseResources() override {
@@ -40,12 +51,14 @@ public:
     }
 
     void addMidiMessage(const juce::MidiMessage& message) {
+        const juce::ScopedLock sl(midiLock);
         midiBuffer.addEvent(message, 0);
     }
 
     juce::Synthesiser& getSynth() { return synth; }
 
 private:
+    juce::CriticalSection midiLock;
     juce::AudioDeviceManager deviceManager;
     juce::AudioSourcePlayer player;
     juce::Synthesiser synth;

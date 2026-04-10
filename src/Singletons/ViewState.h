@@ -20,13 +20,13 @@ public:
         return instance;
     }
 
-    [[nodiscard]] float getPixelPer(float division , float zoomFactor) const {
+    [[nodiscard]] float getPixelPer(float division , float zoomFactor) {
         return pixelPerQuarterNote * zoomFactor * division;
     }
     [[nodiscard]] float getPixelPerBeat(float zoomFactor) const {        return pixelPerQuarterNote*zoomFactor;   }
 
     [[nodiscard]] float getPixelPerBar(float zoomFactor) const {
-        return pixelPerQuarterNote * zoomFactor * TimeData::instance().timeSignature.getNumerator();
+        return pixelPerQuarterNote * zoomFactor * static_cast<float>(TimeData::instance().timeSignature.getNumerator());
     }
 
     [[nodiscard]] char getRenderedSubDivisions() const { return subdivisionsPianoRoll.renderList[subdivisionsPianoRoll.renderedIndex]; }
@@ -38,7 +38,7 @@ public:
     [[nodiscard]] float getTrackHeight() const { return TrackHeight; }
     [[nodiscard]] uint32_t getStandardSnapTime() const
     {
-        if (subdivisionsPianoRoll.snapList.end() == subdivisionsPianoRoll.snapList.begin()+subdivisionsPianoRoll.snapIndex)
+        if (subdivisionsPianoRoll.snapList.end() == subdivisionsPianoRoll.snapList.begin()+static_cast<long>(subdivisionsPianoRoll.snapIndex))
         {
             return static_cast<float>(TimeData::PPQ) / subdivisionsPianoRoll.snapList.at(3);
         }

@@ -12,11 +12,21 @@ public:
     }
 
     [[nodiscard]] bool    isPlaying()               const { return m_playing; }
-    [[nodiscard]] double  getPlayheadPositionTicks() const { return player.getCurrentPositionTicks(); }
+    [[nodiscard]] double  getPlayheadPositionTicks() const {
+     return player.getCurrentPositionTicks();
+}
+
+    [[nodiscard]] double getArrangerPlayheadTicks () {
+        return player.getArrangerPositionTicks();
+    }
+    [[nodiscard]] double getPianoRollPlayheadTicks () {
+        return player.getPianoRollPositionTicks();
+    }
 
     void shutDown() { player.cleanUp(); }
 
     void setMode(PlaybackMode mode) { m_mode = mode; }
+    [[nodiscard]] PlaybackMode getMode() const { return m_mode; }
 
     void togglePlay() {
         m_playing = !m_playing;
@@ -28,6 +38,7 @@ public:
         } else {
             player.pause();
         }
+        std::cout << "mode" <<std::endl;
     }
 
     void stop() {
@@ -35,11 +46,12 @@ public:
         player.stop();
     }
 
-    void seekToTicks(uint32_t ticks) {
-        player.seekToTicks(ticks);
-    }
+    void seekToTicks(uint32_t ticks, bool isArranger) {
+        isArranger ?
+        player.seekSourceToTicks(PlaybackSource::Arranger, ticks) :
+        player.seekSourceToTicks(PlaybackSource::PianoRoll, ticks);
 
-    void setPlaybackMode(PlaybackMode m) {m_mode = m;}
+    }
 
 private:
     PlayBackManager() {

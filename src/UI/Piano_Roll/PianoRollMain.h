@@ -32,7 +32,7 @@ public:
     PianoRollMain(PatternPanelState& panel) : panelDetails(&panel) {
         pianoRollToolbar.addGroup(ToolbarGroups::snapping(false));
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollTools());
-        pianoRollToolbar.addGroup(ToolbarGroups::playback());
+        pianoRollToolbar.addGroup(ToolbarGroups::playback(false));
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollZoom());
     }
 
@@ -65,8 +65,8 @@ public:
                     timelineXScroll = ImGui::GetScrollX();
                     } ImGui::EndChild();
                 timelineLabel.create(timelineLength, timelineXScroll,
-                    PatternManager::instance().getCurrentPattern().m_bars,
-                    zoomFactor::pianoRoll);
+                    PatternManager::instance().getCurrentPattern()->m_bars,
+                    false);
             }
             ImGui::EndTable();
 
@@ -95,7 +95,7 @@ public:
                 ImGui::TableNextColumn();
                 if (ImGui::BeginChild("custom_scroll", ImVec2(15, pianoRollHeight), false,
                     ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-                    ImGui::Dummy(ImVec2(15, ViewState::instance().WHITE_KEYS
+                    ImGui::Dummy(ImVec2(15, static_cast<float>(ViewState::WHITE_KEYS)
                         * ViewState::instance().getWhiteSize().y));
                     if (initialLoad) {
                         ImGui::SetScrollY(ViewState::instance().getNoteHeight() * 48);
@@ -141,7 +141,7 @@ public:
         ImGui::End();
     }
 
-    void updatePanelDetails() {
+    void updatePanelDetails() const {
         panelDetails->pos = ImGui::GetCursorPos();
         panelDetails->size = ImGui::GetContentRegionAvail();
     }

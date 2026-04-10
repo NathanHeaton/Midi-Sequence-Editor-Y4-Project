@@ -53,7 +53,7 @@ namespace ToolbarGroups {
         };
     }
 
-    ToolbarGroup playback();
+    ToolbarGroup playback(bool isArranger);
 
     inline ToolbarGroup pianoRollZoom() {
         return {

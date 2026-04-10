@@ -32,9 +32,9 @@ public:
 
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);
-            auto& pattern = PatternManager::instance().getCurrentPattern();
+            auto pattern = PatternManager::instance().getCurrentPattern();
 
-            lengthX =  view_state->getPixelPerBar(pianoRoll) * (pattern.m_bars+1);// extra bar for visual purposes
+            lengthX =  view_state->getPixelPerBar(pianoRoll) * (pattern->m_bars+1);// extra bar for visual purposes
             ImGui::Dummy(ImVec2(lengthX ,view_state->WHITE_KEYS*view_state->getWhiteSize().y));
         }
         ImGui::EndChild();
@@ -51,16 +51,16 @@ private:
         renderPlaceHolderNotes(ctx);
 
         DrawToolEffects(ctx);
-        DrawPlayHead(ctx);
+        DrawPlayLine(ctx);
     }
 
     void renderPattern(const TimelineContext& ctx) const;
     void DrawToolEffects(const TimelineContext& ctx);
     void renderPlaceHolderNotes(const TimelineContext& ctx);
 
-    void DrawPlayHead(const TimelineContext& ctx) const {
+    void DrawPlayLine(const TimelineContext& ctx) const {
 
-        float xPos = ctx.cursorPos.x + view_state->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPlayheadPositionTicks()/TimeData::instance().PPQ);
+        float xPos = ctx.cursorPos.x + view_state->getPixelPerBeat(pianoRoll)* (PlayBackManager::instance().getPianoRollPlayheadTicks()/TimeData::instance().PPQ);
 
         ctx.drawList->AddLine(ImVec2(xPos,ctx.cursorPos.y+ 0),
         ImVec2(xPos,ctx.cursorPos.y+ ctx.height),

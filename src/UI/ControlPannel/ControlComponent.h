@@ -39,7 +39,6 @@ public:
                     if (ImGui::Selectable(patterns.at(i).m_title.c_str(), is_selected)) {
                         selectedPattern = i;
                         PatternManager::instance().setCurrentPattern(i);
-                        PatternManager::instance().setActivePatternID(PatternManager::instance().getCurrentPattern().ID);
                     }
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
@@ -48,7 +47,7 @@ public:
                 ImGui::EndCombo();
             }
             if (ImGui::Button("piano roll")) {
-                PanelManager::instance().openPatern(PatternManager::instance().getCurrentPattern().ID);
+                PanelManager::instance().openPatern(PatternManager::instance().getCurrentPattern()->ID);
             }
             if (ImGui::Button("import midi")) {
                 openMidiFilePicker();

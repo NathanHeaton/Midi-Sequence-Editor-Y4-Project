@@ -14,7 +14,22 @@ struct ScheduledEvent {
 
 class EventCompiler {
 public:
-    // Piano-roll mode: compile one pattern, no clip offset
+
+    static juce::MidiMessage validNoteOn(uint8_t channel, uint8_t pitch, uint8_t velocity) {
+        pitch    = std::clamp<uint8_t>(pitch,    0,   127);
+        velocity = std::clamp<uint8_t>(velocity, 0,   127);
+        channel  = std::clamp<uint8_t>(channel,  1,    16);
+        auto msg = juce::MidiMessage::noteOn(channel, pitch, velocity);
+        return msg;
+    }
+
+    static juce::MidiMessage validNoteOff(uint8_t channel, uint8_t pitch) {
+        pitch   = std::clamp<uint8_t>(pitch,   0,  127);
+        channel = std::clamp<uint8_t>(channel, 1,   16);
+        auto msg = juce::MidiMessage::noteOff(channel, pitch);
+        return msg;
+    }
+
     static std::vector<ScheduledEvent> compilePattern(const Pattern& pattern, double bpm) {
         std::vector<ScheduledEvent> out;
         const double mpt = msPerTick(bpm);
@@ -25,9 +40,9 @@ public:
             if (!on || !off) continue;
 
             out.push_back({ on->getAbsoluteTime()  * mpt,
-                juce::MidiMessage::noteOn (on->getChannel(),  on->getPitch(),  on->getVelocity()) });
+                validNoteOn(on->getChannel()+1,  on->getPitch(),  on->getVelocity()) });
             out.push_back({ off->getAbsoluteTime() * mpt,
-                juce::MidiMessage::noteOff(off->getChannel(), off->getPitch()) });
+                validNoteOff(off->getChannel()+1, off->getPitch()) });
         }
         std::sort(out.begin(), out.end());
         return out;
@@ -38,7 +53,6 @@ public:
         std::vector<ScheduledEvent> out;
         const double mpt   = msPerTick(bpm);
         const auto*  clips = ArrangerManager::instance().getPatternClips();
-
         for (const auto& clip : *clips) {
             if (!clip.enabled) continue;
             const Pattern* pat = PatternManager::instance().getPatternByID(clip.patternID);
@@ -55,9 +69,9 @@ public:
                 offAbs = std::min(offAbs, clip.endTime);       // clamp note-off to clip boundary
 
                 out.push_back({ onAbs  * mpt,
-                    juce::MidiMessage::noteOn (on->getChannel(),  on->getPitch(),  on->getVelocity()) });
+                    validNoteOn(on->getChannel()+1,  on->getPitch(),  on->getVelocity()) });
                 out.push_back({ offAbs * mpt,
-                    juce::MidiMessage::noteOff(off->getChannel(), off->getPitch()) });
+                    validNoteOff(off->getChannel()+1, off->getPitch()) });
             }
         }
         std::sort(out.begin(), out.end());

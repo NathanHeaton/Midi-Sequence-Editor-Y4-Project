@@ -2,10 +2,13 @@
 #include "../../Singletons/PlayBackManager.h"
 #include "../../Singletons/ViewState.h"
 
-void TimelineLabel::create(float timelineLength, float &xScroll, int bars, float t_zoomFactor) {
+void TimelineLabel::create(float timelineLength, float &xScroll, int bars, bool isArranger) {
     totalBars = bars + 1;
-    m_zoomFactor = t_zoomFactor;
+    m_isArranger = isArranger;
+    if (isArranger) {m_zoomFactor = zoomFactor::arranger; }
+    else {m_zoomFactor = zoomFactor::pianoRoll;}
     barWidth = ViewState::instance().getPixelPerBar(m_zoomFactor);
+
     if (ImGui::BeginChild("Timeline", ImVec2(0, height), false)) {
         ImGui::SetScrollX(xScroll);
         ImGui::Dummy(ImVec2(timelineLength, 0));
@@ -38,13 +41,16 @@ void TimelineLabel::DrawPlayHead() {
     auto cursorPos = ImGui::GetCursorScreenPos();
     auto drawList = ImGui::GetWindowDrawList();
 
-    float xPos = cursorPos.x + ViewState::instance().getPixelPerBeat(zoomFactor::pianoRoll)
-        * (PlayBackManager::instance().getPlayheadPositionTicks() / TimeData::instance().PPQ);
+    double ticks =  (m_isArranger) ?
+    PlayBackManager::instance().getArrangerPlayheadTicks() :
+    PlayBackManager::instance().getPianoRollPlayheadTicks();
+
+    float xPos = cursorPos.x + ViewState::instance().getPixelPerBeat(m_zoomFactor) * (ticks / TimeData::instance().PPQ);
 
     drawList->AddLine(
         ImVec2(xPos, cursorPos.y),
         ImVec2(xPos, cursorPos.y + height),
-        Theme::currentThemeColours.accentPacked, 15
+        Theme::currentThemeColours.accentPacked, 3
     );
 }
 
@@ -55,8 +61,8 @@ void TimelineLabel::HandleMouse() {
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
         PlayBackManager::instance().stop();
         unsigned int ticks = TimeData::instance().PPQ *
-            ((mousePos.x - cursorPos.x) / ViewState::instance().getPixelPerBeat(zoomFactor::pianoRoll));
-        PlayBackManager::instance().seekToTicks(ticks);
+            ((mousePos.x - cursorPos.x) / ViewState::instance().getPixelPerBeat(m_zoomFactor));
+        PlayBackManager::instance().seekToTicks(ticks, m_isArranger);
         mouseDown = true;
     }
     else if (mouseDown) { firstMouseUp = true; mouseDown = false; }

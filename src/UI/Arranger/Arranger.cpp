@@ -36,7 +36,7 @@ void Arranger::create() {
 
             timelineLabel.create(timelineLength,timelineXScroll,
                 ProjectData::instance().getTotalBars(),
-                zoomFactor::arranger);
+                true);
 
         }ImGui::EndTable();
         ImGui::PopStyleVar();

@@ -24,8 +24,8 @@ public:
             renderSteps(ctx);
 
             ImGui::SetScrollX(scrollX);
-            auto& pattern = PatternManager::instance().getCurrentPattern();
-            lengthX = view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern.m_bars;
+            auto pattern = PatternManager::instance().getCurrentPattern();
+            lengthX = view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern->m_bars;
             ImGui::Dummy(ImVec2(lengthX, height));
             }
         ImGui::EndChild();

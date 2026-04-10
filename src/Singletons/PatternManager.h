@@ -50,8 +50,8 @@ public:
         return pattern;
     }
 
-    const Pattern& getCurrentPattern() {
-        return pattern.at(activePatternIndex);
+    const Pattern* getCurrentPattern() {
+        return getPatternByID(activePatternId);
     }
 
     void setActivePatternID(uint32_t patternID) {activePatternId = patternID;}
@@ -183,6 +183,7 @@ public:
 
     void setCurrentPattern(size_t newPattern) {
         activePatternIndex = newPattern;
+        activePatternId = patternAt(newPattern).ID;
     }
 
     uint32_t assignNoteId()    { return m_nextNoteId++; }

@@ -12,10 +12,10 @@ public:
     float height = 20.0f;
     bool mouseDown = false;
     bool firstMouseUp = false;
-
+    bool m_isArranger = false;
     TimelineLabel() = default;
 
-    void create(float timelineLength, float &xScroll, int bars, float t_zoomFactor);
+    void create(float timelineLength, float &xScroll, int bars, bool isArranger);
     void DrawBarLabel();
     void DrawPlayHead();
     void HandleMouse();
