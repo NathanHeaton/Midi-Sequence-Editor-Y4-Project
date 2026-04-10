@@ -23,8 +23,6 @@ public:
         return player.getPianoRollPositionTicks();
     }
 
-    void shutDown() { player.cleanUp(); }
-
     void setMode(PlaybackMode mode) { m_mode = mode; }
     [[nodiscard]] PlaybackMode getMode() const { return m_mode; }
 
@@ -38,7 +36,6 @@ public:
         } else {
             player.pause();
         }
-        std::cout << "mode" <<std::endl;
     }
 
     void stop() {
@@ -60,10 +57,13 @@ public:
         });
     }
 
-private:
-    PlayBackManager() {
-
+    void shutDown() {
+        m_audioManager.shutdownAudio();
+        player.cleanUp();
     }
+
+private:
+    PlayBackManager() = default;
 
     PlaybackMode  m_mode{PlaybackMode::Arranger};
     bool          m_playing{false};

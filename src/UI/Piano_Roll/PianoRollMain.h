@@ -39,18 +39,25 @@ public:
     float pianoRollScrollY = 300.0f;
     float pianoRollScrollX;
     bool initialLoad = true;
-    float velocityHeight      = 120.0f;
-    float defaultVelocityHeight = 120.0f;
+
+    float velocityHeight = 120.0f;
+    const float VELOCITY_MAX_Y = 120.0f;
+    float m_totalAvail{};
+    float m_dragBarHeight = 6.0f;
+    float m_minVelHeight  = 20.0f;
 
     void create() {
         if (initialLoad) {
             ImGui::SetNextWindowPos(panelDetails->pos);
             ImGui::SetNextWindowSize(panelDetails->size);
         }
+
         auto patternTitle = PatternManager::instance().getPatternByID(panelDetails->patternID)->m_title;
         if (ImGui::Begin(patternTitle.c_str(), &panelDetails->open,
             ImGuiWindowFlags_NoScrollbar)) {
             pianoRollToolbar.create();
+            m_totalAvail = ImGui::GetContentRegionAvail().y;
+            velocityHeight = std::clamp(velocityHeight, m_minVelHeight, m_totalAvail - 60.0f);
 
             if (ImGui::BeginTable("table", 2, ImGuiTableFlags_SizingFixedFit)) {
                 ImGui::TableSetupColumn("gap", ImGuiTableColumnFlags_WidthFixed,
@@ -70,12 +77,7 @@ public:
             }
             ImGui::EndTable();
 
-            float totalAvail    = ImGui::GetContentRegionAvail().y;
-            float dragBarHeight = 6.0f;
-            float minVelHeight  = 20.0f;
-
-            velocityHeight = std::clamp(velocityHeight, minVelHeight, totalAvail - 60.0f);
-            float pianoRollHeight = totalAvail - velocityHeight - dragBarHeight;
+            float pianoRollHeight = m_totalAvail - velocityHeight - m_dragBarHeight;
 
             if (ImGui::BeginTable("note_edit_elements", 3, ImGuiTableFlags_SizingFixedFit)) {
                 ImGui::TableSetupColumn("Piano");
@@ -102,44 +104,48 @@ public:
                         initialLoad = false;
                     }
                     pianoRollScrollY = ImGui::GetScrollY();
-                } ImGui::EndChild();
+                    } ImGui::EndChild();
+            } ImGui::EndTable();
+            velocitySection();
+            ImGui::End();
+            }
+    }
+
+    void velocitySection() {
+        // bool collapsed = (velocityHeight <= m_minVelHeight + 1.0f);
+        //
+        // const char* arrow = "Velocity";
+        // if (ImGui::Button(arrow, ImVec2(120, m_dragBarHeight + 8))) {
+        //     velocityHeight = collapsed
+        //         ? 160.f   // expand to default
+        //         : m_minVelHeight;           // collapse
+        // }
+        // ImGui::SameLine();
+        // ImGui::Button("##drag_handle",
+        //     ImVec2(ImGui::GetContentRegionAvail().x, m_dragBarHeight + 8));
+        // if (ImGui::IsItemActive()) {
+        //     velocityHeight -= ImGui::GetIO().MouseDelta.y;  // drag up = more height
+        //     velocityHeight = std::clamp(velocityHeight, m_minVelHeight, m_totalAvail - 60.0f);
+        // }
+
+       // if (!collapsed) {
+            if (ImGui::BeginTable("velocity_elements", 3, ImGuiTableFlags_SizingFixedFit)) {
+                ImGui::TableSetupColumn("Piano gap",
+                    ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("vel grid",
+                    ImGuiTableColumnFlags_WidthStretch, 0);
+
+                ImGui::TableNextColumn();
+                //piano.create(pianoRollScrollY, velocityHeight);
+                velocityLabels.create(velocityHeight);
+                ImGui::TableNextColumn();
+                velocity.create(timelineXScroll);
+
             } ImGui::EndTable();
 
-            bool collapsed = (velocityHeight <= minVelHeight + 1.0f);
-            // const char* arrow = "Velocity";
-            // if (ImGui::Button(arrow, ImVec2(120, dragBarHeight + 8))) {
-            //     velocityHeight = collapsed
-            //         ? defaultVelocityHeight   // expand to default
-            //         : minVelHeight;           // collapse
-            // }
-            // ImGui::SameLine();
-            // ImGui::Button("##drag_handle",
-            //     ImVec2(ImGui::GetContentRegionAvail().x, dragBarHeight + 8));
-            // if (ImGui::IsItemActive()) {
-            //     velocityHeight -= ImGui::GetIO().MouseDelta.y;  // drag up = more height
-            //     velocityHeight = std::clamp(velocityHeight, minVelHeight, totalAvail - 60.0f);
-            // }
-
-            if (!collapsed) {
-                if (ImGui::BeginTable("velocity_elements", 3, ImGuiTableFlags_SizingFixedFit)) {
-                    ImGui::TableSetupColumn("Piano gap",
-                        ImGuiTableColumnFlags_WidthFixed,
-                        ViewState::instance().getWhiteSize().x);
-                    ImGui::TableSetupColumn("vel grid",
-                        ImGuiTableColumnFlags_WidthStretch, 0);
-                    ImGui::TableSetupColumn("scroll gap",
-                        ImGuiTableColumnFlags_WidthFixed, 15);
-
-                    ImGui::TableNextColumn();
-                    velocityLabels.create(velocityHeight);
-                    ImGui::TableNextColumn();
-                    velocity.create(timelineXScroll, timelineLength, velocityHeight);
-                    ImGui::TableNextColumn();
-                } ImGui::EndTable();
-            }
-        }
-        ImGui::End();
+       // }
     }
+
 
     void updatePanelDetails() const {
         panelDetails->pos = ImGui::GetCursorPos();

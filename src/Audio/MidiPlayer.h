@@ -13,6 +13,7 @@ public:
 
     void cleanUp() {
         stopTimer();
+
         allNotesOff();
         m_midiOut.reset();
     }
@@ -23,7 +24,7 @@ public:
             m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
         if (m_midiOut) {
             DBG("MIDI Output opened: " << devices[0].name);
-        
+
     } else {
         DBG("No MIDI output devices available");
     }
@@ -56,6 +57,7 @@ public:
 
     void stop() {
         stopTimer();
+
         allNotesOff();
         activePlayheadMs() = 0.0;
         m_eventIndex = 0;

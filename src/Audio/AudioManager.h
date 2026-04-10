@@ -13,6 +13,13 @@ public:
     }
 
     ~AudioManager() {
+        // deviceManager.removeAudioCallback(&player);
+        // player.setSource(nullptr);
+        // deviceManager.closeAudioDevice();
+    }
+
+    void shutdownAudio() {
+        midiBuffer.clear();
         deviceManager.removeAudioCallback(&player);
         player.setSource(nullptr);
         deviceManager.closeAudioDevice();

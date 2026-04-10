@@ -8,6 +8,7 @@
 #include "../../../Singletons/ViewState.h"
 #include "../../../Singletons/PatternManager.h"
 #include "../../../Singletons/ToolManager.h"
+#include "TimelineContext.h"
 
 class Velocity {
 public:
@@ -16,66 +17,33 @@ public:
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
 
-    void create(float &scrollX, float& lengthX, float height) {
-        if (ImGui::BeginChild("velocity window", ImVec2(0, height),
+    void create(float &scrollX) {
+        auto pattern = PatternManager::instance().getCurrentPattern();
+        float lengthX = view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern->m_bars;
+        if (ImGui::BeginChild("velocity window", ImVec2(lengthX, 0),
             ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
 
+            ImGui::Dummy(ImVec2(lengthX, 0));
             TimelineContext ctx;
             renderSteps(ctx);
+            // test
+            ImGui::GetWindowDrawList()->AddRect(ImGui::GetCursorPos(),
+                          ImGui::GetContentRegionAvail(),Theme::currentThemeColours.accentPacked
+                          );
 
             ImGui::SetScrollX(scrollX);
-            auto pattern = PatternManager::instance().getCurrentPattern();
-            lengthX = view_state->getPixelPerBar(zoomFactor::pianoRoll) * pattern->m_bars;
-            ImGui::Dummy(ImVec2(lengthX, height));
+
             }
         ImGui::EndChild();
     }
 
-
-
 private:
     const int octaves = 10;
-    struct TimelineContext {
-        ImVec2 cursorPos;
-        ImDrawList* drawList;
-        float height;
-        float scrollX;
-        float scrollY;
-        float width;
-        int firstVisibleSubBeat;
-        int lastVisibleSubBeat;
-        float barWidth;
-        float noteHeight;
-        float relativeX;
-        float relativeY;
-        ToolTypes activeTool;
-
-        TimelineContext() {
-            cursorPos = ImGui::GetCursorScreenPos();
-            drawList = ImGui::GetWindowDrawList();
-            height = 120;
-            width = ImGui::GetWindowWidth();
-            scrollX = ImGui::GetScrollX();
-            scrollY = ImGui::GetScrollY();
-            barWidth = 2 * TimeData::instance().timeSignature.getNumerator() * ViewState::instance().getPixelPerBar(zoomFactor::pianoRoll);
-            auto& view = ViewState::instance();
-            firstVisibleSubBeat = scrollX != 0.0f ?
-                static_cast<int>(scrollX /
-                    (view.getPixelPerBeat(pianoRoll)/ view.getRenderedSubDivisions())) : 0;
-            lastVisibleSubBeat = static_cast<int>((scrollX + width)
-                / (view.getPixelPerBeat(pianoRoll)/view.getRenderedSubDivisions()));
-            ImVec2 mousePos = ImGui::GetMousePos();
-            relativeX = mousePos.x - cursorPos.x;
-            relativeY = mousePos.y - cursorPos.y;
-        }
-    };
 
     void renderSteps(const TimelineContext& ctx) {
         DrawBars(ctx);
     //    renderPattern(ctx);;
     }
-
-
 
     void HandleMouseInput(const TimelineContext& ctx);
     void renderPattern(const TimelineContext& ctx) const;

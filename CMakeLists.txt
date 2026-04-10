@@ -42,6 +42,6 @@ target_link_libraries(imgui PUBLIC OpenGL::GL)
 add_subdirectory(Dependencies/imgui_juce)
 # Source
 add_subdirectory(src)
-
-target_compile_options(myProject PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-target_link_options(myProject PRIVATE -fsanitize=address)
+# for stack trace
+# target_compile_options(myProject PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+# target_link_options(myProject PRIVATE -fsanitize=address)

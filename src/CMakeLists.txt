@@ -11,7 +11,6 @@ target_sources(${PROJECT_NAME}
         Project_Logic/Pattern.cpp
         UI/Arranger/Arranger.cpp
         UI/Common/ToolbarGroups.cpp
-        Audio/MidiPlayer.cpp
         SetupAssets.cpp
         UI/Common/TimelineLabel.cpp
         UI/Piano_Roll/Panels/PianoRoll.cpp)
