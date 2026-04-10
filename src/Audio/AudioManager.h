@@ -9,20 +9,14 @@ public:
         deviceManager.initialiseWithDefaultDevices(0, 2);
         player.setSource(this);
         deviceManager.addAudioCallback(&player);
+
     }
 
     ~AudioManager() {
         deviceManager.removeAudioCallback(&player);
         player.setSource(nullptr);
+        deviceManager.closeAudioDevice();
     }
-
-    // void initialiseMidiPlayer() {
-    //     juce::MessageManager::callAsync([this]() {
-    //         auto devices = juce::MidiOutput::getAvailableDevices();
-    //         if (!devices.isEmpty())
-    //             m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
-    //     });
-    // }
 
     void prepareToPlay(int samplesPerBlock, double sampleRate) override {
         synth.setCurrentPlaybackSampleRate(sampleRate);

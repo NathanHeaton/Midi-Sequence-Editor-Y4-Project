@@ -8,7 +8,7 @@ class MainWindow : public juce::DocumentWindow
 {
 public:
     explicit MainWindow(const juce::String &name)
-      : juce::DocumentWindow(name, juce::Colours::black, allButtons)
+      : juce::DocumentWindow(name, juce::Colours::transparentBlack, allButtons)
     {
         auto* content = new MainComponent();
         setContentOwned(content, true);
@@ -34,13 +34,14 @@ public:
 
     void initialise(const juce::String &commandLine) override
     {
+        PlayBackManager::instance().init();
         juce::ignoreUnused (commandLine);
         win.reset(new MainWindow(getApplicationName()));
 
     }
     void shutdown() override {
-        ASSETS.Cleanup();
         PlayBackManager::instance().shutDown();
+        ASSETS.Cleanup();
         win = nullptr;
     }
 

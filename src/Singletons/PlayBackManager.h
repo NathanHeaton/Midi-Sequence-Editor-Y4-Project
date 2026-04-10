@@ -53,12 +53,16 @@ public:
 
     }
 
-private:
-    PlayBackManager() {
+    void init() {
         player.setPlayingPtr(&m_playing);
         juce::MessageManager::callAsync([this]() {
             player.initialiseMidiPlayer();
         });
+    }
+
+private:
+    PlayBackManager() {
+
     }
 
     PlaybackMode  m_mode{PlaybackMode::Arranger};

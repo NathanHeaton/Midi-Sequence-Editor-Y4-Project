@@ -18,11 +18,16 @@ public:
     }
 
     void initialiseMidiPlayer() {
-        juce::MessageManager::callAsync([this]() {
-            auto devices = juce::MidiOutput::getAvailableDevices();
-            if (!devices.isEmpty())
-                m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
-        });
+        auto devices = juce::MidiOutput::getAvailableDevices();
+        if (!devices.isEmpty())
+            m_midiOut = juce::MidiOutput::openDevice(devices[0].identifier);
+        if (m_midiOut) {
+            DBG("MIDI Output opened: " << devices[0].name);
+        
+    } else {
+        DBG("No MIDI output devices available");
+    }
+
     }
 
     void setPlayingPtr(bool* ptr) { m_playingPtr = ptr; }

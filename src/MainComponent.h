@@ -48,6 +48,8 @@ public:
         ASSETS.LoadAll(); // after glcontext is setup
         ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
     }
+    // stop juce assertion failure of juce::component:1695
+    void paint(juce::Graphics& g) override {}
 
     void renderOpenGL() override {
         using namespace juce::gl;
