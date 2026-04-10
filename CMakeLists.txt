@@ -12,6 +12,7 @@ set(CMAKE_BUILD_PARALLEL_LEVEL=4)
 set(CMAKE_JOB_POOLS "compile=3")
 set(CMAKE_JOB_POOL_COMPILE compile)
 
+
 # Add JUCE
 set(JUCE_DIR "../../JUCE/install/lib/cmake/JUCE-8.0.10")
 
@@ -42,3 +43,5 @@ add_subdirectory(Dependencies/imgui_juce)
 # Source
 add_subdirectory(src)
 
+target_compile_options(myProject PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+target_link_options(myProject PRIVATE -fsanitize=address)

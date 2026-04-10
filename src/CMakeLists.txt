@@ -42,3 +42,5 @@ add_custom_command(TARGET myProject POST_BUILD
         $<TARGET_FILE_DIR:myProject>/assets
         COMMENT "Copying assets to build directory"
 )
+
+

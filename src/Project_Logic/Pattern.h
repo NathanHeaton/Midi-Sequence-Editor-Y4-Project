@@ -48,6 +48,7 @@ public:
     std::string m_title;
     uint32_t ID;
     std::vector<MidiEvent> m_events;
+
     std::vector<NoteEventPair> m_noteEvents;
     int ticksInMidiFile{0};
     int m_bars{1};
@@ -56,6 +57,7 @@ public:
     std::unordered_set<uint32_t> m_hiddenNoteOnIDs;
 
     Pattern(std::string t_title) {
+        m_events.reserve(512);
         m_title = t_title;
     }
     // from Midi import

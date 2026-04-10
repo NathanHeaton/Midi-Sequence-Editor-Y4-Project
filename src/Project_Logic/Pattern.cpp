@@ -240,8 +240,11 @@ void Pattern::removeNoteOperation(NoteEventPair notepair) {
         m_events[noteOffIndex+1].setDelta(m_events[noteOffIndex+1].getDelta() +offDelta );
     }
 
-    m_events.erase(m_events.begin() + static_cast<int>(noteOffIndex));
-    m_events.erase(m_events.begin() + static_cast<int>(noteOnIndex));
+    size_t first  = std::min(noteOnIndex, noteOffIndex);
+    size_t second = std::max(noteOnIndex, noteOffIndex);
+
+    m_events.erase(m_events.begin() + second);
+    m_events.erase(m_events.begin() + first);
 
 }
 
