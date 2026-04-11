@@ -22,7 +22,9 @@ public:
                 ImGui::Text(trackDetails->title.c_str());
                 ImGui::BeginTable("Controls",2);
                 ImGui::TableNextColumn();
-                ImGui::Button("Instrument");
+                if (ImGui::Button("Instrument")) {
+                    openAudioPicker();
+                };
                 ImGui::TableNextColumn();
                 ImGui::Text("vol");
             }ImGui::EndTable();
@@ -31,7 +33,8 @@ public:
                 ImGui::Text("solo");
             }
         }ImGui::EndTable();
-
     }
+
+    void openAudioPicker();
 };
 #endif //MYPROJECT_TRACK_H

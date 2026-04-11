@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
+#include <juce_audio_formats/juce_audio_formats.h>
 #include "SineWave.h"
 
 class AudioManager : public juce::AudioSource {
@@ -49,6 +50,35 @@ public:
 
     void releaseResources() override {
         midiBuffer.clear();
+    }
+
+    void loadSample(const juce::File& audioFile) {
+        // Temp TODO: added synth vector
+        synth.clearSounds();
+        synth.clearVoices();
+
+        for (int i = 0; i < 8; i++)
+            synth.addVoice(new juce::SamplerVoice());
+
+        juce::AudioFormatManager formatManager;
+        formatManager.registerBasicFormats();
+
+        auto* reader = formatManager.createReaderFor(audioFile);
+        if (reader) {
+            juce::BigInteger allNotes;
+            allNotes.setRange(0, 128, true);
+
+            synth.addSound(new juce::SamplerSound(
+                "temp",
+                *reader,
+                allNotes,
+                60,
+                0.01,
+                0.1,
+                10.0
+            ));
+            delete reader;
+        }
     }
 
     void addMidiMessage(const juce::MidiMessage& message) {

@@ -57,6 +57,10 @@ public:
         });
     }
 
+    void addSoundFile(juce::File& soundFile) {
+        m_audioManager.loadSample(soundFile);
+    }
+
     void shutDown() {
         m_audioManager.shutdownAudio();
         player.cleanUp();

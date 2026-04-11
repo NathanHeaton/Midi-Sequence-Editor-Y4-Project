@@ -28,6 +28,7 @@ public:
         auto& p = pattern.emplace_back(Pattern(defaultTitle));
         p.assignID = [this]() { return assignNoteId(); };
         p.ID = assignPatternId();
+        activePatternId = p.ID;
         unnamedPatterns++;
     }
 
@@ -39,7 +40,9 @@ public:
     }
 
     void addPatternFromMidi(std::string title, auto& events, int fileTicks) {
-        pattern.emplace_back(title, events, fileTicks);
+        auto& p = pattern.emplace_back(title, events, fileTicks);
+        p.assignID = [this]() { return assignNoteId(); };
+        p.ID = assignPatternId();
     }
 
     bool anyPatterns() {
@@ -234,7 +237,6 @@ private:
         else {
             loopThroughTracks(currentFile);
         }
-        setCurrentPattern(pattern.size() - 1);
     }
 
     void assignIdsToMidi(std::vector<MidiEvent>& events) {

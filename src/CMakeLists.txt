@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME}
         UI/Common/ToolbarGroups.cpp
         SetupAssets.cpp
         UI/Common/TimelineLabel.cpp
+        UI/Arranger/TrackControls.cpp
         UI/Piano_Roll/Panels/PianoRoll.cpp)
 
 target_compile_definitions(${PROJECT_NAME}
@@ -27,6 +28,7 @@ target_link_libraries(${PROJECT_NAME}
         imgui_impl_juce
         juce::juce_audio_devices
         juce::juce_audio_basics
+        juce::juce_audio_formats
         juce::juce_gui_extra
         juce::juce_opengl
         imgui
