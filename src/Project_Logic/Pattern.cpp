@@ -359,22 +359,24 @@ void Pattern::fixDeltaFromDeletedNote(NoteEventPair* pair)
     // }
 }
 
-void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate newCoordinatePosition)
+void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate pos)
 {
     auto notePair = findPairByID(ID);
 
     MidiEvent movedOnEvent = *getMidiEventByID_ptr(notePair.onID);
     MidiEvent movedOffEvent = *getMidiEventByID_ptr(notePair.offID);
-    movedOnEvent.setPitch(newCoordinatePosition.pitch);
-    movedOffEvent.setPitch(newCoordinatePosition.pitch);
+    movedOnEvent.setPitch(pos.pitch);
+    movedOffEvent.setPitch(pos.pitch);
     removeNote(notePair);
-
+    if ( pos.absoluteTime < 0) {
+        pos.absoluteTime = 0;
+    }
     m_noteEvents.clear();
     createNoteEventPairs();
 
-    auto endAbsolute = movedOffEvent.getAbsoluteTime() +
-        (newCoordinatePosition.absoluteTime - movedOnEvent.getAbsoluteTime());
-    insertEvent(movedOnEvent, static_cast<unsigned>(newCoordinatePosition.absoluteTime));
+    uint32_t endAbsolute = movedOffEvent.getAbsoluteTime() + (pos.absoluteTime - movedOnEvent.getAbsoluteTime());
+
+    insertEvent(movedOnEvent, static_cast<unsigned>(pos.absoluteTime));
     insertEvent(movedOffEvent, static_cast<unsigned>(endAbsolute));
 
     m_noteEvents.clear();

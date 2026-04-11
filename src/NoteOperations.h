@@ -37,12 +37,15 @@ struct NoteOperation {
 
 struct MoveOperation : NoteOperation{
     NoteCoordinate originalInputCoordinate;
-    int8_t newDeltaPitch;
-    int newDeltaTime;
+    int8_t newDeltaPitch{0};
+    int newDeltaTime{0};
 
-    void update(NoteCoordinate snapped) override    {
+    void update(NoteCoordinate snapped) override {
         newDeltaPitch = snapped.pitch - originalInputCoordinate.pitch ;
-        newDeltaTime = static_cast<signed>(snapped.absoluteTime - originalInputCoordinate.absoluteTime);
+        auto tempDelta = static_cast<signed>(snapped.absoluteTime - originalInputCoordinate.absoluteTime);
+        if (static_cast<signed>(notes.at(0).absoluteTime + tempDelta) >= 0){
+            newDeltaTime = tempDelta;
+        }
     }
 
     [[nodiscard]] CommitData commit() override{
