@@ -45,7 +45,7 @@ public:
     PianoRollMain(PatternPanelState& panel) : panelDetails(&panel) {
         pianoRollToolbar.addGroup(ToolbarGroups::snapping(false));
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollTools());
-        pianoRollToolbar.addGroup(ToolbarGroups::playback(false));
+        pianoRollToolbar.addPlayBackButton(ToolbarGroups::playback(false, panelDetails->patternID));
         pianoRollToolbar.addGroup(ToolbarGroups::pianoRollZoom());
     }
 

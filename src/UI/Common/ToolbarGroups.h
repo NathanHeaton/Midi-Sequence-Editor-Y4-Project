@@ -37,6 +37,8 @@ namespace ToolbarGroups {
         };
     }
 
+    PlayBack playback(bool isArranger, uint32_t ID);
+
     inline ToolbarGroup arrangerTools() {
         return {
             "arranger_tools",
@@ -52,8 +54,6 @@ namespace ToolbarGroups {
             }
         };
     }
-
-    ToolbarGroup playback(bool isArranger);
 
     inline ToolbarGroup pianoRollZoom() {
         return {
