@@ -139,6 +139,10 @@ public:
         patternAt(patternID).moveNoteEvent(noteID, coordinatePosition);
     }
 
+    void setNoteVelocity(uint32_t patternID, NoteEventPair noteIDs, int32_t velocity) {
+        patternAt(patternID).setNoteVelocity(noteIDs, velocity);
+    }
+
     // ----------------------------------------------------------------
     // Clipboard
     // ----------------------------------------------------------------

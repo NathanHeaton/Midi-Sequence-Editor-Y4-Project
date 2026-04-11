@@ -91,7 +91,7 @@ public:
     void stretchNoteEventSelection(NoteMoveDelta notePair);
     void deleteSelection();
     void pasteClipboard(std::vector<MidiEvent>& copied_events, NoteMoveDelta offSet);
-
+    void setNoteVelocity(NoteEventPair noteID,uint8_t velocity);
     void stretchNoteEvent(uint32_t ID, int32_t newEndAbsolute);
 
     void hideNoteEvent(NoteCoordinate coordinate);

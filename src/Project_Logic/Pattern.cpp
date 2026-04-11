@@ -224,6 +224,11 @@ void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
     updateBarCount(absoluteTime);
 }
 
+void Pattern::setNoteVelocity(NoteEventPair notePair, uint8_t velocity) {
+    getMidiEventByID_ptr(notePair.onID)->setVelocity(velocity);
+    getMidiEventByID_ptr(notePair.offID)->setVelocity(velocity);
+}
+
 void Pattern::removeNoteOperation(NoteEventPair notepair) {
     auto onNote = getMidiEventByID_ptr(notepair.onID);
     auto offNote = getMidiEventByID_ptr(notepair.offID);

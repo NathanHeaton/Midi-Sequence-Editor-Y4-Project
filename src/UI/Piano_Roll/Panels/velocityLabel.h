@@ -15,25 +15,24 @@ public:
     VelocityLabels() = default;
     ViewState* view_state = &ViewState::instance();
     bool bg_tone = false;
+    std::string numLabels[3]{"127","64","1"};
 
-    void create(float height) {
+    void create() {
         if (ImGui::BeginChild("velocity Labels", ImVec2(ViewState::instance().getWhiteSize().x, 0),
             ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
-            ImVec2 textPos = ImVec2(0, 0);
-            // printf("width of velocity labels: {%f}\n", ImGui::GetContentRegionAvail().y);
-            char octaveStr[3];
-            octaveStr[0] = 'c';
-            octaveStr[1] = '0';
-            octaveStr[2] = '\0';
-            ImGui::GetWindowDrawList()->AddRect(ImGui::GetCursorPos(),
-                ImGui::GetContentRegionAvail(),Theme::currentThemeColours.accentPacked
+            auto cursorPos = ImGui::GetCursorScreenPos();
+            auto height = ImGui::GetContentRegionAvail().y;
+            auto increment = height / numLabels->length();
+            for (auto i{0u}; i < numLabels->length(); ++i) {
+                ImVec2 textPos = ImVec2(cursorPos.x+ 10, cursorPos.y + (increment * i));
+
+                auto labelC = numLabels[i].c_str();
+                ImGui::GetWindowDrawList()->AddText(
+                    textPos,
+                    Theme::currentThemeColours.barColourPacked,
+                    labelC
                 );
-            ImGui::GetWindowDrawList()->AddText(
-                textPos,
-                Theme::currentThemeColours.backgroundPacked,
-                octaveStr
-            );
             }
-        ImGui::EndChild();
+        } ImGui::EndChild();
     }
 };
