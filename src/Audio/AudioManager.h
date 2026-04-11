@@ -3,6 +3,21 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include "SineWave.h"
+#include <vector>
+
+struct Instruments {
+    uint32_t ID{0};
+    std::string name{"default"};
+    std::unique_ptr<juce::Synthesiser> synth;
+    uint8_t voices{8};// max instance of notes playing at once
+
+    Instruments(uint32_t ID, std::string name, uint8_t voices) {
+        this->ID = ID;
+        this->name = name;
+        this->voices = voices;
+        synth = std::make_unique<juce::Synthesiser>();
+    }
+};
 
 class AudioManager : public juce::AudioSource {
 public:
@@ -10,7 +25,6 @@ public:
         deviceManager.initialiseWithDefaultDevices(0, 2);
         player.setSource(this);
         deviceManager.addAudioCallback(&player);
-
     }
 
     ~AudioManager() {
@@ -27,12 +41,17 @@ public:
     }
 
     void prepareToPlay(int samplesPerBlock, double sampleRate) override {
-        synth.setCurrentPlaybackSampleRate(sampleRate);
-        synth.addSound(new SineWaveSound());
+        InstrumentList.push_back(std::make_unique<Instruments>(assignInstrumentId(),
+                    "sineWave",8));
+
+        currentSampleRate = sampleRate;
+        InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
+        InstrumentList.back()->synth->addSound(new SineWaveSound());
 
         for (int i = 0; i < 8; i++) {
-            synth.addVoice(new SineWaveVoice());
+            InstrumentList.back()->synth->addVoice(new SineWaveVoice());
         }
+
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override {
@@ -43,7 +62,7 @@ public:
             localBuffer = midiBuffer;
             midiBuffer.clear();
         }
-        synth.renderNextBlock(*bufferToFill.buffer, localBuffer,
+        InstrumentList.back()->synth->renderNextBlock(*bufferToFill.buffer, localBuffer,
                               bufferToFill.startSample,
                               bufferToFill.numSamples);
     }
@@ -53,12 +72,11 @@ public:
     }
 
     void loadSample(const juce::File& audioFile) {
-        // Temp TODO: added synth vector
-        synth.clearSounds();
-        synth.clearVoices();
+        InstrumentList.push_back(std::make_unique<Instruments>(assignInstrumentId(),
+            audioFile.getFileName().toStdString(),8));
 
         for (int i = 0; i < 8; i++)
-            synth.addVoice(new juce::SamplerVoice());
+            InstrumentList.back()->synth->addVoice(new juce::SamplerVoice());
 
         juce::AudioFormatManager formatManager;
         formatManager.registerBasicFormats();
@@ -68,8 +86,8 @@ public:
             juce::BigInteger allNotes;
             allNotes.setRange(0, 128, true);
 
-            synth.addSound(new juce::SamplerSound(
-                "temp",
+            InstrumentList.back()->synth->addSound(new juce::SamplerSound(
+                audioFile.getFileName(),
                 *reader,
                 allNotes,
                 60,
@@ -79,6 +97,7 @@ public:
             ));
             delete reader;
         }
+        InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
     }
 
     void addMidiMessage(const juce::MidiMessage& message) {
@@ -86,12 +105,19 @@ public:
         midiBuffer.addEvent(message, 0);
     }
 
-    juce::Synthesiser& getSynth() { return synth; }
+    juce::Synthesiser* getSynth_ptr() { return InstrumentList.back()->synth.get(); }
+
+    std::vector<std::unique_ptr<Instruments>>* getInstrumentList_ptr() { return &InstrumentList; }
+    std::vector<std::unique_ptr<Instruments>> InstrumentList;
 
 private:
     juce::CriticalSection midiLock;
     juce::AudioDeviceManager deviceManager;
     juce::AudioSourcePlayer player;
-    juce::Synthesiser synth;
     juce::MidiBuffer midiBuffer;
+    double currentSampleRate = 44100.0;
+
+    uint32_t m_nextInstrumentId{0};
+    uint32_t assignInstrumentId() { return m_nextInstrumentId++; }
+
 };

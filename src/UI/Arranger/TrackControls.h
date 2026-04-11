@@ -9,9 +9,10 @@
 class TrackControls {
 public:
     TrackControls() = default;
+    size_t m_index{};
 
     void newTrack(size_t trackIndex) {
-
+        m_index=trackIndex;
         auto trackDetails = ArrangerManager::instance().getTrack(trackIndex);
         if (ImGui::BeginTable("Track",2,ImGuiTableFlags_SizingFixedFit
             |ImGuiTableFlags_BordersOuter
@@ -20,21 +21,12 @@ public:
             ImGui::TableSetupColumn("muteSoloControls",ImGuiTableColumnFlags_WidthFixed, 50);
             if (ImGui::TableNextColumn()) {
                 ImGui::Text(trackDetails->title.c_str());
-                ImGui::BeginTable("Controls",2);
-                ImGui::TableNextColumn();
-                if (ImGui::Button("Instrument")) {
-                    openAudioPicker();
-                };
-                ImGui::TableNextColumn();
-                ImGui::Text("vol");
-            }ImGui::EndTable();
-            if (ImGui::TableNextColumn()) {
-                ImGui::Text("mute");
-                ImGui::Text("solo");
-            }
-        }ImGui::EndTable();
-    }
+                trackAudioControls();
 
+            }ImGui::EndTable();
+        }
+    }
+    void trackAudioControls();
     void openAudioPicker();
 };
 #endif //MYPROJECT_TRACK_H

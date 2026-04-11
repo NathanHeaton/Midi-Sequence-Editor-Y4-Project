@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../../Theme.h"
-#include "TopControls.h"
+
 #include "TrackControls.h"
 #include "ArrTimeline.h"
 #include "../../Singletons/ViewState.h"
@@ -15,7 +15,6 @@
 class Arranger
 {
 public:
-    TopControls topControls;
     ArrTimeline arrangerTimeline;
     Toolbar arrangerToolbar;
     TimelineLabel timelineLabel;

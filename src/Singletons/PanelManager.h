@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <deque>
 #include "imgui.h"
 
 struct PatternPanelState {

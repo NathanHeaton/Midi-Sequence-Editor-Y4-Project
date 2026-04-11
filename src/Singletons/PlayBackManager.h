@@ -66,11 +66,21 @@ public:
         player.cleanUp();
     }
 
+    Instruments* getInstrmentByID(uint32_t ID) {
+        auto instruments = m_audioManager.getInstrumentList_ptr();
+
+        for (auto& instrument : *instruments) {
+            if (instrument->ID == ID) {
+                return instrument.get();
+            }
+        }
+    }
 private:
     PlayBackManager() = default;
 
     PlaybackMode  m_mode{PlaybackMode::Arranger};
     bool          m_playing{false};
     AudioManager  m_audioManager;
+
     MidiPlayer    player{m_audioManager};
 };

@@ -5,7 +5,6 @@
 #include "TrackControls.h"
 #include "../../Singletons/PlayBackManager.h"
 
-
 void TrackControls::openAudioPicker() {
     juce::File initalDir = juce::File::getCurrentWorkingDirectory();
     auto chooser = std::make_shared<juce::FileChooser>
@@ -20,4 +19,24 @@ void TrackControls::openAudioPicker() {
                 PlayBackManager::instance().addSoundFile(chosen);
             }
         });
+}
+
+void TrackControls::trackAudioControls() {
+    if (ImGui::BeginTable("Controls",2)) {
+        ImGui::TableNextColumn();
+
+        auto instrumentID = ArrangerManager::instance().getTrack(m_index)->instrumentID;
+        std::string instrumentName = PlayBackManager::instance().getInstrmentByID(instrumentID)->name;
+
+        if (ImGui::Button(instrumentName.c_str())) {
+            openAudioPicker();
+        };
+        ImGui::TableNextColumn();
+        ImGui::Text("vol");
+    }ImGui::EndTable();
+
+    if (ImGui::TableNextColumn()) {
+        ImGui::Text("mute");
+        ImGui::Text("solo");
+    }
 }

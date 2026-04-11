@@ -18,15 +18,14 @@ struct PatternClip{
     bool enabled = true;
 };
 
-struct Track{
-    float volume=1.0f;
-    std::string title = "placeholder";
-    bool muted=false;
-    bool solo=false;
-    // TODO: type for instrument
+struct Track {
+    uint32_t ID;
+    std::string title    = "Untitled Track";
+    float volume         = 1.0f;
+    bool muted           = false;
+    bool solo            = false;
+    uint32_t instrumentID = 0;
 };
-
-
 
 struct ClipResizeOperation {
     bool isActive = false;
@@ -172,6 +171,28 @@ public:
 
     void duplicateClip(uint32_t id, uint32_t newStartTime);
     void splitClip(uint32_t id, uint32_t splitTime);
+
+    // track methods
+    void setTrackMuted(size_t index, bool muted) {
+        if (index < tracks.size()) tracks[index].muted = muted;
+    }
+    void setTrackSolo(size_t index, bool solo) {
+        if (index < tracks.size()) tracks[index].solo = solo;
+    }
+    void setTrackVolume(size_t index, float vol) {
+        if (index < tracks.size()) tracks[index].volume = vol;
+    }
+    bool anySoloed() const {
+        for (const auto& t : tracks) if (t.solo) return true;
+        return false;
+    }
+    bool isTrackAudible(size_t index) const {
+        if (index >= tracks.size()) return false;
+        const auto& t = tracks[index];
+        if (t.muted) return false;
+        if (anySoloed()) return t.solo;
+        return true;
+    }
 
     private:
     uint32_t nextID{0};
