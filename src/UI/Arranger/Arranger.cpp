@@ -12,6 +12,7 @@ void Arranger::create() {
             timelineLength = ViewState::instance().getPixelPerBar(zoomFactor::arranger)*
                 ProjectData::instance().getTotalBars();
         }
+
         ArrangerManager::instance().arrangerUpdated = false; // come up with better system if used in multiple spots
     }
         ImGui::BeginChild("Arranger");
