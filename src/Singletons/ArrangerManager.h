@@ -77,8 +77,13 @@ public:
 
     [[nodiscard]] int getTrackAmount() const { return tracks.size(); }
     [[nodiscard]] Track* getTrack(size_t index) {
+        std::cout << "getting track"<<index<< "track"<<tracks.size() << std::endl;
         if (index < tracks.size()) return &tracks[index];
-        else return nullptr;
+        else
+        {
+            std::cout << "nullptr" << std::endl;
+            return nullptr;
+        }
     }
 
     void addTrack() {tracks.push_back(Track());}

@@ -114,6 +114,7 @@ public:
         const juce::ScopedLock sl(midiLock);
         std::cout<<"recieved channel: "<<message.getChannel()<<std::endl;
         midiBuffers[message.getChannel()-1].addEvent(message, 0);
+        //midiBuffers[0].addEvent(message, 0);
     }
 
     juce::Synthesiser* getSynth_ptr() { return InstrumentList.back()->synth.get(); }
@@ -127,6 +128,7 @@ public:
                 return instrument.get();
             }
         }
+        std::cout << "Instrument not found" << std::endl;
         return nullptr;
     }
 private:

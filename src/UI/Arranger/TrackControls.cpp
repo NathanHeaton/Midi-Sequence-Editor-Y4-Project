@@ -32,6 +32,7 @@ void TrackControls::trackAudioControls() {
             uint32_t selectedInstrument = 0;
             bool is_selected = false;
             for (auto& instrument : *list) {
+
                 is_selected = (selectedInstrument == instrument->ID);
                 if (ImGui::Selectable(instrument->name.c_str(), is_selected)) {
                     selectedInstrument = instrument->ID;
