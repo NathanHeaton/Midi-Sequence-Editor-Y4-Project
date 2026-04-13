@@ -21,6 +21,7 @@ struct PatternClip{
 struct Track {
     std::string title    = "Untitled Track";
     float volume         = 1.0f;
+    float previousVolume = 1.0f;
     bool muted           = false;
     bool solo            = false;
     uint32_t instrumentID = 0;
@@ -77,17 +78,14 @@ public:
 
     [[nodiscard]] int getTrackAmount() const { return tracks.size(); }
     [[nodiscard]] Track* getTrack(size_t index) {
-        std::cout << "getting track"<<index<< "track"<<tracks.size() << std::endl;
         if (index < tracks.size()) return &tracks[index];
-        else
-        {
-            std::cout << "nullptr" << std::endl;
-            return nullptr;
-        }
+        else return nullptr;
     }
 
     void addTrack() {tracks.push_back(Track());}
     [[nodiscard]] const std::vector<PatternClip>* const getPatternClips(){return &patternClips;}
+
+    std::vector<Track>* getTracks(){return &tracks;}
 
     static ArrangerManager& instance(){
         static ArrangerManager singleton;
@@ -105,6 +103,15 @@ public:
             if (patternClips[i].ID == id) return i;
         }
         return SIZE_MAX;
+    }
+
+    [[nodiscard]] uint32_t getlastClipEndTime() {
+        uint32_t lastClipEndTime = 0;
+        for (auto clip : patternClips) {
+            if (clip.endTime > lastClipEndTime)
+            lastClipEndTime = clip.endTime;
+        }
+        return lastClipEndTime;
     }
 
     [[nodiscard]] PatternClip* getClipByIndex(size_t i){
@@ -137,14 +144,14 @@ public:
 
     void addClip(ArrangerCoordinate pos) {
         if (moveOperation.isActive || resizeOperation.isActive) {return;}
-        const auto p = PatternManager::instance().getPatternByID(PatternManager::instance().getActivePatternID());
-        std::cout << "adding clip" << std::endl;
+        const auto p = PatternManager::instance().getPatternByID(PatternManager::instance().getActivePatternID());;
         PatternClip clip(p->ID,
             pos.time,pos.time +
             (p->m_bars * TimeData::instance().timeSignature.getDenominator() * TimeData::PPQ),
             pos.track,
             assignID());
         patternClips.emplace_back(clip);
+        arrangerUpdated = true;
     }
 
     void removeAllClipsOnTrack(size_t trackIndex);
@@ -156,6 +163,7 @@ public:
         clip->startTime = pos.time;
         clip->endTime   = pos.time + duration;
         clip->trackIndex     = pos.track;
+        arrangerUpdated = true;
     }
 
     void resizeClip(uint32_t id, uint32_t endTime) {
@@ -165,6 +173,7 @@ public:
             endTime = clip->endTime;
         }
         clip->endTime   = endTime;
+        arrangerUpdated = true;
     }
 
     void trimClip(uint32_t id, uint32_t newStartTime, uint32_t newEndTime);
@@ -196,6 +205,7 @@ public:
         if (anySoloed()) return t.solo;
         return true;
     }
+    bool arrangerUpdated = false;
 
     private:
     uint32_t nextID{0};

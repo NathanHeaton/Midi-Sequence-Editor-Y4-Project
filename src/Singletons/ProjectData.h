@@ -8,9 +8,9 @@ public:
         return instance;
     }
 
-    [[nodiscard]] int getTotalBars() const { return totalBars; }
+    [[nodiscard]] uint getTotalBars() const { return totalBars; }
 
-    [[nodiscard]] int getTotalBarsPianoRoll() const { return totalBarsPianoRoll; }
+    [[nodiscard]] uint getTotalBarsPianoRoll() const { return totalBarsPianoRoll; }
     
     void setTotalBars(float newTotalBars) {totalBars = newTotalBars;}
 
@@ -18,7 +18,8 @@ public:
 private:
 
     ProjectData() = default;
-    int totalBars = 30;
-    int totalBarsPianoRoll = 30;
+    uint totalBars = 30;
+    uint totalBarsPianoRoll = 30;
+
 
 };

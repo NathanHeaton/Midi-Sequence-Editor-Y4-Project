@@ -26,12 +26,7 @@ public:
 
             renderSteps(ctx);
             timelineHandleInput.process(ctx);
-            if (timelineLength < s->getPixelPerBar(zoomFactor::arranger)* 60) {
-                if (ImGui::GetScrollMaxX() == ImGui::GetScrollX()) {
-                    ProjectData::instance().setTotalBars(ProjectData::instance().getTotalBars()+ 4);
-                    timelineLength = ProjectData::instance().getTotalBars() * s->getPixelPerBar(zoomFactor::arranger);
-                }
-            }
+
             ImGui::SetScrollX(xScroll);
             ImGui::Dummy(ImVec2(timelineLength, s->getTrackHeight() * ArrangerManager::instance().getTrackAmount()));
 

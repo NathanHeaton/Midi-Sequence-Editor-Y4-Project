@@ -12,6 +12,8 @@ struct Instruments {
     std::string name{"default"};
     std::unique_ptr<juce::Synthesiser> synth;
     uint8_t voices{8};// max instance of notes playing at once
+    juce::AudioBuffer<float> audioBuffer;
+    juce::MidiBuffer midiBuffer;
 
     Instruments(uint32_t ID, std::string name, uint8_t voices) {
         this->ID = ID;
@@ -75,8 +77,8 @@ public:
 
 
     void releaseResources() override {
-        for (auto buffer : midiBuffers) {
-            buffer.clear();
+        for (auto& buffer : InstrumentList) {
+            buffer->midiBuffer.clear();
         }
 
     }
@@ -110,12 +112,7 @@ public:
         InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
     }
 
-    void addMidiMessage(const juce::MidiMessage& message) {
-        const juce::ScopedLock sl(midiLock);
-        std::cout<<"recieved channel: "<<message.getChannel()<<std::endl;
-        midiBuffers[message.getChannel()-1].addEvent(message, 0);
-        //midiBuffers[0].addEvent(message, 0);
-    }
+    void addMidiMessage(const juce::MidiMessage& message);
 
     juce::Synthesiser* getSynth_ptr() { return InstrumentList.back()->synth.get(); }
 
