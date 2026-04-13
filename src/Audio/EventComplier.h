@@ -69,9 +69,9 @@ public:
                 offAbs = std::min(offAbs, clip.endTime);       // clamp note-off to clip boundary
 
                 out.push_back({ onAbs  * mpt,
-                    validNoteOn(on->getChannel()+1,  on->getPitch(),  on->getVelocity()) });
+                    validNoteOn(clip.trackIndex+1,  on->getPitch(),  on->getVelocity()) });
                 out.push_back({ offAbs * mpt,
-                    validNoteOff(off->getChannel()+1, off->getPitch()) });
+                    validNoteOff(clip.trackIndex+1, off->getPitch()) });
             }
         }
         std::sort(out.begin(), out.end());

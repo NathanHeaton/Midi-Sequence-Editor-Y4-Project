@@ -13,13 +13,12 @@ struct PatternClip{
     size_t patternID;
     uint32_t startTime;
     uint32_t endTime;
-    uint32_t track;
+    size_t trackIndex;
     uint32_t ID;
     bool enabled = true;
 };
 
 struct Track {
-    uint32_t ID;
     std::string title    = "Untitled Track";
     float volume         = 1.0f;
     bool muted           = false;
@@ -90,8 +89,6 @@ public:
         return singleton;
     }
 
-    [[nodiscard]] std::vector<PatternClip*> getClipsOnTrack(size_t trackIndex);
-    [[nodiscard]] std::vector<PatternClip*> getClipsInRange(uint32_t start, uint32_t end);
     [[nodiscard]] PatternClip* getClipByID(uint32_t id) {
         for (auto& clips : patternClips) {
             if (clips.ID == id) return &clips;
@@ -109,12 +106,10 @@ public:
         if (i < patternClips.size()) return &patternClips[i];
         else return nullptr;
     }
-    [[nodiscard]] PatternClip* getClipAtTime(size_t trackIndex, uint32_t time);
-    [[nodiscard]] bool hasOverlap(size_t trackIndex, uint32_t start, uint32_t end, uint32_t excludeID = UINT32_MAX) const;
 
     void removeClip(ArrangerCoordinate pos) {
         for (auto clip : patternClips) {
-            if ((clip.startTime <= pos.time && clip.endTime >= pos.time) && clip.track == pos.track) {
+            if ((clip.startTime <= pos.time && clip.endTime >= pos.time) && clip.trackIndex == pos.track) {
                 std::cout<<clip.ID<<std::endl;
 
                 patternClips.erase(patternClips.begin() + static_cast<signed>(getIndexFromID(clip.ID)));
@@ -125,7 +120,7 @@ public:
 
     ClipIDHoverState resolveHoverState(ArrangerCoordinate pos) {
         for (auto clips : patternClips) {
-            if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.track == pos.track) {
+            if (clips.startTime <= pos.time && clips.endTime >= pos.time && clips.trackIndex == pos.track) {
                 if (( clips.endTime - clips.startTime ) * 0.8 < pos.time - clips.startTime ) {
                     return {clips.ID, EdgeHover};
                 }
@@ -155,7 +150,7 @@ public:
         uint32_t duration = clip->endTime - clip->startTime;
         clip->startTime = pos.time;
         clip->endTime   = pos.time + duration;
-        clip->track     = pos.track;
+        clip->trackIndex     = pos.track;
     }
 
     void resizeClip(uint32_t id, uint32_t endTime) {
@@ -173,6 +168,9 @@ public:
     void splitClip(uint32_t id, uint32_t splitTime);
 
     // track methods
+    void setTrackInstrumentID(size_t index, uint32_t InstrumentID) {
+        if (index < tracks.size()) tracks[index].instrumentID = InstrumentID;
+    }
     void setTrackMuted(size_t index, bool muted) {
         if (index < tracks.size()) tracks[index].muted = muted;
     }

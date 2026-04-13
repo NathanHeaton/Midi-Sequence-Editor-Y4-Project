@@ -66,7 +66,7 @@ public:
         player.cleanUp();
     }
 
-    Instruments* getInstrmentByID(uint32_t ID) {
+    Instruments* getInstrumentByID(uint32_t ID) {
         auto instruments = m_audioManager.getInstrumentList_ptr();
 
         for (auto& instrument : *instruments) {
@@ -74,7 +74,13 @@ public:
                 return instrument.get();
             }
         }
+        return nullptr;
     }
+
+    std::vector<std::unique_ptr<Instruments>>* getInstruments() {
+        return m_audioManager.getInstrumentList_ptr();
+    }
+
 private:
     PlayBackManager() = default;
 

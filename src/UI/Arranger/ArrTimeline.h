@@ -97,9 +97,9 @@ public:
         auto clips = ArrangerManager::instance().getPatternClips();
         for (auto clip : *clips){
             ImVec2 p1((clip.startTime/ static_cast<float>(TimeData::PPQ)) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
-                clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y);
+                clip.trackIndex * ViewState::instance().getTrackHeight() + ctx.cursorPos.y);
             ImVec2 p2((clip.endTime/  static_cast<float>(TimeData::PPQ)) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
-                clip.track * ViewState::instance().getTrackHeight() + ctx.cursorPos.y + ViewState::instance().getTrackHeight());
+                clip.trackIndex * ViewState::instance().getTrackHeight() + ctx.cursorPos.y + ViewState::instance().getTrackHeight());
 
             ctx.drawList->AddRectFilledMultiColor(p1,p2,
                 Theme::currentThemeColours.patternClip.col0,
@@ -154,7 +154,7 @@ public:
             float startPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * startDelta;
             float endPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * endDelta ;
 
-            float yStart = ctx.cursorPos.y + (ViewState::instance().getTrackHeight() * (clip.track+1) -
+            float yStart = ctx.cursorPos.y + (ViewState::instance().getTrackHeight() * (clip.trackIndex+1) -
                 ((onEvent->getPitch() - pattern->m_pitchRange.lowest) +1)* noteHeight);
             float xStart = ctx.cursorPos.x + startPixel;
             float xEnd =  ctx.cursorPos.x + endPixel;

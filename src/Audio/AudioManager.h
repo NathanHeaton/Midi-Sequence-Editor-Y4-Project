@@ -5,8 +5,10 @@
 #include "SineWave.h"
 #include <vector>
 
+
 struct Instruments {
     uint32_t ID{0};
+    size_t trackIndex{0};
     std::string name{"default"};
     std::unique_ptr<juce::Synthesiser> synth;
     uint8_t voices{8};// max instance of notes playing at once
@@ -34,7 +36,10 @@ public:
     }
 
     void shutdownAudio() {
-        midiBuffer.clear();
+        for (auto buffer : midiBuffers) {
+            buffer.clear();
+        }
+
         deviceManager.removeAudioCallback(&player);
         player.setSource(nullptr);
         deviceManager.closeAudioDevice();
@@ -52,23 +57,28 @@ public:
             InstrumentList.back()->synth->addVoice(new SineWaveVoice());
         }
 
+        // for testing ============
+        InstrumentList.push_back(std::make_unique<Instruments>(assignInstrumentId(),
+                    "sineWave2",8));
+
+        currentSampleRate = sampleRate;
+        InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
+        InstrumentList.back()->synth->addSound(new SineWaveSound());
+
+        for (int i = 0; i < 8; i++) {
+            InstrumentList.back()->synth->addVoice(new SineWaveVoice());
+        }
+
     }
 
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override {
-        bufferToFill.clearActiveBufferRegion();
-        juce::MidiBuffer localBuffer;
-        {
-            const juce::ScopedLock sl(midiLock);
-            localBuffer = midiBuffer;
-            midiBuffer.clear();
-        }
-        InstrumentList.back()->synth->renderNextBlock(*bufferToFill.buffer, localBuffer,
-                              bufferToFill.startSample,
-                              bufferToFill.numSamples);
-    }
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
+
 
     void releaseResources() override {
-        midiBuffer.clear();
+        for (auto buffer : midiBuffers) {
+            buffer.clear();
+        }
+
     }
 
     void loadSample(const juce::File& audioFile) {
@@ -102,7 +112,8 @@ public:
 
     void addMidiMessage(const juce::MidiMessage& message) {
         const juce::ScopedLock sl(midiLock);
-        midiBuffer.addEvent(message, 0);
+        std::cout<<"recieved channel: "<<message.getChannel()<<std::endl;
+        midiBuffers[message.getChannel()-1].addEvent(message, 0);
     }
 
     juce::Synthesiser* getSynth_ptr() { return InstrumentList.back()->synth.get(); }
@@ -110,11 +121,21 @@ public:
     std::vector<std::unique_ptr<Instruments>>* getInstrumentList_ptr() { return &InstrumentList; }
     std::vector<std::unique_ptr<Instruments>> InstrumentList;
 
+    Instruments* getInstrumentBasedOnTrack(size_t index) {
+        for (auto& instrument : InstrumentList) {
+            if (instrument->trackIndex == index) {
+                return instrument.get();
+            }
+        }
+        return nullptr;
+    }
 private:
     juce::CriticalSection midiLock;
     juce::AudioDeviceManager deviceManager;
     juce::AudioSourcePlayer player;
-    juce::MidiBuffer midiBuffer;
+
+        std::array<juce::MidiBuffer, 16> midiBuffers;
+
     double currentSampleRate = 44100.0;
 
     uint32_t m_nextInstrumentId{0};

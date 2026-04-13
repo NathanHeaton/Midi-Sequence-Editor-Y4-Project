@@ -24,13 +24,30 @@ void TrackControls::openAudioPicker() {
 void TrackControls::trackAudioControls() {
     if (ImGui::BeginTable("Controls",2)) {
         ImGui::TableNextColumn();
-
         auto instrumentID = ArrangerManager::instance().getTrack(m_index)->instrumentID;
-        std::string instrumentName = PlayBackManager::instance().getInstrmentByID(instrumentID)->name;
+        std::string instrumentName = PlayBackManager::instance().getInstrumentByID(instrumentID)->name;
 
-        if (ImGui::Button(instrumentName.c_str())) {
-            openAudioPicker();
-        };
+        if (ImGui::BeginCombo("",instrumentName.c_str())) {
+            auto list = PlayBackManager::instance().getInstruments();
+            uint32_t selectedInstrument = 0;
+            bool is_selected = false;
+            for (auto& instrument : *list) {
+                is_selected = (selectedInstrument == instrument->ID);
+                if (ImGui::Selectable(instrument->name.c_str(), is_selected)) {
+                    selectedInstrument = instrument->ID;
+                    std::cout<<instrument->name.c_str()<<std::endl;
+                    ArrangerManager::instance().setTrackInstrumentID(m_index, instrument->ID);
+                    PlayBackManager::instance().getInstrumentByID(instrument->ID)->trackIndex = m_index;
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            if (ImGui::Selectable("add more...", is_selected)) {
+                openAudioPicker();
+                std::cout<<"selecting"<<std::endl;
+                selectedInstrument = list->back()->ID;
+            }
+            ImGui::EndCombo();
+        }
         ImGui::TableNextColumn();
         ImGui::Text("vol");
     }ImGui::EndTable();
