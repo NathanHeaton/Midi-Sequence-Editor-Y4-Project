@@ -15,7 +15,7 @@ void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferT
     //         renderNextBlock(*bufferToFill.buffer, localBuffer,
     //                           bufferToFill.startSample,
     //                           bufferToFill.numSamples);;
-
+    // TODO: if instrument is already used by another buffer figure out a solution, either make a copy for that track or use the same buffer
     for (int i = 0; i < ArrangerManager::instance().getTrackAmount(); i++) {
         {
             const juce::ScopedLock sl(midiLock);
@@ -23,17 +23,14 @@ void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferT
             midiBuffers[i].clear();
         }
         auto instrument = getInstrumentBasedOnTrack(i);
+        auto buffer = localBuffer[i];
+        if (instrument == nullptr) {buffer = localBuffer[0];}
         instrument = (instrument == nullptr) ? InstrumentList[0].get() : instrument;
-        // if (instrument == nullptr)
-        // {
-        //     instrument = InstrumentList[i].get();
-        // }
-        //
-        std::cout << "Rendering track " << i << std::endl;
+
         instrument->synth->
-        renderNextBlock(*bufferToFill.buffer, localBuffer[i],
+        renderNextBlock(*bufferToFill.buffer, buffer,
                           bufferToFill.startSample,
                           bufferToFill.numSamples);;
-        std::cout << "after Rendering track " << i << std::endl;
+
     }
 }
