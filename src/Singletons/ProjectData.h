@@ -14,10 +14,11 @@ public:
     
     void setTotalBars(float newTotalBars) {totalBars = newTotalBars;}
 
-
+    float masterVolume = 1.0f;
 private:
 
     ProjectData() = default;
+
     uint totalBars = 30;
     uint totalBarsPianoRoll = 30;
 

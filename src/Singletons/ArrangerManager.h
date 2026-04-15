@@ -85,7 +85,7 @@ public:
     void addTrack() {tracks.push_back(Track());}
     [[nodiscard]] const std::vector<PatternClip>* const getPatternClips(){return &patternClips;}
 
-    std::vector<Track>* getTracks(){return &tracks;}
+    std::vector<Track>& getTracks(){return tracks;}
 
     static ArrangerManager& instance(){
         static ArrangerManager singleton;

@@ -50,11 +50,21 @@ void TrackControls::trackAudioControls() {
             ImGui::EndCombo();
         }
         ImGui::TableNextColumn();
-        ImGui::Text("vol");
+        ImGui::SliderFloat("vol",&ArrangerManager::instance().getTrack(m_index)->volume,0.0f,1.0f);
     }ImGui::EndTable();
 
     if (ImGui::TableNextColumn()) {
-        ImGui::Text("mute");
-        ImGui::Text("solo");
+        if (ImGui::Button("mute")) {
+            ArrangerManager::instance().getTrack(m_index)->muted = !ArrangerManager::instance().getTrack(m_index)->muted;
+        }
+
+        if (ImGui::Button("solo")) {
+            for (auto& tracks : ArrangerManager::instance().getTracks()) {
+                tracks.muted = true;
+                tracks.solo = false;
+            }
+            ArrangerManager::instance().getTrack(m_index)->solo = true;
+            ArrangerManager::instance().getTrack(m_index)->muted = false;
+        }
     }
 }

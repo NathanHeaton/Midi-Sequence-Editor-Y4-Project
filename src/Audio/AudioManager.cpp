@@ -1,6 +1,6 @@
 #include "AudioManager.h"
 #include "../Singletons/ArrangerManager.h"
-
+#include "../Singletons/ProjectData.h"
 void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) {
     bufferToFill.clearActiveBufferRegion();
 
@@ -12,7 +12,7 @@ void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferT
         instrument->midiBuffer.clear();
     }
 
-    for (auto track : *ArrangerManager::instance().getTracks()) {
+    for (const auto& track : ArrangerManager::instance().getTracks()) {
         if (track.muted) continue;
         auto& instrBuffer = InstrumentList[track.instrumentID]->audioBuffer;
         for (int ch = 0; ch < 2; ch++) {
@@ -20,23 +20,23 @@ void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferT
                 ch, bufferToFill.startSample,
                 instrBuffer.getReadPointer(ch),
                 bufferToFill.numSamples,
-                track.previousVolume, track.volume
+                track.previousVolume* ProjectData::instance().masterVolume, track.volume * ProjectData::instance().masterVolume
             );
         }
     }
-        for (auto track : *ArrangerManager::instance().getTracks())
-         track.previousVolume = track.volume;
+    for (auto& track : ArrangerManager::instance().getTracks())
+        track.previousVolume = track.volume;
 }
 
 void AudioManager::addMidiMessage(const juce::MidiMessage& message) {
     const juce::ScopedLock sl(midiLock);
     auto ar = ArrangerManager::instance();
     for (auto& instrument : InstrumentList){
-        for (auto i{0u} ; i < ar.getTracks()->size(); i++) {
+        for (auto i{0u} ; i < ar.getTracks().size(); i++) {
             if (ar.getTrack(i)->muted) continue;
             if (ar.getTrack(i)->instrumentID == instrument->ID &&
                 message.getChannel() == i + 1) {
-                std::cout << "addMidiMessage: " << ar.getTrack(i)->instrumentID << std::endl;
+                std::cout << "Add Midi Message: " << ar.getTrack(i)->instrumentID<< "track: " << ar.getTrack(i) << std::endl;
                 instrument->midiBuffer.addEvent(message,0);
                 break;
             }

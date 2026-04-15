@@ -38,13 +38,14 @@ public:
     }
 
     void shutdownAudio() {
-        for (auto buffer : midiBuffers) {
-            buffer.clear();
+        for (auto& instrument : InstrumentList) {
+            instrument->midiBuffer.clear();
         }
 
         deviceManager.removeAudioCallback(&player);
         player.setSource(nullptr);
         deviceManager.closeAudioDevice();
+        std::cout << "AudioManager shutdown" << std::endl;
     }
 
     void prepareToPlay(int samplesPerBlock, double sampleRate) override {

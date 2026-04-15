@@ -4,13 +4,14 @@
 #include "../../MIDI_Logic/MidiFileManager.h"
 #include "imgui.h"
 #include "../../Singletons/PanelManager.h"
+#include "../../Singletons/ProjectData.h"
 
 class ControlComponent {
 public:
 
     MidiFileManager midifileManager;
 
-    float test_vol{0.0f};
+
     size_t selectedPattern{0};
     ControlComponent() {
         PatternManager::instance().addPattern();
@@ -25,7 +26,7 @@ public:
 
             ImGui::TableNextColumn();
             ImGui::Text("Master");
-            ImGui::SliderFloat("",&test_vol,0.0f,1.0f);
+            ImGui::SliderFloat("", &ProjectData::instance().masterVolume, 0.0f,1.0f);
             ImGui::TableNextColumn();
 
             if (ImGui::Button("New Pattern")) {
