@@ -48,8 +48,10 @@ public:
     std::string m_title;
     uint32_t ID;
     std::vector<MidiEvent> m_events;
+    std::unordered_map<uint32_t, size_t> m_eventsIndex;
 
     std::vector<NoteEventPair> m_noteEvents;
+    std::unordered_map<uint32_t, size_t> m_noteEventsIndex;
     int ticksInMidiFile{0};
     int m_bars{1};
 
@@ -111,6 +113,19 @@ public:
     std::optional<NoteEventPair> findNoteBasedOnPoint(NoteCoordinate noteCoordinate);
     HoverState findNoteHoverState(NoteCoordinate hoverCoordinate);
 
+    void rebuildNoteIndices() {
+        m_eventsIndex.clear();
+        m_eventsIndex.reserve(m_events.size());
+        m_noteEventsIndex.clear();
+        m_noteEventsIndex.reserve(m_noteEvents.size());
+
+        for (size_t i{0}; i < m_events.size(); i++)  {
+            m_eventsIndex[m_events[i].getID()] = i;
+        }
+        for (size_t i{0}; i < m_noteEvents.size(); i++)  {
+            m_noteEventsIndex[m_noteEvents[i].onID] = i;
+        }
+    }
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {
         std::vector<NoteEventPair> events;
@@ -125,21 +140,15 @@ public:
     }
 
     [[nodiscard]] const MidiEvent *getMidiEventByID_ptr(uint32_t ID) const{
-        for (auto& event: m_events) {
-            if (event.getID() == ID) {
-                return &event;
-            }
-        }
-        return nullptr;
+        auto i = m_eventsIndex.find(ID);
+        if (i == m_eventsIndex.end()) {return nullptr;}
+        return &m_events[i->second];
     }
 
     [[nodiscard]] MidiEvent *getMidiEventByID_ptr(uint32_t ID) {
-        for (auto& event: m_events) {
-            if (event.getID() == ID) {
-                return &event;
-            }
-        }
-        return nullptr;
+        auto i = m_eventsIndex.find(ID);
+        if (i == m_eventsIndex.end()) {return nullptr;}
+        return &m_events[i->second];
     }
 
     [[nodiscard]] size_t getEventIndexByID(uint32_t ID) const{
@@ -154,17 +163,9 @@ public:
     [[nodiscard]] size_t findInsertionPoint(uint32_t absoluteTime);
 
     [[nodiscard]] const NoteEventPair* getEventIDPairFromOnID(uint32_t ID) const{
-        for (auto i{0u}; i < m_noteEvents.size(); ++i ) {
-            if (m_noteEvents.at(i).onID == ID) {
-                return &m_noteEvents.at(i);
-            }
-        }
-        return nullptr;
-    }
-    void updateEventDeltas(auto startIndex, auto deltaIncrement) {
-        // for (int i = startIndex+1; i < m_events.size(); i++) {
-        //     m_events.at(i).m_delta += deltaIncrement;
-        // }
+        auto i = m_noteEventsIndex.find(ID);
+        if (i == m_noteEventsIndex.end()) {return nullptr;}
+        return &m_noteEvents[i->second];
     }
 
     void printEvents() {

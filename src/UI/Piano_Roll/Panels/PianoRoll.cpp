@@ -15,9 +15,6 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID)) continue;
         auto offEvent = pattern->getMidiEventByID_ptr(noteIDs.offID);
 
-        if (static_cast<float>(TimeData::PPQ)/onEvent->getAbsoluteTime()*
-            ViewState::instance().getPixelPerBeat(pianoRoll) > ctx.width + ctx.cursorPos.x){ continue;}
-
         float startDelta =0;
         if (onEvent->m_absoluteTime != 0){startDelta =
             static_cast<float>(onEvent->m_absoluteTime) / TimeData::PPQ;}
@@ -30,20 +27,17 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         float endPixel = view_state->getPixelPerBeat(pianoRoll) * endDelta ;
 
         if (endPixel < ctx.scrollX){ continue;}
-        if (startPixel > ctx.width + ctx.scrollX + ViewState::instance().getPixelPerBeat(pianoRoll)){break;}
+        if (startPixel > ctx.width + ctx.scrollX + ctx.width/3){break;}
 
         float yStart = ctx.cursorPos.y + (ctx.height - (onEvent->getPitch()+1)*ctx.noteHeight);
         float xStart = ctx.cursorPos.x + startPixel;
         float xEnd =  ctx.cursorPos.x + endPixel;
         float yEnd = yStart + ctx.noteHeight;
 
-        auto colour = Theme::currentThemeColours.barColourPacked;
-        for (auto id : pattern->m_selectedNoteOnIDs) {
-            if (noteIDs.onID == id) {
-                colour = Theme::currentThemeColours.beatColourPacked;
-                break;
-            }
-        }
+        auto colour = pattern->m_selectedNoteOnIDs.contains(noteIDs.onID)
+        ? Theme::currentThemeColours.beatColourPacked
+        : Theme::currentThemeColours.barColourPacked;
+
         ctx.drawList->AddRectFilled(
             ImVec2(xStart, yStart),
             ImVec2(xEnd,yEnd),

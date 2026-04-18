@@ -58,6 +58,8 @@ void Pattern::createNoteEventPairs(){
             pendingEvents.emplace_back(event.getID(),event.getPitch(),event.getChannel());
         }
     }
+    rebuildNoteIndices();
+
     m_pitchRange = {};
     for (const auto& pair : m_noteEvents) {
         uint8_t pitch = getMidiEventByID_ptr(pair.onID)->getPitch();
