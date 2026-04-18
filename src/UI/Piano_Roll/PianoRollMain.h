@@ -70,10 +70,11 @@ public:
                 piano.create(pianoRollScrollY, pianoRollHeight);
 
                 ImGui::TableNextColumn();
-                if (initialLoad) {
+                if (initialLoad || m_availY != ImGui::GetContentRegionAvail().y) {
                     m_availY = ImGui::GetContentRegionAvail().y;
                     pianoRollHeight = m_availY - m_bottomSectionHeight;
                 }
+
                 pianoRoll.create(pianoRollScrollY, timelineXScroll, timelineLength,
                     pianoRollHeight, *panelDetails);
 

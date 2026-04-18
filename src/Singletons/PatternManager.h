@@ -254,7 +254,6 @@ private:
                 addPatternFromMidi(title, currentFile.m_tracks.at(track).Events,
                     currentFile.ticksInQuarterNote);
             }
-            else { std::cout << "skipping non note track" << std::endl; }
         }
     }
 };

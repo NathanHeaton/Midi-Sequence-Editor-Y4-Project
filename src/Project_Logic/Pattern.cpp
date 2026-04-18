@@ -19,9 +19,7 @@ void Pattern::setLastBar() {
     int endAbsolute = m_events.back().m_absoluteTime;
 
     float bars = static_cast<float>(endAbsolute) / static_cast<float>(barSize);
-    std::cout << "before setting bars" << std::endl;
     m_bars = ceil(bars);
-    std::cout << "after setting bars" << std::endl;
 }
 
 void Pattern::createNoteEventPairs(){
@@ -135,7 +133,8 @@ void Pattern::timeShiftSelection(int32_t t_timeDelta) {
         return;
     }
     timeShiftOperation(t_timeDelta,m_selectedNoteOnIDs);
-
+    //m_noteEvents.clear();
+    //createNoteEventPairs();
 }
 
 void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs) {
@@ -147,6 +146,7 @@ void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32
             tempEvents.push_back(onNote);
             tempEvents.push_back(offNote);
             removeNoteOperation(noteIds);
+            rebuildNoteIndices();
         }
     }
 
@@ -413,7 +413,6 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
 
     insertEvent(movedOnEvent, movedOnEvent.getAbsoluteTime());
     if (movedOnEvent.getAbsoluteTime() >= movedOffEvent.getAbsoluteTime() + newEndDelta) {
-        std::cout << "Had to fix note end time" << ID << std::endl;
         insertEvent(movedOffEvent, movedOnEvent.getAbsoluteTime() + ViewState::instance().getStandardSnapTime());
     }
     else{insertEvent(movedOffEvent, movedOffEvent.getAbsoluteTime() + newEndDelta);}
@@ -433,6 +432,7 @@ void Pattern::scaleNoteEventSelection(float scale) {
         tempEvents.push_back(*getMidiEventByID_ptr(pair.onID));
         tempEvents.push_back(*getMidiEventByID_ptr(pair.offID));
         removeNoteOperation(pair);
+        rebuildNoteIndices();
     }
 
     for (auto& event : tempEvents) {

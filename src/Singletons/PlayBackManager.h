@@ -70,7 +70,6 @@ public:
 
     void playOnNote(size_t track, uint8_t pitch, bool hold){
         ScheduledEvent event;
-        std::cout << "Playing note " << pitch << std::endl;
         event.message = juce::MidiMessage::noteOn(1, pitch, static_cast<uint8_t>(127));
         event.trackIndex = track;
         player.sendEvent(event);
@@ -79,7 +78,6 @@ public:
 
     void playOffNote(size_t track, uint8_t pitch){
         ScheduledEvent offEvent;
-        std::cout << "note off" << pitch << std::endl;
         offEvent.message = juce::MidiMessage::noteOff(1, pitch, static_cast<uint8_t>(127));
         offEvent.trackIndex = track;
         player.sendEvent(offEvent);

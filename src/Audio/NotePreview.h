@@ -16,7 +16,6 @@ public:
     void start(size_t t,uint8_t p) {
         if (isTimerRunning()){
             sendNoteOff();
-            std::cout << "Stopping note preview" << std::endl;
             stopTimer();
         }
 
@@ -31,9 +30,7 @@ public:
     std::function<void()> sendNoteOff;
 
 private:
-    void timerCallback() override
-    {
-        std::cout << "Sending note off from timer" << std::endl;
+    void timerCallback() override {
         sendNoteOff();
         stopTimer();
     }
