@@ -43,7 +43,6 @@ void AudioManager::addMidiMessage(const ScheduledEvent& event) {
             if (ar.getTrack(trackIndex)->muted) { continue; }
             if (ar.getTrack(trackIndex)->instrumentID == instrument->ID &&
                 event.trackIndex == trackIndex) {
-                std::cout << "Add Midi Message: " << ar.getTrack(trackIndex)->instrumentID<< "track: " << trackIndex << std::endl;
                 instrument->midiBuffer.addEvent(message,0);
                 break;
                 }

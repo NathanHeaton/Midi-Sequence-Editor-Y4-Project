@@ -119,6 +119,10 @@ private:
     // ---------------------------------------------------------------
 
     void updateMoveOperation(NoteCoordinate snapped) {
+        static uint8_t previousPitch;
+        if (previousPitch != snapped.pitch) PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
+        previousPitch = snapped.pitch;
+
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             moveOperation.update(snapped);
         } else {
@@ -169,6 +173,7 @@ private:
     // ---------------------------------------------------------------
 
     void sendNewNote(NoteCoordinate snapped) {
+        PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
         PatternManager::instance().addNoteToPattern(m_patternID,
             snapped.pitch,
             static_cast<signed>(snapped.absoluteTime),
@@ -176,6 +181,7 @@ private:
     }
 
     void beginMoveNote(NoteCoordinate snapped) {
+        PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
         auto snapshots = setupSnapshots(snapped);
         moveOperation.originalInputCoordinate = snapped;
         moveOperation.addNotes(snapshots);

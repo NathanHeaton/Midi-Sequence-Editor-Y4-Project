@@ -95,6 +95,13 @@ public:
         }
     }
 
+    void sendEvent(const ScheduledEvent event) {
+        m_audio.addMidiMessage(event);
+        if (m_midiOut) m_midiOut->sendMessageNow(event.message);
+    }
+
+    bool looping{true};
+
 private:
     // ---------------------------------------------------------------
     void timerCallback() override {
@@ -109,17 +116,18 @@ private:
 
         if (m_eventIndex >= m_events.size()) {
             allNotesOff();
-            if (m_playingPtr) *m_playingPtr = false;
             activePlayheadMs() = 0.0;
             m_eventIndex = 0;
             stopTimer();
+            if (looping){
+                play(m_activeSource);
+            }
+            else {if (m_playingPtr) *m_playingPtr = false;}
+
         }
     }
 
-    void sendEvent(const ScheduledEvent event) {
-        m_audio.addMidiMessage(event);
-        if (m_midiOut) m_midiOut->sendMessageNow(event.message);
-    }
+
 
     void allNotesOff() {
         for (uint8_t ch = 1; ch < 16; ch++) {

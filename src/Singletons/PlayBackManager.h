@@ -1,11 +1,13 @@
 #pragma once
 #include "../Audio/AudioManager.h"
 #include "../Audio/MidiPlayer.h"
+#include "../Audio/NotePreview.h"
 
 enum class PlaybackMode { PianoRoll, Arranger };
 
 class PlayBackManager {
 public:
+
     static PlayBackManager& instance() {
         static PlayBackManager inst;
         return inst;
@@ -66,6 +68,27 @@ public:
         player.cleanUp();
     }
 
+    void playOnNote(size_t track, uint8_t pitch, bool hold){
+        ScheduledEvent event;
+        std::cout << "Playing note " << pitch << std::endl;
+        event.message = juce::MidiMessage::noteOn(1, pitch, static_cast<uint8_t>(127));
+        event.trackIndex = track;
+        player.sendEvent(event);
+        if (!hold) notePreviewTimeout.start(track, pitch);
+    }
+
+    void playOffNote(size_t track, uint8_t pitch){
+        ScheduledEvent offEvent;
+        std::cout << "note off" << pitch << std::endl;
+        offEvent.message = juce::MidiMessage::noteOff(1, pitch, static_cast<uint8_t>(127));
+        offEvent.trackIndex = track;
+        player.sendEvent(offEvent);
+    }
+
+
+
+    void toggleLooping(){ player.looping = !player.looping;}
+
     Instruments* getInstrumentByID(uint32_t ID) {
         auto instruments = m_audioManager.getInstrumentList_ptr();
 
@@ -82,11 +105,12 @@ public:
     }
 
 private:
-    PlayBackManager() = default;
-
+    PlayBackManager(){
+        notePreviewTimeout.sendNoteOff = [this]() { playOffNote(notePreviewTimeout.trackIndex, notePreviewTimeout.pitch); };
+    };
     PlaybackMode  m_mode{PlaybackMode::Arranger};
     bool          m_playing{false};
     AudioManager  m_audioManager;
-
+    NotePreview   notePreviewTimeout;
     MidiPlayer    player{m_audioManager};
 };
