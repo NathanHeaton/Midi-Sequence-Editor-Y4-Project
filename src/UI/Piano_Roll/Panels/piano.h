@@ -74,6 +74,7 @@ public:
             }
         }
     }
+    
 
     void drawBlackKey(pianoVars &vars) const
     {

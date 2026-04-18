@@ -96,6 +96,8 @@ public:
             ImVec2 p2((clip.endTime/  static_cast<float>(TimeData::PPQ)) * vs->getPixelPerBeat(arranger) + ctx.cursorPos.x,
                 clip.trackIndex * ViewState::instance().getTrackHeight() + ctx.cursorPos.y + ViewState::instance().getTrackHeight());
 
+            //if ((p1.x > ctx.width + ctx.scrollX + ctx.width/3) || (p2.x < ctx.scrollX)) {continue;} for some reason clip culling breaks
+
             ctx.drawList->AddRectFilledMultiColor(p1,p2,
                 Theme::currentThemeColours.patternClip.col0,
                 Theme::currentThemeColours.patternClip.col0,
@@ -145,9 +147,11 @@ public:
                 {startDelta = static_cast<float>(onEvent->m_absoluteTime + clip.startTime) / TimeData::PPQ;}
 
             float endDelta = static_cast<float>(offEvent->m_absoluteTime + clip.startTime) / TimeData::PPQ;
-
             float startPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * startDelta;
             float endPixel = ViewState::instance().getPixelPerBeat(zoomFactor::arranger) * endDelta ;
+
+            if (endPixel < ctx.scrollX){ continue;}
+            if (startPixel > ctx.width + ctx.scrollX){break;}
 
             float yStart = ctx.cursorPos.y + (ViewState::instance().getTrackHeight() * (clip.trackIndex+1) -
                 ((onEvent->getPitch() - pattern->m_pitchRange.lowest) +1)* noteHeight);

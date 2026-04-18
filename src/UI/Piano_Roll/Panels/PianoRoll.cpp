@@ -12,12 +12,11 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
     //pattern->
     for (auto noteIDs : pattern->m_noteEvents) {
         auto onEvent = pattern->getMidiEventByID_ptr(noteIDs.onID);
-
-        if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID))
-        {
-            continue;
-        }
+        if (pattern->m_hiddenNoteOnIDs.contains(noteIDs.onID)) continue;
         auto offEvent = pattern->getMidiEventByID_ptr(noteIDs.offID);
+
+        if (static_cast<float>(TimeData::PPQ)/onEvent->getAbsoluteTime()*
+            ViewState::instance().getPixelPerBeat(pianoRoll) > ctx.width + ctx.cursorPos.x){ continue;}
 
         float startDelta =0;
         if (onEvent->m_absoluteTime != 0){startDelta =
@@ -29,6 +28,9 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
 
         float startPixel = view_state->getPixelPerBeat(pianoRoll) * startDelta;
         float endPixel = view_state->getPixelPerBeat(pianoRoll) * endDelta ;
+
+        if (endPixel < ctx.scrollX){ continue;}
+        if (startPixel > ctx.width + ctx.scrollX + ViewState::instance().getPixelPerBeat(pianoRoll)){break;}
 
         float yStart = ctx.cursorPos.y + (ctx.height - (onEvent->getPitch()+1)*ctx.noteHeight);
         float xStart = ctx.cursorPos.x + startPixel;

@@ -63,9 +63,6 @@ void Arranger::create() {
                 tracksControls.at(i)->newTrack(i);
                 ImGui::PopStyleVar();
             }
-            for (const auto& track : tracksControls) {
-
-            }
 
             ImGui::TableNextColumn();
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
