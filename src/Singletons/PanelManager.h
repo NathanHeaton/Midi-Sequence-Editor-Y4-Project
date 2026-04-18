@@ -5,6 +5,7 @@
 
 struct PatternPanelState {
     size_t      patternID;
+    size_t      trackIndex;
     bool        open  = true;
     ImVec2      pos   = {100, 100};
     ImVec2      size  = {900, 500};
@@ -19,7 +20,7 @@ public:
         return s;
     }
 
-    void openPatern(size_t ID = 0) {
+    void openPatern(size_t ID = 0, size_t trackIndex = 0) {
         for (auto& p : m_paternPanels)
             if (p.patternID == ID) { p.open = true; return; }
 
@@ -29,7 +30,7 @@ public:
             pos = {m_paternPanels.back().pos.x +OFFSET.x, m_paternPanels.back().pos.y + OFFSET.y};
         }
 
-        m_paternPanels.push_back({ ID });
+        m_paternPanels.push_back({ ID, trackIndex });
         m_paternPanels.back().pos = pos;
     }
 

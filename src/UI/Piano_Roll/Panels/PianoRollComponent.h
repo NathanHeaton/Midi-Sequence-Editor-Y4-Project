@@ -11,9 +11,9 @@
 #include "../../../Singletons/PlayBackManager.h"
 #include "PianoRollEventHandler.h"
 #include "TimelineContext.h"
+#include "../../../Singletons/PanelManager.h"
 
-class PianoRollComponent
-{
+class PianoRollComponent {
 public:
 
     PianoRollComponent() = default;
@@ -21,14 +21,16 @@ public:
     bool bg_tone = false;
     PianoRollInputHandler inputHandler;
     uint32_t m_patternID{0};
+    size_t m_trackIndex{0};
 
-    void create(float &scrollY, float &scrollX, float& lengthX, float height, uint32_t patternID) {
+    void create(float &scrollY, float &scrollX, float& lengthX, float height, PatternPanelState panel_state) {
         if (ImGui::BeginChild("piano grid", ImVec2(0, height),
             ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
             TimelineContext ctx;
-            m_patternID = patternID;
+            m_patternID = panel_state.patternID;
+            m_trackIndex = panel_state.trackIndex;
             renderSteps(ctx);
-            inputHandler.process(ctx, patternID);
+            inputHandler.process(ctx, m_patternID, m_trackIndex);
 
             ImGui::SetScrollX(scrollX);
             ImGui::SetScrollY(scrollY);

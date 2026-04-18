@@ -75,7 +75,7 @@ public:
                     pianoRollHeight = m_availY - m_bottomSectionHeight;
                 }
                 pianoRoll.create(pianoRollScrollY, timelineXScroll, timelineLength,
-                    pianoRollHeight, panelDetails->patternID);
+                    pianoRollHeight, *panelDetails);
 
                 ImGui::TableNextColumn();
                 if (ImGui::BeginChild("custom_scroll", ImVec2(15, pianoRollHeight), false,

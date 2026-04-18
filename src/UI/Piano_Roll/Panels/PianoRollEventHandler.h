@@ -11,8 +11,9 @@ class PianoRollInputHandler {
 public:
 
     // Called once per frame from PianoRollComponent::create().
-    void process(const TimelineContext& ctx, uint32_t patternID) {
+    void process(const TimelineContext& ctx, uint32_t patternID, size_t trackIndex) {
         m_patternID = patternID;
+        m_trackIndex = trackIndex;
         handleMouseInput(ctx);
         handleKeyboardInput(ctx);
     }
@@ -23,6 +24,7 @@ private:
     // Top-level input routing
     // ---------------------------------------------------------------
     uint32_t m_patternID{0};
+    size_t m_trackIndex{0};
     NoteCoordinate hover{0,0};
     NoteCoordinate snapped{0,0};
     void handleMouseInput(const TimelineContext& ctx) {
@@ -120,7 +122,7 @@ private:
 
     void updateMoveOperation(NoteCoordinate snapped) {
         static uint8_t previousPitch;
-        if (previousPitch != snapped.pitch) PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
+        if (previousPitch != snapped.pitch) PlayBackManager::instance().playOnNote(m_trackIndex, snapped.pitch, false );
         previousPitch = snapped.pitch;
 
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
@@ -173,7 +175,7 @@ private:
     // ---------------------------------------------------------------
 
     void sendNewNote(NoteCoordinate snapped) {
-        PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
+        PlayBackManager::instance().playOnNote(m_trackIndex, snapped.pitch, false );
         PatternManager::instance().addNoteToPattern(m_patternID,
             snapped.pitch,
             static_cast<signed>(snapped.absoluteTime),
@@ -181,7 +183,7 @@ private:
     }
 
     void beginMoveNote(NoteCoordinate snapped) {
-        PlayBackManager::instance().playOnNote(0, snapped.pitch, false );
+        PlayBackManager::instance().playOnNote(m_trackIndex, snapped.pitch, false );
         auto snapshots = setupSnapshots(snapped);
         moveOperation.originalInputCoordinate = snapped;
         moveOperation.addNotes(snapshots);
