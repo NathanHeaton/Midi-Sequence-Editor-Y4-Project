@@ -103,7 +103,7 @@ private:
         while (m_eventIndex < m_events.size() &&
                m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs())
         {
-            sendEvent(m_events[m_eventIndex].message);
+            sendEvent(m_events[m_eventIndex]);
             ++m_eventIndex;
         }
 
@@ -116,15 +116,18 @@ private:
         }
     }
 
-    void sendEvent(const juce::MidiMessage& msg) {
-        m_audio.addMidiMessage(msg);
-        if (m_midiOut) m_midiOut->sendMessageNow(msg);
+    void sendEvent(const ScheduledEvent event) {
+        m_audio.addMidiMessage(event);
+        if (m_midiOut) m_midiOut->sendMessageNow(event.message);
     }
 
     void allNotesOff() {
-        for (int ch = 1; ch <= 16; ++ch) {
+        for (uint8_t ch = 1; ch < 16; ch++) {
             auto msg = juce::MidiMessage::allNotesOff(ch);
-            m_audio.addMidiMessage(msg);
+            for (auto i{0u}; i < ArrangerManager::instance().getTrackAmount(); i++){
+                ScheduledEvent offEvent {0,msg, i};
+                m_audio.addMidiMessage(offEvent);
+            }
             if (m_midiOut) m_midiOut->sendMessageNow(msg);
         }
     }

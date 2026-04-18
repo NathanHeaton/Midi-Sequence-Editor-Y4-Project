@@ -188,23 +188,28 @@ public:
     void setTrackMuted(size_t index, bool muted) {
         if (index < tracks.size()) tracks[index].muted = muted;
     }
-    void setTrackSolo(size_t index, bool solo) {
-        if (index < tracks.size()) tracks[index].solo = solo;
+    void toggleTrackSolo(size_t index) {
+        if (index >= tracks.size()) return;
+        if (tracks[index].solo){
+            for (auto& tracks : tracks) {
+                tracks.muted = false;
+                tracks.solo = false;
+            }
+        }
+        else {
+            for (auto& tracks : ArrangerManager::instance().getTracks()) {
+                tracks.muted = true;
+                tracks.solo = false;
+            }
+            tracks[index].solo = true;
+            tracks[index].muted = false;
+        }
     }
+
     void setTrackVolume(size_t index, float vol) {
         if (index < tracks.size()) tracks[index].volume = vol;
     }
-    bool anySoloed() const {
-        for (const auto& t : tracks) if (t.solo) return true;
-        return false;
-    }
-    bool isTrackAudible(size_t index) const {
-        if (index >= tracks.size()) return false;
-        const auto& t = tracks[index];
-        if (t.muted) return false;
-        if (anySoloed()) return t.solo;
-        return true;
-    }
+
     bool arrangerUpdated = false;
 
     private:

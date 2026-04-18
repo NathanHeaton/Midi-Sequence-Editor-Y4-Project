@@ -6,6 +6,8 @@
 #include <vector>
 
 
+struct ScheduledEvent;
+
 struct Instruments {
     uint32_t ID{0};
     size_t trackIndex{0};
@@ -113,7 +115,7 @@ public:
         InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
     }
 
-    void addMidiMessage(const juce::MidiMessage& message);
+    void addMidiMessage(const ScheduledEvent& message);
 
     juce::Synthesiser* getSynth_ptr() { return InstrumentList.back()->synth.get(); }
 

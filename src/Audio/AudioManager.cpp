@@ -1,6 +1,9 @@
 #include "AudioManager.h"
+
+#include "EventComplier.h"
 #include "../Singletons/ArrangerManager.h"
 #include "../Singletons/ProjectData.h"
+
 void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) {
     bufferToFill.clearActiveBufferRegion();
 
@@ -28,18 +31,23 @@ void AudioManager::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferT
         track.previousVolume = track.volume;
 }
 
-void AudioManager::addMidiMessage(const juce::MidiMessage& message) {
+void AudioManager::addMidiMessage(const ScheduledEvent& event) {
+
     const juce::ScopedLock sl(midiLock);
+    auto message = event.message;
     auto ar = ArrangerManager::instance();
-    for (auto& instrument : InstrumentList){
-        for (auto i{0u} ; i < ar.getTracks().size(); i++) {
-            if (ar.getTrack(i)->muted) continue;
-            if (ar.getTrack(i)->instrumentID == instrument->ID &&
-                message.getChannel() == i + 1) {
-                std::cout << "Add Midi Message: " << ar.getTrack(i)->instrumentID<< "track: " << ar.getTrack(i) << std::endl;
+    auto trackIndex = 0;
+    for (trackIndex ; trackIndex < ar.getTracks().size(); trackIndex++) {
+        for (auto& instrument : InstrumentList)
+        {
+            if (ar.getTrack(trackIndex)->muted) { continue; }
+            if (ar.getTrack(trackIndex)->instrumentID == instrument->ID &&
+                event.trackIndex == trackIndex) {
+                std::cout << "Add Midi Message: " << ar.getTrack(trackIndex)->instrumentID<< "track: " << trackIndex << std::endl;
                 instrument->midiBuffer.addEvent(message,0);
                 break;
-            }
+                }
         }
     }
+
 }

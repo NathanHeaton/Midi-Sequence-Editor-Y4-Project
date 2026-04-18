@@ -10,6 +10,7 @@ struct ScheduledEvent {
     double absoluteTimeMs{0.0};
     juce::MidiMessage message;
     bool operator<(const ScheduledEvent& o) const { return absoluteTimeMs < o.absoluteTimeMs; }
+    uint trackIndex{0};
 };
 
 class EventCompiler {
@@ -69,9 +70,11 @@ public:
                 offAbs = std::min(offAbs, clip.endTime);       // clamp note-off to clip boundary
 
                 out.push_back({ onAbs  * mpt,
-                    validNoteOn(clip.trackIndex+1,  on->getPitch(),  on->getVelocity()) });
+                    validNoteOn(on->getChannel() +1,  on->getPitch(),  on->getVelocity()) });
+                out.back().trackIndex = clip.trackIndex;
                 out.push_back({ offAbs * mpt,
-                    validNoteOff(clip.trackIndex+1, off->getPitch()) });
+                    validNoteOff(on->getChannel() +1, off->getPitch()) });
+                out.back().trackIndex = clip.trackIndex;
             }
         }
         std::sort(out.begin(), out.end());

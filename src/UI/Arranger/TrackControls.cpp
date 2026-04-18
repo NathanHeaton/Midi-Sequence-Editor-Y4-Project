@@ -59,12 +59,7 @@ void TrackControls::trackAudioControls() {
         }
 
         if (ImGui::Button("solo")) {
-            for (auto& tracks : ArrangerManager::instance().getTracks()) {
-                tracks.muted = true;
-                tracks.solo = false;
-            }
-            ArrangerManager::instance().getTrack(m_index)->solo = true;
-            ArrangerManager::instance().getTrack(m_index)->muted = false;
+            ArrangerManager::instance().toggleTrackSolo(m_index);
         }
     }
 }
