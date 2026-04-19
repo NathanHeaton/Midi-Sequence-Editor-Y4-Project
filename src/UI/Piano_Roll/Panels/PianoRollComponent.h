@@ -24,8 +24,10 @@ public:
     size_t m_trackIndex{0};
 
     void create(float &scrollY, float &scrollX, float& lengthX, float height, PatternPanelState panel_state) {
+
         if (ImGui::BeginChild("piano grid", ImVec2(0, height),
             ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+
             TimelineContext ctx;
             m_patternID = panel_state.patternID;
             m_trackIndex = panel_state.trackIndex;
@@ -66,7 +68,7 @@ private:
 
         ctx.drawList->AddLine(ImVec2(xPos,ctx.cursorPos.y+ 0),
         ImVec2(xPos,ctx.cursorPos.y+ ctx.height),
-        Theme::currentThemeColours.accentPacked, 5
+        Theme::cTheme.accentPacked, 5
             );
     }
 
@@ -99,9 +101,9 @@ private:
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
 
-            ImU32 colour = Theme::currentThemeColours.beatColourPacked;
-            if (checkIfBarStart(i)){colour=Theme::currentThemeColours.barColourPacked;}
-            if (checkIfSubDivision(i)){colour=Theme::currentThemeColours.subBeatColourPacked;}
+            ImU32 colour = Theme::cTheme.beatColourPacked;
+            if (checkIfBarStart(i)){colour=Theme::cTheme.barColourPacked;}
+            if (checkIfSubDivision(i)){colour=Theme::cTheme.subBeatColourPacked;}
 
             DrawBarLine(ctx, beatPosStart, beatPosEnd, colour);
         }
@@ -130,7 +132,7 @@ private:
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.barColourPacked,
+                Theme::cTheme.barColourPacked,
                 1.0f
             );
         }
@@ -148,12 +150,12 @@ private:
             yPos = (ctx.cursorPos.y + (i) * ctx.noteHeight) ;
             ctx.drawList->AddRectFilled(ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.cursorPos.x+ ctx.width, yPos + ctx.noteHeight ),
-                whiteNote ? Theme::currentThemeColours.backgroundAltPacked : Theme::currentThemeColours.backgroundPacked);
+                whiteNote ? Theme::cTheme.backgroundAltPacked : Theme::cTheme.backgroundPacked);
 
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.subBeatColourPacked,
+                Theme::cTheme.subBeatColourPacked,
                 1.0f
             );
             if (((octaveNoteIndex+noteOffset)% 12 < 7 || (octaveNoteIndex+noteOffset)%12 > 7) && (octaveNoteIndex+noteOffset)% 12 != 0 ) {

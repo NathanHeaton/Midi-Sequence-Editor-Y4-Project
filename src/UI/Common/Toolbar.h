@@ -14,22 +14,22 @@ public:
         m_playBack = playBack;
     }
     void create() {
-        ImGui::Separator();
 
-        ImGui::BeginTable("toolList", static_cast<int>(m_groups.size()),
-            ImGuiTableFlags_SizingFixedFit, ImVec2(0, 0));
-
+        int cols = m_playBackActive ? m_groups.size() + 1 : m_groups.size();
+        ImGui::BeginTable("toolList", cols,
+            ImGuiTableFlags_SizingFixedFit, ImVec2(0, 32));
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,ImVec2(0,0));
         for (auto& group : m_groups) {
             ImGui::TableNextColumn();
                 group.render(true);
         }
-
         if (m_playBackActive) {
+            ImGui::TableNextColumn();
             m_playBack.renderP(true,0);
         }
-
+        ImGui::PopStyleVar();
         ImGui::EndTable();
-        ImGui::Separator();
+
     }
 
 private:

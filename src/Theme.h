@@ -15,6 +15,7 @@ struct Gradient
     ImU32 col1;
 };
 
+
 namespace Theme
 {
     enum class ThemeType{
@@ -88,27 +89,58 @@ namespace Theme
         ImVec4(9.0/255.0f, 16.0f/255.0f, 28.0f/255.0f, 1.0f)
     };
 
-    inline ColourScheme currentThemeColours = DarkBColours;
+    inline ColourScheme cTheme = DarkBColours;
 
     inline void applyTheme() {
         ImGuiStyle& style = ImGui::GetStyle();
-        style.Colors[ImGuiCol_WindowBg] = currentThemeColours.background;
-        style.Colors[ImGuiCol_FrameBg] = currentThemeColours.backgroundAlt;
-        style.Colors[ImGuiCol_Border] = currentThemeColours.outline;
-
+        style.Colors[ImGuiCol_WindowBg] = cTheme.background;
+        style.Colors[ImGuiCol_FrameBg] = cTheme.backgroundAlt;
+        style.Colors[ImGuiCol_Border] = cTheme.outline;
+        style.Colors[ImGuiCol_Button] =  ImVec4(0,0,0,0);
+        style.Colors[ImGuiCol_ButtonHovered] = cTheme.backgroundAlt;
+        style.Colors[ImGuiCol_ButtonActive] = ImVec4(0,0,0,0);
+        style.Colors[ImGuiCol_Separator] = cTheme.outline;
     }
 
     inline void changeTheme(ThemeType theme) {
         switch (theme) {
             case ThemeType::Dark_Blue:
-                currentThemeColours = DarkBColours;
+                cTheme = DarkBColours;
             case ThemeType::Dark_Orange:
-                currentThemeColours = DarkBColours;
+                cTheme = DarkBColours;
             case ThemeType::Light_Orange:
-                currentThemeColours = DarkBColours;
+                cTheme = DarkBColours;
             case ThemeType::Light_Blue:
-                currentThemeColours = LightOColours;
+                cTheme = LightOColours;
         }
+    }
+
+    inline ImFont* monoSmall;
+    inline ImFont* textMedium;
+    inline ImFont* textSmall;
+    inline ImFont* windowTitle;
+    inline ImFont* trackTitle;
+    inline ImFont* textHeading;
+
+    inline float borderSize = 1.0f;
+    // In Theme.h or a ThemeApplier.cpp
+    static void setImGuiStyle() {
+        ImGuiIO& io = ImGui::GetIO();
+        textSmall  = io.Fonts->AddFontFromFileTTF("assets/fonts/poppins/Poppins-Regular.ttf", 14.0f);
+        textMedium  = io.Fonts->AddFontFromFileTTF("assets/fonts/poppins/Poppins-Regular.ttf", 16.0f);
+        windowTitle  = io.Fonts->AddFontFromFileTTF("assets/fonts/poppins/Poppins-Regular.ttf", 24.0f);
+        trackTitle  = io.Fonts->AddFontFromFileTTF("assets/fonts/poppins/Poppins-Medium.ttf", 24.0f);
+        textHeading  = io.Fonts->AddFontFromFileTTF("assets/fonts/poppins/Poppins-Regular.ttf", 20.0f);
+
+        monoSmall  = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf", 16.0f);
+        auto* s = &ImGui::GetStyle();
+
+        s->WindowPadding     = ImVec2(8, 8);
+        s->FramePadding      = ImVec2(4, 4);
+        s->ItemSpacing       = ImVec2(4, 4);
+        s->ItemInnerSpacing  = ImVec2(2, 2);
+        s->ScrollbarSize     = 20.0f;
+
     }
 
 }

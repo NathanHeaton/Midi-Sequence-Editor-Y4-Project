@@ -26,13 +26,13 @@ void TimelineLabel::DrawBarLabel() {
         snprintf(label, sizeof(label), "%d", bar);
         drawList->AddText(
             ImVec2((bar * barWidth) + cursorPos.x + 2, cursorPos.y),
-            Theme::currentThemeColours.barColourPacked,
+            Theme::cTheme.barColourPacked,
             label
         );
         drawList->AddLine(
             ImVec2(cursorPos.x + bar * barWidth, cursorPos.y),
             ImVec2(cursorPos.x + bar * barWidth, cursorPos.y + 20),
-            Theme::currentThemeColours.barColourPacked, 1
+            Theme::cTheme.barColourPacked, 1
         );
     }
 }
@@ -50,7 +50,7 @@ void TimelineLabel::DrawPlayHead() {
     drawList->AddLine(
         ImVec2(xPos, cursorPos.y),
         ImVec2(xPos, cursorPos.y + height),
-        Theme::currentThemeColours.accentPacked, 3
+        Theme::cTheme.accentPacked, 3
     );
 }
 

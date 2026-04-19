@@ -94,10 +94,10 @@ private:
             float xStart = ctx.cursorPos.x + startPixel;
             float xEnd =  ctx.cursorPos.x + endPixel;
 
-            auto colour = Theme::currentThemeColours.barColourPacked;
+            auto colour = Theme::cTheme.barColourPacked;
             for (auto id : pattern->m_selectedNoteOnIDs) {
                 if (noteIDs.onID == id) {
-                    colour = Theme::currentThemeColours.beatColourPacked;
+                    colour = Theme::cTheme.beatColourPacked;
                     break;
                 }
             }
@@ -126,8 +126,8 @@ private:
             );
             ImVec2 beatPosEnd = ImVec2(beatPosStart.x, ctx.cursorPos.y + ctx.height);
 
-            ImU32 colour = Theme::currentThemeColours.beatColourPacked;
-            if (checkIfBarStart(i)){colour=Theme::currentThemeColours.barColourPacked;}
+            ImU32 colour = Theme::cTheme.beatColourPacked;
+            if (checkIfBarStart(i)){colour=Theme::cTheme.barColourPacked;}
 
             DrawBarLine(ctx, beatPosStart, beatPosEnd, colour);
         }

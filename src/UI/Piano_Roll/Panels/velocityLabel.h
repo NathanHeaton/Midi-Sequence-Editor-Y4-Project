@@ -29,7 +29,7 @@ public:
                 auto labelC = numLabels[i].c_str();
                 ImGui::GetWindowDrawList()->AddText(
                     textPos,
-                    Theme::currentThemeColours.barColourPacked,
+                    Theme::cTheme.barColourPacked,
                     labelC
                 );
             }

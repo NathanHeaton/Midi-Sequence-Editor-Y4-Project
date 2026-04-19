@@ -12,7 +12,6 @@ PlayBack ToolbarGroups::playback(bool isArranger, uint32_t ID) {
                 : (void*)(intptr_t)ASSETS.pauseIcon.textureID;
             if (isArranger) {PlayBackManager::instance().setMode(PlaybackMode::Arranger);}
             else {PlayBackManager::instance().setMode(PlaybackMode::PianoRoll);}
-
             if (ImGui::ImageButton("play_button", icon, ImVec2(32,32))){
                 PatternManager::instance().setActivePatternID(ID);
                 PlayBackManager::instance().togglePlay();

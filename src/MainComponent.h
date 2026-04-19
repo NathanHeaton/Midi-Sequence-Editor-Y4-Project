@@ -45,8 +45,13 @@ public:
         ImGui::CreateContext();
         ImGui_ImplJuce_Init(*this, glctx);
         ImGui_ImplOpenGL3_Init();
+
+        ImGuiIO& io = ImGui::GetIO();
+        Theme::applyTheme();
+        Theme::setImGuiStyle();
+        io.Fonts->Build(); // call before uploading texture to GPU
         ASSETS.LoadAll(); // after glcontext is setup
-        ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+        io.ConfigWindowsMoveFromTitleBarOnly = true;
     }
     // stop juce assertion failure of juce::component:1695
     void paint(juce::Graphics& g) override {}
@@ -54,7 +59,7 @@ public:
     void renderOpenGL() override {
         using namespace juce::gl;
 
-        Theme::applyTheme();
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplJuce_NewFrame();
         ImGui::NewFrame();
@@ -65,7 +70,9 @@ public:
         ImGui::Begin("Main Window", nullptr, flags);
 
         top_nav_component.nav();
+        ImGui::Separator();
         control_component.ControlPanel();
+        ImGui::Separator();
         arranger_component.create();
 
 
@@ -78,7 +85,6 @@ public:
         for (auto& p : pianoRollPanels){
             if (p.panelDetails->open) {
                 if (PatternManager::instance().getPatternByID(p.panelDetails->patternID)==nullptr) {
-                    std::cout<<"can't find pattern of that ID"<<std::endl;
                     continue;
                 }
                 p.create();

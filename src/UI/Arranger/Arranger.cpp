@@ -17,10 +17,14 @@ void Arranger::create() {
     }
         ImGui::BeginChild("Arranger");
 
-        if (ImGui::BeginTable("arranngerchild", 2)) {
+        if (ImGui::BeginTable("arranger child", 2)) {
             ImGui::TableSetupColumn("Top Controls", ImGuiTableColumnFlags_WidthFixed,trackControlWidth);
             ImGui::TableNextColumn();
+            ImGui::PushFont(Theme::textHeading);
+            ImGui::PushStyleColor(ImGuiCol_Text, Theme::cTheme.outline);
             ImGui::Text("Arranger");
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
             ImGui::TableNextColumn();
             arrangerToolbar.create();
         }ImGui::EndTable();
@@ -28,9 +32,14 @@ void Arranger::create() {
         if (ImGui::BeginTable("Add and Scroll", 2)) {
             ImGui::TableSetupColumn("Top Controls", ImGuiTableColumnFlags_WidthFixed,trackControlWidth);
             ImGui::TableNextColumn();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, Theme::borderSize);
+            ImGui::PushFont(Theme::textMedium);
             if (ImGui::Button("Add Track")) {
                 AddTrack();
             }
+            ImGui::PopFont();
+            ImGui::PopStyleVar();
             ImGui::TableNextColumn();
             if (ImGui::BeginChild("horizontalScroll", ImVec2(0, 15), false,
                 ImGuiWindowFlags_HorizontalScrollbar)) {
@@ -43,6 +52,7 @@ void Arranger::create() {
         if (ImGui::BeginTable("Track Timeline label", 2)) {
             ImGui::TableSetupColumn("Tracks1", ImGuiTableColumnFlags_WidthFixed, trackControlWidth);
             ImGui::TableNextColumn();
+
             ImGui::Text("Tracks");
             ImGui::TableNextColumn();
 
@@ -59,12 +69,11 @@ void Arranger::create() {
 
             ImGui::TableNextColumn();
             for (int i = 0; i < tracksControls.size(); i++) {
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
                 tracksControls.at(i)->newTrack(i);
-                ImGui::PopStyleVar();
             }
 
             ImGui::TableNextColumn();
+
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             arrangerTimeline.createTimeline(timelineLength,timelineXScroll);
             ImGui::PopStyleVar();

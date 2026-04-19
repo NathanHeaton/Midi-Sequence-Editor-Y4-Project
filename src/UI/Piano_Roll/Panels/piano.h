@@ -56,7 +56,7 @@ public:
             ImVec2 textPos = ImVec2(rectStart.x + ySize-20,rectStart.y+10);
             vars.drawList->AddRectFilled(
                 rectStart, rectEnd,
-                Theme::currentThemeColours.barColourPacked,
+                Theme::cTheme.barColourPacked,
                 6.0f
             );
             runningSize += ySize;
@@ -68,7 +68,7 @@ public:
                 octave--;
                 vars.drawList->AddText(
                     textPos,
-                    Theme::currentThemeColours.backgroundPacked,
+                    Theme::cTheme.backgroundPacked,
                     octaveStr
                 );
             }
@@ -96,7 +96,7 @@ public:
 
             vars.drawList->AddRectFilled(
             rectStart, rectEnd,
-            Theme::currentThemeColours.backgroundPacked,
+            Theme::cTheme.backgroundPacked,
             6.0f
         );
             if (setOf3Count < 3) {

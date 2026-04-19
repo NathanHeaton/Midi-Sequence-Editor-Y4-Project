@@ -35,8 +35,8 @@ void PianoRollComponent::renderPattern(const TimelineContext& ctx) const{
         float yEnd = yStart + ctx.noteHeight;
 
         auto colour = pattern->m_selectedNoteOnIDs.contains(noteIDs.onID)
-        ? Theme::currentThemeColours.beatColourPacked
-        : Theme::currentThemeColours.barColourPacked;
+        ? Theme::cTheme.beatColourPacked
+        : Theme::cTheme.barColourPacked;
 
         ctx.drawList->AddRectFilled(
             ImVec2(xStart, yStart),
@@ -100,7 +100,7 @@ void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
         ctx.drawList->AddRectFilled(
     ImVec2(xStart, yStart),
     ImVec2(xEnd,yStart + ctx.noteHeight),
-        Theme::currentThemeColours.beatColourPacked, 3.0f);
+        Theme::cTheme.beatColourPacked, 3.0f);
     }
 }
 
@@ -116,7 +116,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
             ctx.drawList->AddRectFilled(
                 p1Box,
                 p2Box,
-                Theme::currentThemeColours.barColourPacked, 0.0f);
+                Theme::cTheme.barColourPacked, 0.0f);
         }
     }
     if (PatternManager::instance().areNotesSelected(m_patternID)){ // render scale effect
@@ -141,6 +141,6 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
         ctx.drawList->AddRectFilled(
         tool->getScaleHandlePosition(),
             endCoords,
-        Theme::currentThemeColours.barColourPacked, 0.0f);
+        Theme::cTheme.barColourPacked, 0.0f);
     }
 }

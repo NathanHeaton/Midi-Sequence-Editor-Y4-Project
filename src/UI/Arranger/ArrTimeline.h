@@ -42,7 +42,7 @@ public:
             ctx.drawList->AddLine(
                 ImVec2(ctx.scrollX + ctx.cursorPos.x, yPos),
                 ImVec2(ctx.scrollX + ctx.width + ctx.cursorPos.x, yPos),
-                Theme::currentThemeColours.barColourPacked,
+                Theme::cTheme.barColourPacked,
                 1.0f
             );
         }
@@ -99,13 +99,13 @@ public:
             //if ((p1.x > ctx.width + ctx.scrollX + ctx.width/3) || (p2.x < ctx.scrollX)) {continue;} for some reason clip culling breaks
 
             ctx.drawList->AddRectFilledMultiColor(p1,p2,
-                Theme::currentThemeColours.patternClip.col0,
-                Theme::currentThemeColours.patternClip.col0,
-                Theme::currentThemeColours.patternClip.col1,
-                Theme::currentThemeColours.patternClip.col1
+                Theme::cTheme.patternClip.col0,
+                Theme::cTheme.patternClip.col0,
+                Theme::cTheme.patternClip.col1,
+                Theme::cTheme.patternClip.col1
                 );
             ctx.drawList->AddRect(p1,p2,
-            Theme::currentThemeColours.barColourPacked,
+            Theme::cTheme.barColourPacked,
             3.0f,
             0,
             1.0f
@@ -114,10 +114,10 @@ public:
             ImVec4 clipRect(p1.x, p1.y, p2.x, p2.y);
             p1.x += textLeftMargin;
             ctx.drawList->AddText(
-                ImGui::GetDefaultFont(),
-                12.0f,
+                Theme::monoSmall,
+                13.0f,
                 p1,
-                Theme::currentThemeColours.barColourPacked,
+                Theme::cTheme.barColourPacked,
                 pattern->m_title.c_str(),
                 nullptr,
                 0.0f,
@@ -159,10 +159,10 @@ public:
             float xEnd =  ctx.cursorPos.x + endPixel;
             float yEnd = yStart + noteHeight;
 
-            auto colour = Theme::currentThemeColours.barColourPacked;
+            auto colour = Theme::cTheme.barColourPacked;
             for (auto id : pattern->m_selectedNoteOnIDs) {
                 if (noteIDs.onID == id) {
-                    colour = Theme::currentThemeColours.beatColourPacked;
+                    colour = Theme::cTheme.beatColourPacked;
                     break;
                 }
             }
@@ -197,8 +197,8 @@ public:
         );
         ctx.drawList->AddRectFilled(
             rectStart, rectEnd,
-            bg_tone ? Theme::currentThemeColours.backgroundAltPacked
-                   : Theme::currentThemeColours.backgroundPacked,
+            bg_tone ? Theme::cTheme.backgroundAltPacked
+                   : Theme::cTheme.backgroundPacked,
             0.0f
         );
     }
@@ -206,8 +206,8 @@ public:
     void DrawBarLine(const ArrangerContext& ctx, ImVec2 start, ImVec2 end, bool barStart) {
         ctx.drawList->AddLine(
             start, end,
-            barStart ? Theme::currentThemeColours.barColourPacked
-                     : Theme::currentThemeColours.beatColourPacked,
+            barStart ? Theme::cTheme.barColourPacked
+                     : Theme::cTheme.beatColourPacked,
             1.0f
         );
     }

@@ -50,9 +50,12 @@ public:
     }
 
     void create() {
+        ImGui::PushFont(Theme::windowTitle);
         auto patternTitle = PatternManager::instance().getPatternByID(panelDetails->patternID)->m_title;
-        if (ImGui::Begin(patternTitle.c_str(), &panelDetails->open, ImGuiWindowFlags_NoScrollbar)) {
+        bool windowOpen = ImGui::Begin(patternTitle.c_str(), &panelDetails->open, ImGuiWindowFlags_NoScrollbar);
+        ImGui::PopFont();
 
+        if (windowOpen){
             if (initialLoad) {
                 ImGui::SetNextWindowPos(panelDetails->pos);
                 ImGui::SetNextWindowSize(panelDetails->size);
