@@ -98,31 +98,45 @@ public:
 
 struct ScaleOperation : NoteOperation {
 private:
-    uint32_t firstNoteAbsolute{0};
     uint32_t endNoteAbsolute{0};
     uint32_t gapFromInitialScalePoint{0};
 public:
-
+    uint32_t firstNoteAbsolute{0};
     float scale= 1.0f;
     void init(uint32_t start,uint32_t end,uint32_t gap) {
         firstNoteAbsolute=start;
         endNoteAbsolute=end;
+        for (auto n :notes) {
+            firstNoteAbsolute = (firstNoteAbsolute > n.absoluteTime)?n.absoluteTime:firstNoteAbsolute;
+            endNoteAbsolute = (endNoteAbsolute < n.absoluteTime)?n.absoluteTime:endNoteAbsolute;
+        }
         gapFromInitialScalePoint=gap;
     }
     void update(NoteCoordinate snapped) override {
         if (snapped.absoluteTime <= 0){return;}
+        if (snapped.absoluteTime <= firstNoteAbsolute){std::cout<<"invalid"<<std::endl;return;}
         scale = static_cast<float>(snapped.absoluteTime  - firstNoteAbsolute )/
             static_cast<float>(endNoteAbsolute  - firstNoteAbsolute + gapFromInitialScalePoint);
         std::cout<<"scale: "<<scale<<std::endl;
-        if (scale <= 0) {
-            scale = 1.0f;
+        if (scale <= 0.1f) {
+            scale = 0.1f;
         }
     }
+
     CommitData commit() override {
         CommitData result;
         result = ScaleCommit(scale);
         clearNotes();
         return result;
+    }
+
+    void valitdate() {
+        for (auto n :notes) {
+            auto onTime = firstNoteAbsolute + static_cast<uint32_t>((n.absoluteTime - firstNoteAbsolute) *
+                scale);
+            auto offTime = firstNoteAbsolute + static_cast<uint32_t>((n.endAbsoluteTime - firstNoteAbsolute ) * scale);
+            if (offTime - onTime <= 0){std::cout<<"invalid"<<std::endl;}
+        }
     }
 };
 

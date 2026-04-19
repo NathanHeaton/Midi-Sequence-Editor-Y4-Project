@@ -67,19 +67,21 @@ void PianoRollComponent::renderPlaceHolderNotes(const TimelineContext& ctx){
         auto offTime = note.endAbsoluteTime;
         auto pitch = note.pitch;
         if ( i < moveOperation.notes.size() ) {
-            onTime +=  moveOperation.newDeltaTime;
-            offTime +=  moveOperation.newDeltaTime;
+            onTime +=  static_cast<uint32_t>(moveOperation.newDeltaTime);
+            offTime +=  static_cast<uint32_t>(moveOperation.newDeltaTime);
             pitch +=  moveOperation.newDeltaPitch;
         }
         else if ( i < stretchOperation.notes.size()) {
-            if (offTime + stretchOperation.newEndDelta < onTime) {
+            if (offTime + static_cast<uint32_t>(stretchOperation.newEndDelta) < onTime) {
                 offTime = onTime + ViewState::instance().getStandardSnapTime();
             }
-            else{offTime += stretchOperation.newEndDelta;}
+            else{offTime += static_cast<uint32_t>(stretchOperation.newEndDelta);}
         }
         else if (i < scaleOperation.notes.size()) {
-            onTime = onTime * scaleOperation.scale;
-            offTime = offTime * scaleOperation.scale;
+            auto firstScaledNote = scaleOperation.firstNoteAbsolute;
+            onTime = firstScaledNote + static_cast<uint32_t>((onTime - firstScaledNote) *
+                scaleOperation.scale);
+            offTime = firstScaledNote + static_cast<uint32_t>((offTime - firstScaledNote ) * scaleOperation.scale);
         }
         float startDelta =0;
         if (onTime != 0){startDelta =

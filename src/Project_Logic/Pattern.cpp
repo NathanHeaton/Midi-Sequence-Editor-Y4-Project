@@ -421,8 +421,7 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
 }
 
 void Pattern::scaleNoteEventSelection(float scale) {
-    if (m_selectedNoteOnIDs.empty() || scale <= 0.0f)
-        return;
+    if (m_selectedNoteOnIDs.empty() || scale <= 0.2f) {return;}
 
     std::vector<MidiEvent> tempEvents;
 
@@ -435,8 +434,13 @@ void Pattern::scaleNoteEventSelection(float scale) {
         rebuildNoteIndices();
     }
 
+    auto firstNoteAbsolute = tempEvents[0].getAbsoluteTime();
+    for (const auto& n :tempEvents) {
+        firstNoteAbsolute = (firstNoteAbsolute > n.getAbsoluteTime())?n.getAbsoluteTime():firstNoteAbsolute;
+    }
+
     for (auto& event : tempEvents) {
-        auto newTime = static_cast<uint32_t>(event.getAbsoluteTime() * scale);
+        auto newTime = firstNoteAbsolute + static_cast<uint32_t>((event.getAbsoluteTime() - firstNoteAbsolute) * scale);
         insertEvent(event, newTime);
     }
     m_selectedNoteOnIDs.clear();

@@ -43,6 +43,7 @@ private:
     }
 
     void handleKeyboardInput(const TimelineContext& ctx) {
+        if (!ImGui::IsWindowFocused()){return;}
         if (ImGui::IsKeyDown(ImGuiMod_Shift)) {
             if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))  PatternManager::instance().pitchShiftSelection(m_patternID,-1);
             if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))    PatternManager::instance().pitchShiftSelection(m_patternID,+1);
@@ -75,6 +76,7 @@ private:
         }
         if      (ImGui::IsKeyPressed(ImGuiKey_E)) ToolManager::instance().setPianoRollTool(ToolTypes::EDIT);
         else if (ImGui::IsKeyPressed(ImGuiKey_S)) ToolManager::instance().setPianoRollTool(ToolTypes::SELECT);
+        if (ImGui::IsKeyPressed(ImGuiKey_Space)) {PlayBackManager::instance().setMode(PlaybackMode::PianoRoll); PlayBackManager::instance().togglePlay();}
     }
 
     // ---------------------------------------------------------------
