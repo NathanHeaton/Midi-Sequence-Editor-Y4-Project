@@ -28,6 +28,7 @@ public:
         arrangerToolbar.addGroup(ToolbarGroups::snapping(true));
         arrangerToolbar.addGroup(ToolbarGroups::arrangerTools());
         arrangerToolbar.addGroup(ToolbarGroups::arrangerZoom());
+        arrangerToolbar.addPlayBackButton(ToolbarGroups::playback(true,0));
     }
 
 

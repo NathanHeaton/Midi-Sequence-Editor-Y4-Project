@@ -60,11 +60,13 @@ public:
             ImGui::TableNextColumn();
             UI::VerticalSeparator(controlPanelHeight);
             ImGui::TableNextColumn();
-            ImGui::Text("playback controls");
-            //playbackButtons.create();
+            playbackControls();
+
         }ImGui::EndTable();
 
     }
+
+    void playbackControls();
 
     void patternControls() {
         auto& patterns = PatternManager::instance().getPatterns();

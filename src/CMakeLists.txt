@@ -15,6 +15,7 @@ target_sources(${PROJECT_NAME}
         UI/Common/TimelineLabel.cpp
         UI/Arranger/TrackControls.cpp
         Audio/AudioManager.cpp
+        UI/ControlPanel/ControlComponent.cpp
         UI/Piano_Roll/Panels/PianoRoll.cpp)
 
 target_compile_definitions(${PROJECT_NAME}

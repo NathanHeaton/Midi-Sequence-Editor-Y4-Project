@@ -118,7 +118,7 @@ void PianoRollComponent::DrawToolEffects(const TimelineContext& ctx) {
             ctx.drawList->AddRectFilled(
                 p1Box,
                 p2Box,
-                Theme::cTheme.barColourPacked, 0.0f);
+                Theme::cTheme.selectionPacked, 0.0f);
         }
     }
     if (PatternManager::instance().areNotesSelected(m_patternID)){ // render scale effect

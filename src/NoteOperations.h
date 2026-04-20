@@ -50,6 +50,12 @@ struct MoveOperation : NoteOperation{
 
     [[nodiscard]] CommitData commit() override{
         CommitData result;
+        for (auto note : notes) {
+            if (note.absoluteTime + newDeltaPitch < 0 ) {
+                std::cout<<"invalid"<<std::endl;
+                newDeltaTime =  0;
+            }
+        }
         if (notes.size() == 1 ){
             auto note = notes.at(0);
             NoteCoordinate newPos(note.pitch +newDeltaPitch, note.absoluteTime+newDeltaTime);

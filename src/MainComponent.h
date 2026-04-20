@@ -2,7 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_events/juce_events.h>
-#include "UI/ControlPannel/ControlComponent.h"
+#include "UI/ControlPanel/ControlComponent.h"
 #include  "MIDI_Logic/ParsedMidi.h"
 #include "UI/Top_nav/TopNavComponent.h"
 #include "UI/Arranger/Arranger.h"

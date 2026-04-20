@@ -122,7 +122,6 @@ private:
 
             timelineLabel.create(timelineLength, timelineXScroll,
                 PatternManager::instance().getCurrentPattern()->m_bars, false);
-
         } ImGui::EndTable();
     }
 
@@ -130,7 +129,9 @@ private:
         bool expanded = activePanel != NoteExtraPanel::None;
 
         if (expanded) {
+            ImGui::PushStyleColor(ImGuiCol_Button, Theme::cTheme.outline);
             ImGui::Button("##drag_handle", ImVec2(ImGui::GetContentRegionAvail().x, m_dragBarHeight));
+            ImGui::PopStyleColor();
             if (ImGui::IsItemActive()) {
                 velocityHeight -= ImGui::GetIO().MouseDelta.y;
                 velocityHeight = std::clamp(velocityHeight, m_minVelHeight,

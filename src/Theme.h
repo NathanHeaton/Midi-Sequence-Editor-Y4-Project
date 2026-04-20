@@ -46,6 +46,7 @@ namespace Theme
         ImU32 beatColourPacked;
         ImU32 subBeatColourPacked;
         ImU32 accentPacked;
+        ImU32 selectionPacked;
         Gradient patternClip;
 
     };
@@ -70,6 +71,7 @@ namespace Theme
         IM_COL32(70,87,118,255),
         IM_COL32(37,47,64,255),
         IM_COL32(243,180,64,255),
+        IM_COL32(243,188,64,49),
 
         Gradient(ImVec2(1,1),
             ImVec2(1,4),
