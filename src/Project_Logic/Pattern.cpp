@@ -143,6 +143,7 @@ void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32
         if (m_selectedNoteOnIDs.contains(noteIds.onID)) {
             auto onNote = *getMidiEventByID_ptr(noteIds.onID);
             auto offNote = *getMidiEventByID_ptr(noteIds.offID);
+            if (static_cast<signed>(onNote.getAbsoluteTime() + t_timeDelta) < 0) {return;}
             tempEvents.push_back(onNote);
             tempEvents.push_back(offNote);
             removeNoteOperation(noteIds);
@@ -338,27 +339,6 @@ void Pattern::hideNoteEvent(NoteCoordinate coordinate)
                 }
         }
     }
-}
-
-void Pattern::fixDeltaFromDeletedNote(NoteEventPair* pair)
-{
-    // auto onIndex = pair->onID;
-    // auto offIndex = pair->offID;
-    //
-    // if (onIndex < m_events.size()) {
-    //     if (m_events[onIndex].getAbsoluteTime() < m_events[onIndex+1].getAbsoluteTime())
-    //     {
-    //         uint32_t followingDelta = m_events[onIndex+1].getAbsoluteTime() - m_events[onIndex].getAbsoluteTime() ;
-    //         m_events[onIndex+1].setDelta(followingDelta);
-    //     }
-    // }
-    // if (offIndex < m_events.size()) {
-    //     if (m_events[offIndex].getAbsoluteTime() < m_events[offIndex+1].getAbsoluteTime())
-    //     {
-    //         uint32_t followingDelta = m_events[offIndex+1].getAbsoluteTime() - m_events[offIndex].getAbsoluteTime() ;
-    //         m_events[offIndex+1].setDelta(followingDelta);
-    //     }
-    // }
 }
 
 void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate pos)

@@ -69,7 +69,9 @@ void Arranger::create() {
 
             ImGui::TableNextColumn();
             for (int i = 0; i < tracksControls.size(); i++) {
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
                 tracksControls.at(i)->newTrack(i);
+                ImGui::PopStyleVar();
             }
 
             ImGui::TableNextColumn();

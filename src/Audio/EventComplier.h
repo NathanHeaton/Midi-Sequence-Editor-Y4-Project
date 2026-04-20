@@ -31,9 +31,9 @@ public:
         return msg;
     }
 
-    static std::vector<ScheduledEvent> compilePattern(const Pattern& pattern, double bpm) {
+    static std::vector<ScheduledEvent> compilePattern(const Pattern& pattern) {
         std::vector<ScheduledEvent> out;
-        const double mpt = msPerTick(bpm);
+        const double mpt = TimeData::msPerTick();
 
         for (const auto& pair : pattern.m_noteEvents) {
             const auto* on  = pattern.getMidiEventByID_ptr(pair.onID);
@@ -50,9 +50,9 @@ public:
     }
 
     // Arranger mode: all clips, all tracks, offset by clip.startTime
-    static std::vector<ScheduledEvent> compileArranger(double bpm) {
+    static std::vector<ScheduledEvent> compileArranger() {
         std::vector<ScheduledEvent> out;
-        const double mpt   = msPerTick(bpm);
+        const double mpt   = TimeData::msPerTick();
         const auto*  clips = ArrangerManager::instance().getPatternClips();
         for (const auto& clip : *clips) {
             if (!clip.enabled) continue;
@@ -81,7 +81,4 @@ public:
         return out;
     }
 
-    static double msPerTick(double bpm) {
-        return 60000.0 / (bpm * static_cast<double>(TimeData::PPQ));
-    }
 };

@@ -35,13 +35,12 @@ public:
 
     void play(PlaybackSource source) {
         m_activeSource = source;
-        const double bpm = TimeData::instance().getBPM();
         if (source == PlaybackSource::PianoRoll) {
             m_events = EventCompiler::compilePattern(
-                *PatternManager::instance().getCurrentPattern(), bpm);
+                *PatternManager::instance().getCurrentPattern());
         } else {
             std::cout << "Arranger playing" <<std::endl;
-            m_events = EventCompiler::compileArranger(bpm);
+            m_events = EventCompiler::compileArranger();
         }
         if (m_events.empty()) return;
         double& playheadMs = activePlayheadMs();
@@ -65,21 +64,21 @@ public:
 
     // Returns current playhead in ticks for the active source
     [[nodiscard]] double getCurrentPositionTicks() const {
-        return activePlayheadMs() / msPerTick();
+        return activePlayheadMs() / TimeData::msPerTick();
     }
 
     // Per-source getters (for rendering both playheads independently)
     [[nodiscard]] double getPianoRollPositionTicks() const {
-        return m_pianoRollPlayheadMs / msPerTick();
+        return m_pianoRollPlayheadMs / TimeData::msPerTick();
     }
     [[nodiscard]] double getArrangerPositionTicks() const {
-        return m_arrangerPlayheadMs / msPerTick();
+        return m_arrangerPlayheadMs / TimeData::msPerTick();
     }
 
 
     // Seek the active source to a tick position
     void seekToTicks(uint32_t ticks) {
-        activePlayheadMs() = ticks * msPerTick();
+        activePlayheadMs() = ticks * TimeData::msPerTick();
         m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
         if (isTimerRunning())
             m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - activePlayheadMs();
@@ -87,7 +86,7 @@ public:
 
     // Seek a specific source without changing the active one
     void seekSourceToTicks(PlaybackSource source, uint32_t ticks) {
-        playheadMsFor(source) = ticks * msPerTick();
+        playheadMsFor(source) = ticks * TimeData::msPerTick();
         if (m_activeSource == source) {
             m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
             if (isTimerRunning())
@@ -150,12 +149,9 @@ private:
         return lo;
     }
 
-    [[nodiscard]] double msPerTick() const {
-        return EventCompiler::msPerTick(TimeData::instance().getBPM());
-    }
-
     // Non-const helpers so timerCallback can write through them
     double& activePlayheadMs() { return playheadMsFor(m_activeSource); }
+
     [[nodiscard]] const double& activePlayheadMs() const { return playheadMsFor(m_activeSource); }
 
     double& playheadMsFor(PlaybackSource source) {

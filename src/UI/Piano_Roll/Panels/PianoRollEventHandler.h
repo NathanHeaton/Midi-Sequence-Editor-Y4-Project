@@ -76,7 +76,12 @@ private:
         }
         if      (ImGui::IsKeyPressed(ImGuiKey_E)) ToolManager::instance().setPianoRollTool(ToolTypes::EDIT);
         else if (ImGui::IsKeyPressed(ImGuiKey_S)) ToolManager::instance().setPianoRollTool(ToolTypes::SELECT);
-        if (ImGui::IsKeyPressed(ImGuiKey_Space)) {PlayBackManager::instance().setMode(PlaybackMode::PianoRoll); PlayBackManager::instance().togglePlay();}
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Space)) {
+            std::cout<<"toggle play"<<std::endl;
+            PlayBackManager::instance().setMode(PlaybackMode::PianoRoll);
+            PlayBackManager::instance().togglePlay();
+        }
     }
 
     // ---------------------------------------------------------------
@@ -96,7 +101,6 @@ private:
     void handleEditTool(const TimelineContext& ctx) {
         const auto hoverState = PatternManager::instance().getNoteHoverState(m_patternID,hover);
 
-        // Tick any active operation
         if      (moveOperation.isActive)    updateMoveOperation(snapped);
         else if (stretchOperation.isActive) updateStretchOperation(snapped);
         else if (scaleOperation.isActive)   updateScaleOperation(hover);
@@ -173,7 +177,7 @@ private:
     }
 
     // ---------------------------------------------------------------
-    // Operation beginners (previously named moveNote / stretchNote / scaleNote)
+    // Operation beginners
     // ---------------------------------------------------------------
 
     void sendNewNote(NoteCoordinate snapped) {

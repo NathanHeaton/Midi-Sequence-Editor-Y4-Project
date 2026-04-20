@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+static double BPM{120};
+
 class TimeData {
 public:
     static TimeData& instance() {
@@ -26,7 +28,11 @@ public:
     static constexpr int PPQ = 960;
     void setBPM(int newBPM) {BPM = newBPM;}
     TimeSignature timeSignature{4, 4};
+
+    static double msPerTick() {
+        return 60000.0 / (BPM * static_cast<double>(PPQ));
+    }
+
 private:
-    double BPM = 120;
     TimeData() = default;
 };
