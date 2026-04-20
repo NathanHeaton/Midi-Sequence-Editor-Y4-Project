@@ -64,21 +64,21 @@ public:
 
     // Returns current playhead in ticks for the active source
     [[nodiscard]] double getCurrentPositionTicks() const {
-        return activePlayheadMs() / TimeData::msPerTick();
+        return activePlayheadMs() / TimeData::instance().msPerTick();
     }
 
     // Per-source getters (for rendering both playheads independently)
     [[nodiscard]] double getPianoRollPositionTicks() const {
-        return m_pianoRollPlayheadMs / TimeData::msPerTick();
+        return m_pianoRollPlayheadMs / TimeData::instance().msPerTick();
     }
     [[nodiscard]] double getArrangerPositionTicks() const {
-        return m_arrangerPlayheadMs / TimeData::msPerTick();
+        return m_arrangerPlayheadMs / TimeData::instance().msPerTick();
     }
 
 
     // Seek the active source to a tick position
     void seekToTicks(uint32_t ticks) {
-        activePlayheadMs() = ticks * TimeData::msPerTick();
+        activePlayheadMs() = ticks * TimeData::instance().msPerTick();
         m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
         if (isTimerRunning())
             m_wallClockStart = juce::Time::getMillisecondCounterHiRes() - activePlayheadMs();
@@ -86,7 +86,7 @@ public:
 
     // Seek a specific source without changing the active one
     void seekSourceToTicks(PlaybackSource source, uint32_t ticks) {
-        playheadMsFor(source) = ticks * TimeData::msPerTick();
+        playheadMsFor(source) = ticks * TimeData::instance().msPerTick();
         if (m_activeSource == source) {
             m_eventIndex = firstEventAtOrAfter(activePlayheadMs());
             if (isTimerRunning())

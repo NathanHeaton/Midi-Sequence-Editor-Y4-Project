@@ -25,7 +25,7 @@ public:
     float controlPanelHeight{80.0f};
     void ControlPanel() {
 
-        if (ImGui::BeginTable("Control Panel",7,ImGuiActivateFlags_None, ImVec2(0,controlPanelHeight))) {
+        if (ImGui::BeginTable("Control Panel",9,ImGuiActivateFlags_None, ImVec2(0,controlPanelHeight))) {
             ImGui::TableSetupColumn("Master",ImGuiTableColumnFlags_WidthFixed,200);
             ImGui::TableSetupColumn("seperator",ImGuiTableColumnFlags_WidthFixed,0);
             ImGui::TableSetupColumn("Pattern",ImGuiTableColumnFlags_WidthFixed, 220);
@@ -33,6 +33,8 @@ public:
             ImGui::TableSetupColumn("pianoRoll",ImGuiTableColumnFlags_WidthFixed,220);
             ImGui::TableSetupColumn("seperator",ImGuiTableColumnFlags_WidthFixed,0);
             ImGui::TableSetupColumn("Playback",ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("seperator",ImGuiTableColumnFlags_WidthFixed,0);
+            ImGui::TableSetupColumn("projectData",ImGuiTableColumnFlags_WidthFixed,150);
 
             ImGui::TableNextColumn();
             ImGui::PushFont(Theme::textHeading);
@@ -61,10 +63,15 @@ public:
             UI::VerticalSeparator(controlPanelHeight);
             ImGui::TableNextColumn();
             playbackControls();
+            ImGui::TableNextColumn();
+            UI::VerticalSeparator(controlPanelHeight);
+            ImGui::TableNextColumn();
+            projectDataControls();
 
         }ImGui::EndTable();
 
     }
+    void projectDataControls();
 
     void playbackControls();
 

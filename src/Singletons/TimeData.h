@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <iostream>
+#include <ostream>
 
-static double BPM{120};
 
 class TimeData {
 public:
@@ -12,16 +13,16 @@ public:
 
     class TimeSignature {
     public:
-        TimeSignature(uint32_t n, uint32_t d) : numerator(n), denominator(d) {}
-        void change(uint32_t n, uint32_t d) {
+        TimeSignature(uint n, uint d) : numerator(n), denominator(d) {}
+        void change(uint n, uint d) {
             numerator = n;
             denominator = d;
         }
-        uint32_t getNumerator() const { return numerator; }
-        uint32_t getDenominator() const { return denominator; }
+        uint getNumerator() const { return numerator; }
+        uint getDenominator() const { return denominator; }
     private:
-        uint32_t numerator;
-        uint32_t denominator;
+        uint numerator;
+        uint denominator;
     };
     [[nodiscard]] double getBPM() const { return BPM;}
 
@@ -29,10 +30,11 @@ public:
     void setBPM(int newBPM) {BPM = newBPM;}
     TimeSignature timeSignature{4, 4};
 
-    static double msPerTick() {
+    double msPerTick() {
         return 60000.0 / (BPM * static_cast<double>(PPQ));
     }
 
+    double BPM{120};
 private:
     TimeData() = default;
 };

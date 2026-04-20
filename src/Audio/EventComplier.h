@@ -33,7 +33,7 @@ public:
 
     static std::vector<ScheduledEvent> compilePattern(const Pattern& pattern) {
         std::vector<ScheduledEvent> out;
-        const double mpt = TimeData::msPerTick();
+        const double mpt = TimeData::instance().msPerTick();
 
         for (const auto& pair : pattern.m_noteEvents) {
             const auto* on  = pattern.getMidiEventByID_ptr(pair.onID);
@@ -52,7 +52,7 @@ public:
     // Arranger mode: all clips, all tracks, offset by clip.startTime
     static std::vector<ScheduledEvent> compileArranger() {
         std::vector<ScheduledEvent> out;
-        const double mpt   = TimeData::msPerTick();
+        const double mpt   = TimeData::instance().msPerTick();
         const auto*  clips = ArrangerManager::instance().getPatternClips();
         for (const auto& clip : *clips) {
             if (!clip.enabled) continue;
