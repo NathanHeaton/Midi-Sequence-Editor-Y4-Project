@@ -19,6 +19,7 @@ public:
         ImGui::BeginTable("toolList", cols,
             ImGuiTableFlags_SizingFixedFit, ImVec2(0, 32));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,ImVec2(0,0));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
         for (auto& group : m_groups) {
             ImGui::TableNextColumn();
                 group.render(true);
@@ -27,7 +28,7 @@ public:
             ImGui::TableNextColumn();
             m_playBack.renderP(true,0);
         }
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(2);
         ImGui::EndTable();
 
     }

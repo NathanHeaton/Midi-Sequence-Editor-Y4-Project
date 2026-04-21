@@ -87,6 +87,8 @@ public:
 
     CommitData commit() override{
         CommitData result;
+        if (static_cast<int>(originalEndTime) + newEndDelta <= static_cast<int>(originalStartTime) ) {newEndDelta = 0;}
+
         if (notes.size() == 1 ){
             auto note = notes.at(0);
             NoteCoordinate newPos(0, newEndDelta);

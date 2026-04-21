@@ -4,6 +4,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Dependencies/imgui" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Dependencies/imgui_juce" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/JUCE" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/modules/JUCE" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../JUCE" vcs="Git" />
   </component>

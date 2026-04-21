@@ -54,12 +54,20 @@ void TrackControls::trackAudioControls() {
     }ImGui::EndTable();
 
     if (ImGui::TableNextColumn()) {
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5,12));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        auto muted = ArrangerManager::instance().getTrack(m_index)->muted;
+        auto soloed = ArrangerManager::instance().getTrack(m_index)->solo;
+        if (muted) ImGui::PushStyleColor(ImGuiCol_Button, Theme::cTheme.accent);
         if (ImGui::Button("mute")) {
             ArrangerManager::instance().getTrack(m_index)->muted = !ArrangerManager::instance().getTrack(m_index)->muted;
         }
-
+        if (muted) ImGui::PopStyleColor();
+        if (soloed) ImGui::PushStyleColor(ImGuiCol_Button, Theme::cTheme.accent);
         if (ImGui::Button("solo")) {
             ArrangerManager::instance().toggleTrackSolo(m_index);
         }
+        if (soloed) ImGui::PopStyleColor();
+        ImGui::PopStyleVar(2);
     }
 }

@@ -3,28 +3,32 @@
 #include "../../Singletons/ViewState.h"
 #include "../../SetupAssets.h"
 #include "ToolbarGroup.h"
-
+#include "../../Theme.h"
 namespace ToolbarGroups {
 
     inline ToolbarGroup pianoRollTools() {
         return {
             "piano_roll_tools",
             [](bool) {
+
+                auto tool = ToolManager::instance().getActiveNoteTool();
+                if (tool == EDIT) ImGui::PushStyleColor(ImGuiCol_Button, Theme::cTheme.accent);
                 if (ImGui::ImageButton("edit_button",
                     (void*)(intptr_t)ASSETS.editIcon.textureID, ImVec2(32,32)))
                     ToolManager::instance().setPianoRollTool(EDIT);
+                if (tool == EDIT) ImGui::PopStyleColor();
                 ImGui::SameLine();
-
+                if (tool == SELECT) ImGui::PushStyleColor(ImGuiCol_Button, Theme::cTheme.accent);
                 if (ImGui::ImageButton("box_select",
                     (void*)(intptr_t)ASSETS.boxSelect.textureID, ImVec2(32,32)))
                     ToolManager::instance().setPianoRollTool(SELECT);
                 ImGui::SameLine();
-
+                if (tool == SELECT) ImGui::PopStyleColor();
                 if (ImGui::ImageButton("delete_button",
                     (void*)(intptr_t)ASSETS.deleteIcon.textureID, ImVec2(32,32)))
                     ToolManager::instance().setPianoRollTool(DELETE);
                 ImGui::SameLine();
-
+                /* Todo: implement these tools
                 if (ImGui::ImageButton("move_tool",
                     (void*)(intptr_t)ASSETS.moveIcon.textureID, ImVec2(32,32)))
                     ToolManager::instance().setPianoRollTool(MOVE);
@@ -33,6 +37,7 @@ namespace ToolbarGroups {
                 if (ImGui::ImageButton("cut_button",
                     (void*)(intptr_t)ASSETS.cutIcon.textureID, ImVec2(32,32)))
                     ToolManager::instance().setPianoRollTool(SNIP);
+                */
             }
         };
     }

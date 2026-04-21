@@ -39,7 +39,6 @@ public:
             m_events = EventCompiler::compilePattern(
                 *PatternManager::instance().getCurrentPattern());
         } else {
-            std::cout << "Arranger playing" <<std::endl;
             m_events = EventCompiler::compileArranger();
         }
         if (m_events.empty()) return;
@@ -94,6 +93,7 @@ public:
         }
     }
 
+
     void sendEvent(const ScheduledEvent event) {
         m_audio.addMidiMessage(event);
         if (m_midiOut) m_midiOut->sendMessageNow(event.message);
@@ -107,7 +107,8 @@ private:
         activePlayheadMs() = juce::Time::getMillisecondCounterHiRes() - m_wallClockStart;
 
         while (m_eventIndex < m_events.size() &&
-               m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs())
+               m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs() &&
+               m_events[m_eventIndex].absoluteTimeMs >= activePlayheadMs()-playbackBuffer)
         {
             sendEvent(m_events[m_eventIndex]);
             ++m_eventIndex;
@@ -125,6 +126,8 @@ private:
 
         }
     }
+
+    double playbackBuffer{20};
 
 
 
