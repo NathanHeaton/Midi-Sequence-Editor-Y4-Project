@@ -14,9 +14,7 @@ set(CMAKE_JOB_POOL_COMPILE compile)
 
 
 # Add JUCE
-set(JUCE_DIR "../../JUCE/install/lib/cmake/JUCE-8.0.10")
-
-find_package(JUCE CONFIG REQUIRED)
+add_subdirectory(JUCE)
 
 # Build ImGui library with OpenGL3 backend
 add_library(imgui STATIC
