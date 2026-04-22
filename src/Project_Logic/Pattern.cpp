@@ -57,14 +57,15 @@ void Pattern::createNoteEventPairs(){
         }
     }
     rebuildNoteIndices();
-
-    m_pitchRange = {};
     for (const auto& pair : m_noteEvents) {
         uint8_t pitch = getMidiEventByID_ptr(pair.onID)->getPitch();
         m_pitchRange.lowest  = std::min(m_pitchRange.lowest,  pitch);
         m_pitchRange.highest = std::max(m_pitchRange.highest, pitch);
     }
+    m_pitchRange = {};
 }
+
+
 
 void Pattern::convertMidiTicksToPPQ() {
     for (auto& event : m_events) {
@@ -156,6 +157,8 @@ void Pattern::timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32
     }
     m_noteEvents.clear();
     createNoteEventPairs();
+
+    overlapValidate();
 }
 
 
@@ -219,12 +222,30 @@ uint32_t Pattern::calculateDelta(size_t insertionIndex, uint32_t absoluteTime) c
 // Inserts a MidiEvent at the correct position in m_events based on its absolute time,
 // adjusting surrounding deltas to keep the sequence consistent.
 void Pattern::insertEvent(MidiEvent& event, uint32_t absoluteTime) {
+    //absoluteTime = adjustTimeIfNeeded(event, absoluteTime);
     size_t index    = findInsertionPoint(absoluteTime);
     uint32_t delta  = calculateDelta(index, absoluteTime);
     event.setDelta(delta);
     event.m_absoluteTime = absoluteTime;
     m_events.insert(m_events.begin() + index, event);
+
     updateBarCount(absoluteTime);
+}
+
+uint32_t Pattern::adjustTimeIfNeeded(MidiEvent& event, uint32_t absoluteTime) {
+    for (auto& pair : m_noteEvents) {
+        auto eventOnCheck = getMidiEventByIDLinearSearch_ptr(pair.onID);
+        if (eventOnCheck->getPitch() != event.getPitch()) {continue;}
+        auto eventOffCheck = getMidiEventByIDLinearSearch_ptr(pair.offID);
+        if (absoluteTime > eventOnCheck->getAbsoluteTime() &&
+            absoluteTime < eventOffCheck->getAbsoluteTime())
+        {
+            if (event.isNoteOn()) {absoluteTime = eventOffCheck->getAbsoluteTime(); }
+            else if (event.isNoteOff()) {absoluteTime = eventOnCheck->getAbsoluteTime();}
+        }
+    }
+
+    return absoluteTime;
 }
 
 void Pattern::setNoteVelocity(NoteEventPair notePair, uint8_t velocity) {
@@ -263,14 +284,17 @@ void Pattern::addNote(uint8_t t_pitch, uint32_t absoluteTime, uint32_t duration)
 
     MidiEvent noteOn(0, 0x90, Note{t_pitch, velocity}, channel);
     noteOn.setID(assignID());
-    insertEvent(noteOn, absoluteTime);
 
     MidiEvent noteOff(0, 0x80, Note{t_pitch, velocity}, channel);
     noteOff.setID(assignID());
+
+    insertEvent(noteOn, absoluteTime);
     insertEvent(noteOff, offAbsoluteTime);
 
     m_noteEvents.clear();
     createNoteEventPairs();
+
+    overlapValidate();
 }
 
 
@@ -324,6 +348,8 @@ void Pattern::pasteClipboard(std::vector<MidiEvent>& copied_events, NoteMoveDelt
     }
     m_noteEvents.clear();
     createNoteEventPairs();
+
+    overlapValidate();
 }
 
 void Pattern::hideNoteEvent(NoteCoordinate coordinate)
@@ -364,6 +390,8 @@ void Pattern::moveNoteEvent(uint32_t ID, NoteCoordinate pos)
     m_noteEvents.clear();
     createNoteEventPairs();
 
+    overlapValidate();
+
 }
 void Pattern::updateBarCount(uint32_t endAbsolute) {
     if (endAbsolute >= (barSizeTicks * m_bars)) {
@@ -391,6 +419,9 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
 
     removeNoteOperation(notePair);
 
+    m_noteEvents.clear();
+    createNoteEventPairs();
+
     insertEvent(movedOnEvent, movedOnEvent.getAbsoluteTime());
     if (movedOnEvent.getAbsoluteTime() >= movedOffEvent.getAbsoluteTime() + newEndDelta) {
         insertEvent(movedOffEvent, movedOnEvent.getAbsoluteTime() + ViewState::instance().getStandardSnapTime());
@@ -398,6 +429,7 @@ void Pattern::stretchNoteEvent(uint32_t ID, int32_t newEndDelta) {
     else{insertEvent(movedOffEvent, movedOffEvent.getAbsoluteTime() + newEndDelta);}
     m_noteEvents.clear();
     createNoteEventPairs();
+    overlapValidate();
 }
 
 void Pattern::scaleNoteEventSelection(float scale) {

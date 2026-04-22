@@ -82,7 +82,7 @@ public:
     void scaleNoteEventSelection(float scale);
     void removeNoteOperation(NoteEventPair notepair);
     void timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs);
-
+    uint32_t adjustTimeIfNeeded(MidiEvent& event, uint32_t absoluteTime);
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
 
     void calculateSelection(const SelectionCoords &t_selection);
@@ -151,6 +151,13 @@ public:
         return &m_events[i->second];
     }
 
+    [[nodiscard]] MidiEvent *getMidiEventByIDLinearSearch_ptr(uint32_t ID) {
+        for (auto& n :m_events) {
+            if (n.getID() == ID) return &n;
+        }
+        return nullptr;
+    }
+
     [[nodiscard]] size_t getEventIndexByID(uint32_t ID) const{
         for (auto i{0u}; i < m_events.size(); ++i ) {
             if (m_events.at(i).getID() == ID) {
@@ -164,29 +171,29 @@ public:
 
     [[nodiscard]] const NoteEventPair* getEventIDPairFromOnID(uint32_t ID) const{
         auto i = m_noteEventsIndex.find(ID);
+
         if (i == m_noteEventsIndex.end()) {return nullptr;}
         return &m_noteEvents[i->second];
     }
 
-    void printEvents() {
-        printf("Events ==========\n");
-        int count{0};
-        for (auto event : m_events) {
-            printf("Note index %d =======\n", count);
-            if (event.isNoteOff()) {
-                printf("note is note off\n");
-                printf("pitch %d\n",event.getPitch());
-            }
-            else if (event.isNoteOn()) {
-                printf("note is note on\n");
-                printf("pitch %d\n",event.getPitch());
-            }
-            else {
-                printf("note is other\n");
-            }
-            count++;
-        }
+    [[nodiscard]] const NoteEventPair* getEventIDPairFromOffID(uint32_t ID) const{
+        auto i = m_noteEventsIndex.find(ID);
+        if (i == m_noteEventsIndex.end()) {return nullptr;}
+        return &m_noteEvents[i->second];
     }
+
+    // struct noteOverlap {
+    //     bool overlap() {return fixedOff && fixedOn;}
+    //     bool fixedOff{false};
+    //     bool fixedOn{false};
+    //     bool active{false};
+    //     uint32_t offID;
+    //     uint32_t onID;
+    //     void reset() {fixedOff = false;fixedOn = false;active = false;}
+    //     void setNote(uint32_t on,uint32_t off) {onID = on;offID = off;active = true;}
+    // };
+
+    //noteOverlap lastNoteOverlap;
 
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
@@ -199,6 +206,40 @@ public:
         }
         std::cout << "NoteEventPairs not found" << std::endl;
         return NoteEventPair(SIZE_MAX,SIZE_MAX);
+    }
+
+    void overlapValidate() {
+        bool foundOverlap = true;
+        while (foundOverlap) {
+            foundOverlap = false;
+            for (size_t i = 0; i < m_noteEvents.size(); i++) {
+                auto& pairA = m_noteEvents[i];
+                auto* onA  = getMidiEventByID_ptr(pairA.onID);
+                auto* offA = getMidiEventByID_ptr(pairA.offID);
+                if (!onA || !offA) continue;
+
+                for (size_t j = 0; j < m_noteEvents.size(); j++) {
+                    if (i == j) continue;
+                    auto& pairB = m_noteEvents[j];
+                    auto* onB  = getMidiEventByID_ptr(pairB.onID);
+                    auto* offB = getMidiEventByID_ptr(pairB.offID);
+                    if (!onB || !offB) continue;
+                    if (onA->getPitch() != onB->getPitch()) continue;
+
+                    uint32_t startA = onA->getAbsoluteTime();
+                    uint32_t startB = onB->getAbsoluteTime();
+                    uint32_t endB   = offB->getAbsoluteTime();
+
+                    if (startA > startB && startA < endB) {
+                        int32_t delta = static_cast<int32_t>(startA) - static_cast<int32_t>(endB);
+                        stretchNoteEvent(pairB.onID, delta);
+                        foundOverlap = true;
+                        goto next_pass;
+                    }
+                }
+            }
+            next_pass:;
+        }
     }
 
 

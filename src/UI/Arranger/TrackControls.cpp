@@ -8,7 +8,7 @@
 void TrackControls::openAudioPicker() {
     juce::File initalDir = juce::File::getCurrentWorkingDirectory();
     auto chooser = std::make_shared<juce::FileChooser>
-    ("choose a .WAV or .AIFF file",initalDir ,"*.WAV;*");
+    ("choose a .WAV or .AIFF file",initalDir ,"*.wav;*.aif;*.aiff;*.mp3;*.flac;*.ogg" );
     chooser->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
         [this, chooser](const juce::FileChooser& fc)
         {
@@ -17,6 +17,7 @@ void TrackControls::openAudioPicker() {
             {
                 DBG("Async selected file: " + chosen.getFullPathName());
                 PlayBackManager::instance().addSoundFile(chosen);
+                ArrangerManager::instance().getTrack(m_index)->instrumentID = PlayBackManager::instance().getInstruments()->back()->ID;
             }
         });
 }

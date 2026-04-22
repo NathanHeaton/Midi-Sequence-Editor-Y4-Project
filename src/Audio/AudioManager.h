@@ -62,19 +62,16 @@ public:
             InstrumentList.back()->synth->addVoice(new SineWaveVoice());
         }
 
-        // for testing ============
-        InstrumentList.push_back(std::make_unique<Instruments>(assignInstrumentId(),
-                    "sineWave2",8));
+        createAudioDir();
+        juce::File soundsDir = juce::File::getCurrentWorkingDirectory().getChildFile("sounds");
 
-        currentSampleRate = sampleRate;
-        InstrumentList.back()->synth->setCurrentPlaybackSampleRate(currentSampleRate);
-        InstrumentList.back()->synth->addSound(new SineWaveSound());
-
-        for (int i = 0; i < 8; i++) {
-            InstrumentList.back()->synth->addVoice(new SineWaveVoice());
+        juce::Array<juce::File> files;
+        soundsDir.findChildFiles(files,juce::File::findFiles ,false, "*.wav;*.aif;*.aiff;*.mp3;*.flac;*.ogg");
+        for (auto& file : files) {
+            loadSample(file);
         }
-
     }
+
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
 
@@ -86,23 +83,33 @@ public:
 
     }
 
+    std::unordered_set<juce::String> usedNames;
     void loadSample(const juce::File& audioFile) {
+        juce::String name = audioFile.getFileNameWithoutExtension();
+        if (usedNames.find(name)!=usedNames.end()) {
+            name = name + "_" + std::to_string(InstrumentList.size());
+        }
+        usedNames.insert(name);
         InstrumentList.push_back(std::make_unique<Instruments>(assignInstrumentId(),
-            audioFile.getFileName().toStdString(),8));
+            name.toStdString(),8));
 
         for (int i = 0; i < 8; i++)
             InstrumentList.back()->synth->addVoice(new juce::SamplerVoice());
 
+        juce::File copyPlace("sounds/" + name);
+        audioFile.copyFileTo(copyPlace);
         juce::AudioFormatManager formatManager;
+
         formatManager.registerBasicFormats();
 
         auto* reader = formatManager.createReaderFor(audioFile);
+
         if (reader) {
             juce::BigInteger allNotes;
             allNotes.setRange(0, 128, true);
 
             InstrumentList.back()->synth->addSound(new juce::SamplerSound(
-                audioFile.getFileName(),
+                name,
                 *reader,
                 allNotes,
                 60,
@@ -142,5 +149,11 @@ private:
 
     uint32_t m_nextInstrumentId{0};
     uint32_t assignInstrumentId() { return m_nextInstrumentId++; }
+
+    void createAudioDir() {
+        juce::File soundsDir = juce::File::getCurrentWorkingDirectory().getChildFile("sounds");
+        if (!soundsDir.exists())
+            soundsDir.createDirectory();
+    }
 
 };
