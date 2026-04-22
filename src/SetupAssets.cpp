@@ -47,6 +47,8 @@ void AssetManager::LoadAll() {
     zoomOut = loadTextureFromFile("assets/icons/zoom_out.png");
     moveIcon = loadTextureFromFile("assets/icons/move.png");
     deleteIcon = loadTextureFromFile("assets/icons/delete.png");
+    seekStart = loadTextureFromFile("assets/icons/seek_start.png");
+    seekEnd = loadTextureFromFile("assets/icons/seek_end.png");
 }
 
 void AssetManager::Cleanup() {
@@ -61,5 +63,7 @@ void AssetManager::Cleanup() {
     glDeleteTextures(1, &deleteIcon.textureID);
     glDeleteTextures(1, &editIcon.textureID);
     glDeleteTextures(1, &cutIcon.textureID);
+    glDeleteTextures(1, &seekStart.textureID);
+    glDeleteTextures(1, &seekEnd.textureID);
 
 }

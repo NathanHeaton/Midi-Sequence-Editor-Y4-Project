@@ -44,6 +44,10 @@ namespace ToolbarGroups {
 
     PlayBack playback(bool isArranger, uint32_t ID);
 
+    PlayBack seekStart(bool isArranger, uint32_t ID);
+
+    PlayBack seekEnd(bool isArranger, uint32_t ID);
+
     inline ToolbarGroup arrangerTools() {
         return {
             "arranger_tools",

@@ -34,6 +34,7 @@ public:
     void setPlayingPtr(bool* ptr) { m_playingPtr = ptr; }
 
     void play(PlaybackSource source) {
+        m_notesCleared = false;
         m_activeSource = source;
         if (source == PlaybackSource::PianoRoll) {
             m_events = EventCompiler::compilePattern(
@@ -74,7 +75,6 @@ public:
         return m_arrangerPlayheadMs / TimeData::instance().msPerTick();
     }
 
-
     // Seek the active source to a tick position
     void seekToTicks(uint32_t ticks) {
         activePlayheadMs() = ticks * TimeData::instance().msPerTick();
@@ -106,11 +106,13 @@ private:
     void timerCallback() override {
         activePlayheadMs() = juce::Time::getMillisecondCounterHiRes() - m_wallClockStart;
 
-        while (m_eventIndex < m_events.size() &&
-               m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs() &&
-               m_events[m_eventIndex].absoluteTimeMs >= activePlayheadMs()-playbackBuffer)
+        while (m_eventIndex < m_events.size() && m_events[m_eventIndex].absoluteTimeMs <= activePlayheadMs() )
         {
-            sendEvent(m_events[m_eventIndex]);
+            if (m_events[m_eventIndex].absoluteTimeMs >= activePlayheadMs()-playbackBuffer)
+            {
+                sendEvent(m_events[m_eventIndex]);
+            }
+
             ++m_eventIndex;
         }
 
@@ -125,13 +127,15 @@ private:
             else {if (m_playingPtr) *m_playingPtr = false;}
 
         }
+
     }
 
     double playbackBuffer{20};
 
-
+    bool m_notesCleared{false};
 
     void allNotesOff() {
+        if (m_notesCleared) return;
         for (uint8_t ch = 1; ch < 16; ch++) {
             auto msg = juce::MidiMessage::allNotesOff(ch);
             for (auto i{0u}; i < ArrangerManager::instance().getTrackAmount(); i++){
@@ -140,6 +144,7 @@ private:
             }
             if (m_midiOut) m_midiOut->sendMessageNow(msg);
         }
+        m_notesCleared = true;
     }
 
     size_t firstEventAtOrAfter(double ms) const {

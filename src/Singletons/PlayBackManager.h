@@ -40,7 +40,7 @@ public:
         }
     }
 
-    void stop() {
+    void pause() {
         m_playing = false;
         player.stop();
     }

@@ -9,13 +9,13 @@ public:
         m_groups.push_back(std::move(group));
     }
 
+
     void addPlayBackButton(PlayBack playBack) {
-        m_playBackActive = true;
-        m_playBack = playBack;
+        m_playbackGroups.push_back(std::move(playBack));
     }
     void create() {
 
-        int cols = m_playBackActive ? m_groups.size() + 1 : m_groups.size();
+        int cols =m_playbackGroups.size() + m_groups.size();
         ImGui::BeginTable("toolList", cols,
             ImGuiTableFlags_SizingFixedFit, ImVec2(0, 32));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,ImVec2(0,0));
@@ -24,9 +24,9 @@ public:
             ImGui::TableNextColumn();
                 group.render(true);
         }
-        if (m_playBackActive) {
+        for (auto& group : m_playbackGroups) {
             ImGui::TableNextColumn();
-            m_playBack.renderP(true,0);
+            group.renderP(true,0);
         }
         ImGui::PopStyleVar(2);
         ImGui::EndTable();
@@ -35,6 +35,6 @@ public:
 
 private:
     std::vector<ToolbarGroup> m_groups;
-    bool m_playBackActive = false;
-    PlayBack m_playBack;
+    std::vector<PlayBack>  m_playbackGroups;
+
 };

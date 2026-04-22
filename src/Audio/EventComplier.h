@@ -54,6 +54,7 @@ public:
         std::vector<ScheduledEvent> out;
         const double mpt   = TimeData::instance().msPerTick();
         const auto*  clips = ArrangerManager::instance().getPatternClips();
+        std::cout<<"compiling"<<std::endl;
         for (const auto& clip : *clips) {
             if (!clip.enabled) continue;
             const Pattern* pat = PatternManager::instance().getPatternByID(clip.patternID);

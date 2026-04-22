@@ -20,7 +20,9 @@ public:
     size_t selectedPattern{0};
     ControlComponent() {
         PatternManager::instance().addPattern();
+        playbackButtons.addPlayBackButton(ToolbarGroups::seekStart(true, 0));
         playbackButtons.addPlayBackButton(ToolbarGroups::playback(true, 0));
+        playbackButtons.addPlayBackButton(ToolbarGroups::seekEnd(true, 0));
     };
     float controlPanelHeight{80.0f};
     void ControlPanel() {

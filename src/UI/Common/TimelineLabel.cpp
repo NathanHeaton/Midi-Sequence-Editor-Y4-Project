@@ -59,7 +59,7 @@ void TimelineLabel::HandleMouse() {
     auto mousePos = ImGui::GetMousePos();
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
-        PlayBackManager::instance().stop();
+        PlayBackManager::instance().pause();
         unsigned int ticks = TimeData::instance().PPQ *
             ((mousePos.x - cursorPos.x) / ViewState::instance().getPixelPerBeat(m_zoomFactor));
         PlayBackManager::instance().seekToTicks(ticks, m_isArranger);
