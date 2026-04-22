@@ -17,15 +17,15 @@ public:
     IconTexture deleteIcon;
     IconTexture muteIcon;
     IconTexture soloIcon;
-    IconTexture instrumentIcon;
     IconTexture divisionSnapIcon;
     IconTexture snipIcon;
-    IconTexture saveIcon;
     IconTexture zoomIn;
     IconTexture zoomOut;
     IconTexture editIcon;
     IconTexture cutIcon;
     IconTexture moveIcon;
+    IconTexture seekStart;
+    IconTexture seekEnd;
 
 
     IconTexture boxSelect;

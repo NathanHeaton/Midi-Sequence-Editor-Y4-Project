@@ -81,9 +81,10 @@ public:
         ImGui::PushFont(Theme::textMedium);
         if (ImGui::Button("New Pattern")) {
             PatternManager::instance().addPattern();
+            PatternManager::instance().setCurrentPattern(patterns.size() - 1);
         }
         if (ImGui::BeginCombo("##pattern select",
-            patterns.at(selectedPattern).m_title.c_str()))
+            PatternManager::instance().getCurrentPattern()->m_title.c_str()))
         {
             for (size_t i{0}; i < patterns.size(); i++) {
                 bool is_selected = (selectedPattern == i);

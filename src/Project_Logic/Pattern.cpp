@@ -57,15 +57,18 @@ void Pattern::createNoteEventPairs(){
         }
     }
     rebuildNoteIndices();
+    updatePitchRange();
+}
+
+void Pattern::updatePitchRange()
+{
+    m_pitchRange = {};
     for (const auto& pair : m_noteEvents) {
         uint8_t pitch = getMidiEventByID_ptr(pair.onID)->getPitch();
         m_pitchRange.lowest  = std::min(m_pitchRange.lowest,  pitch);
         m_pitchRange.highest = std::max(m_pitchRange.highest, pitch);
     }
-    m_pitchRange = {};
 }
-
-
 
 void Pattern::convertMidiTicksToPPQ() {
     for (auto& event : m_events) {
@@ -309,6 +312,8 @@ void Pattern::pitchShiftSelection(signed short t_pitchDelta) {
             }
         }
     }
+    updatePitchRange();
+    overlapValidate();
 }
 
 

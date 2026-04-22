@@ -138,7 +138,7 @@ namespace Theme
         auto* s = &ImGui::GetStyle();
 
         s->WindowPadding     = ImVec2(8, 8);
-        s->FramePadding      = ImVec2(4, 4);
+        s->FramePadding      = ImVec2(12, 8);
         s->ItemSpacing       = ImVec2(4, 4);
         s->ItemInnerSpacing  = ImVec2(2, 2);
         s->ScrollbarSize     = 20.0f;

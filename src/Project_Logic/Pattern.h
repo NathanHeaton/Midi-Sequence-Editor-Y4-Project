@@ -102,6 +102,7 @@ public:
     void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteOnIDs.clear();}
 
+    void updatePitchRange();
     void hideNoteByID(uint32_t ID) {m_hiddenNoteOnIDs.insert(ID);}
     void clearPattern(){
         m_events.clear();
