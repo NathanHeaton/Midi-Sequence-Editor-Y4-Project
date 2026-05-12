@@ -185,10 +185,15 @@ void Pattern::moveNoteEventSelection(NoteMoveDelta delta) {
     auto pairs = convertNoteIdsToNotePair();
     executeOperation(pairs, [&](MidiEvent& on, MidiEvent& off) {
         if (static_cast<int32_t>(on.getAbsoluteTime()) + delta.timeDelta < 0) return;
+        std::cout<<on.getAbsoluteTime()<< " : " << off.getAbsoluteTime() << "time pre change"<<std::endl;
         on.setAbsoluteTime(on.getAbsoluteTime()   + delta.timeDelta);
         off.setAbsoluteTime(off.getAbsoluteTime() + delta.timeDelta);
+
+        std::cout<<on.getPitch()<< " : " << off.getPitch() << "pitch pre change"<<std::endl;
         on.setPitch( std::clamp(on.getPitch()  + delta.pitchD, 0, 127));
         off.setPitch(std::clamp(off.getPitch() + delta.pitchD, 0, 127));
+
+
     });
     m_selectedNoteOnIDs.clear();
     std::cout<<"ended move selection"<<std::endl;

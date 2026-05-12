@@ -63,7 +63,7 @@ public:
         }
 
         createAudioDir();
-        juce::File soundsDir = juce::File::getCurrentWorkingDirectory().getChildFile("sounds");
+        juce::File soundsDir = juce::File::getCurrentWorkingDirectory().getChildFile("/sounds");
 
         juce::Array<juce::File> files;
         soundsDir.findChildFiles(files,juce::File::findFiles ,false, "*.wav;*.aif;*.aiff;*.mp3;*.flac;*.ogg");

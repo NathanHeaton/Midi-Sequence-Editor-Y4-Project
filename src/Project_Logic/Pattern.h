@@ -214,13 +214,13 @@ public:
 
         std::vector<std::pair<MidiEvent, MidiEvent>> snapshots;
         snapshots.reserve(pairs.size());
-
         for (auto& pair : pairs) {
             snapshots.emplace_back(*getMidiEventByID_ptr(pair.onID),
                                    *getMidiEventByID_ptr(pair.offID));
+        }
+        for (auto& pair : pairs) {
             removeNoteOperation(pair);
         }
-
         m_noteEvents.clear();
         createNoteEventPairs();
 
@@ -252,9 +252,9 @@ public:
             foundOverlap = false;
             for (auto onId: m_previousOperationsOnNoteIDs) {
                 auto pairA = getEventIDPairFromOnID(onId);
+                if (pairA == nullptr) {std::cout<<"NoteEventPairs not found"<<std::endl; continue;}
                 auto* onA  = getMidiEventByID_ptr(pairA->onID);
                 auto* offA = getMidiEventByID_ptr(pairA->offID);
-                if (!onA || !offA) continue;
                 continue;// for test
                 for (size_t j = 0; j < m_noteEvents.size(); j++) {
                     //if (i == j) continue;
