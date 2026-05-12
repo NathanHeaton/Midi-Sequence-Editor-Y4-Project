@@ -13,6 +13,10 @@ class NotePreview : public juce::Timer
 public:
     NotePreview() = default;
 
+    void shutdown() {
+        stopTimer();
+    }
+
     void start(size_t t,uint8_t p) {
         if (isTimerRunning()){
             sendNoteOff();

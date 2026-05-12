@@ -1,9 +1,7 @@
 //
 // Created by nathan on 04/01/2026.
 //
-
-#ifndef MYPROJECT_PATTERN_H
-#define MYPROJECT_PATTERN_H
+#pragma once
 
 #include <functional>
 #include <iostream>
@@ -38,6 +36,7 @@ struct PitchRange {
 };
 
 
+
 class Pattern {
 public:
     PitchRange m_pitchRange;
@@ -52,11 +51,13 @@ public:
 
     std::vector<NoteEventPair> m_noteEvents;
     std::unordered_map<uint32_t, size_t> m_noteEventsIndex;
+
     int ticksInMidiFile{0};
     int m_bars{1};
 
     std::unordered_set<uint32_t> m_selectedNoteOnIDs;
     std::unordered_set<uint32_t> m_hiddenNoteOnIDs;
+    std::unordered_set<uint32_t> m_previousOperationsOnNoteIDs;
 
     Pattern(std::string t_title) {
         m_events.reserve(512);
@@ -72,6 +73,7 @@ public:
             setLastBar();
         }
     }
+
     void createNoteEventPairs();
     void convertMidiTicksToPPQ();
     void setLastBar();
@@ -84,6 +86,8 @@ public:
     void timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs);
     uint32_t adjustTimeIfNeeded(MidiEvent& event, uint32_t absoluteTime);
     uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
+
+
 
     void calculateSelection(const SelectionCoords &t_selection);
     void pitchShiftSelection(signed short t_pitchDelta);
@@ -127,6 +131,7 @@ public:
             m_noteEventsIndex[m_noteEvents[i].onID] = i;
         }
     }
+
     // coverts selected on note ids into note events pairs
     [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {
         std::vector<NoteEventPair> events;
@@ -183,19 +188,6 @@ public:
         return &m_noteEvents[i->second];
     }
 
-    // struct noteOverlap {
-    //     bool overlap() {return fixedOff && fixedOn;}
-    //     bool fixedOff{false};
-    //     bool fixedOn{false};
-    //     bool active{false};
-    //     uint32_t offID;
-    //     uint32_t onID;
-    //     void reset() {fixedOff = false;fixedOn = false;active = false;}
-    //     void setNote(uint32_t on,uint32_t off) {onID = on;offID = off;active = true;}
-    // };
-
-    //noteOverlap lastNoteOverlap;
-
     void addNoteSelection(std::vector<MidiEvent> t_events) {
         m_events.insert(m_events.end(), t_events.begin(), t_events.end());
     }
@@ -208,19 +200,64 @@ public:
         std::cout << "NoteEventPairs not found" << std::endl;
         return NoteEventPair(SIZE_MAX,SIZE_MAX);
     }
+    // ============================================================
+    //  Core operation executor
+    // ============================================================
+
+    // Snapshots the given pairs, removes them, applies a caller-supplied
+    // transform to each (on, off) pair, then re-inserts and validates.
+    // All note-mutating operations should go through here.
+    template<typename Transform>
+    void executeOperation(std::vector<NoteEventPair> pairs, Transform transform) {
+        std::cout<<"begun operation"<<std::endl;
+        m_previousOperationsOnNoteIDs.clear();
+
+        std::vector<std::pair<MidiEvent, MidiEvent>> snapshots;
+        snapshots.reserve(pairs.size());
+
+        for (auto& pair : pairs) {
+            snapshots.emplace_back(*getMidiEventByID_ptr(pair.onID),
+                                   *getMidiEventByID_ptr(pair.offID));
+            removeNoteOperation(pair);
+        }
+
+        m_noteEvents.clear();
+        createNoteEventPairs();
+
+        for (auto& [on, off] : snapshots) {
+            transform(on, off);
+            insertEvent(on,  on.getAbsoluteTime());
+            insertEvent(off, off.getAbsoluteTime());
+            m_previousOperationsOnNoteIDs.insert(on.getID());
+        }
+
+        m_noteEvents.clear();
+        createNoteEventPairs();
+        overlapValidate();
+        std::cout<<"ended operation"<<std::endl;
+    }
+
+
+    // ============================================================
+    //  Overlap validation
+    // ============================================================
+
+    // After any mutation, truncates earlier notes that overlap with
+    // newly inserted ones. Loops until the pattern is stable.
 
     void overlapValidate() {
+        std::cout << "Overlap validation begin" << std::endl;
         bool foundOverlap = true;
         while (foundOverlap) {
             foundOverlap = false;
-            for (size_t i = 0; i < m_noteEvents.size(); i++) {
-                auto& pairA = m_noteEvents[i];
-                auto* onA  = getMidiEventByID_ptr(pairA.onID);
-                auto* offA = getMidiEventByID_ptr(pairA.offID);
+            for (auto onId: m_previousOperationsOnNoteIDs) {
+                auto pairA = getEventIDPairFromOnID(onId);
+                auto* onA  = getMidiEventByID_ptr(pairA->onID);
+                auto* offA = getMidiEventByID_ptr(pairA->offID);
                 if (!onA || !offA) continue;
-
+                continue;// for test
                 for (size_t j = 0; j < m_noteEvents.size(); j++) {
-                    if (i == j) continue;
+                    //if (i == j) continue;
                     auto& pairB = m_noteEvents[j];
                     auto* onB  = getMidiEventByID_ptr(pairB.onID);
                     auto* offB = getMidiEventByID_ptr(pairB.offID);
@@ -241,8 +278,7 @@ public:
             }
             next_pass:;
         }
+        m_previousOperationsOnNoteIDs.clear();
     }
 
-
 };
-#endif //MYPROJECT_PATTERN_H

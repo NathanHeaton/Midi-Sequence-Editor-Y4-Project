@@ -65,6 +65,7 @@ public:
 
     void shutDown() {
         m_audioManager.shutdownAudio();
+        notePreviewTimeout.shutdown();
         player.cleanUp();
     }
 
