@@ -10,7 +10,7 @@ struct ScheduledEvent {
     double absoluteTimeMs{0.0};
     juce::MidiMessage message;
     bool operator<(const ScheduledEvent& o) const { return absoluteTimeMs < o.absoluteTimeMs; }
-    uint trackIndex{0};
+    unsigned int trackIndex{0};
 };
 
 class EventCompiler {

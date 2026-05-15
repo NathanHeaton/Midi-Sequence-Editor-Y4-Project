@@ -203,7 +203,7 @@ private:
 
     std::vector<MidiEvent> clipBoard;
     std::vector<Pattern>   pattern{};
-    u_int unnamedPatterns = 0;
+    unsigned int unnamedPatterns = 0;
     size_t activePatternIndex = 0;
     uint32_t activePatternId = 0;
 

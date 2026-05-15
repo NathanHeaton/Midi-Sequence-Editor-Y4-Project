@@ -13,16 +13,16 @@ public:
 
     class TimeSignature {
     public:
-        TimeSignature(uint n, uint d) : numerator(n), denominator(d) {}
-        void change(uint n, uint d) {
+        TimeSignature(uint8_t n, uint8_t d) : numerator(n), denominator(d) {}
+        void change(uint8_t n, uint8_t d) {
             numerator = n;
             denominator = d;
         }
-        uint getNumerator() const { return numerator; }
-        uint getDenominator() const { return denominator; }
+        [[nodiscard]] uint8_t getNumerator() const { return numerator; }
+        [[nodiscard]] uint8_t getDenominator() const { return denominator; }
     private:
-        uint numerator;
-        uint denominator;
+        uint8_t numerator;
+        uint8_t denominator;
     };
     [[nodiscard]] double getBPM() const { return BPM;}
 
@@ -30,7 +30,7 @@ public:
     void setBPM(int newBPM) {BPM = newBPM;}
     TimeSignature timeSignature{4, 4};
 
-    double msPerTick() {
+    [[nodiscard]] double msPerTick() const {
         return 60000.0 / (BPM * static_cast<double>(PPQ));
     }
 

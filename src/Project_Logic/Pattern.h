@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include "../Singletons/TimeData.h"
@@ -84,8 +85,7 @@ public:
     void scaleNoteEventSelection(float scale);
     void removeNoteOperation(NoteEventPair notepair);
     void timeShiftOperation(uint32_t t_timeDelta, std::unordered_set<uint32_t> IDs);
-    uint32_t adjustTimeIfNeeded(MidiEvent& event, uint32_t absoluteTime);
-    uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
+    [[nodiscard]] uint32_t calculateDelta(size_t insertionIndex, uint32_t absoluteTime)const;
 
 
 
@@ -103,7 +103,7 @@ public:
     void hideNoteEvent(NoteCoordinate coordinate);
     void moveNoteEvent(uint32_t ID, NoteCoordinate coordinateDelta);
 
-    void fixDeltaFromDeletedNote(NoteEventPair* pair);
+    //void fixDeltaFromDeletedNote(NoteEventPair* pair);
     void showAllNoteEvents() {m_hiddenNoteOnIDs.clear();}
 
     void updatePitchRange();
@@ -133,7 +133,7 @@ public:
     }
 
     // coverts selected on note ids into note events pairs
-    [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() {
+    [[nodiscard]] std::vector<NoteEventPair> convertNoteIdsToNotePair() const {
         std::vector<NoteEventPair> events;
         for (const auto selectionID: m_selectedNoteOnIDs) {
             for (const auto& pair: m_noteEvents) {

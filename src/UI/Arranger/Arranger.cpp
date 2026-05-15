@@ -4,7 +4,7 @@
 
 void Arranger::create() {
     if (ArrangerManager::instance().arrangerUpdated) {
-        uint totalBars = (ArrangerManager::instance().getlastClipEndTime()/static_cast<float>(TimeData::PPQ)/
+        unsigned int totalBars = (ArrangerManager::instance().getlastClipEndTime()/static_cast<float>(TimeData::PPQ)/
             static_cast<float>(TimeData::instance().timeSignature.getNumerator())) + 8;
         if (totalBars < 30) {totalBars = 30;}
         if (totalBars > ProjectData::instance().getTotalBars()) {
